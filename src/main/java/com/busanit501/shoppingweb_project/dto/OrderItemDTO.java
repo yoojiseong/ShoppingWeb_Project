@@ -19,6 +19,7 @@ public class OrderItemDTO {
     private Long productid; // camelCase
 
 
+    @Builder.Default
     private int quantity=1;
 
     @NotNull
