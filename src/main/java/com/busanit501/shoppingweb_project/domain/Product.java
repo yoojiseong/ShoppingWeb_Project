@@ -19,16 +19,16 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId; // 상품 고유 식별자 (PK)
+    private Long productId;
 
-    private String productName; // 상품 이름
+    private String productName;
 
-    private BigDecimal price; // 💾 가격 (BigDecimal)
+    private BigDecimal price;
 
-    private int stock; // 💾 재고 수량
+    private int stock;
 
-    @Enumerated(EnumType.STRING) // Enum 타입을 DB에 문자열로 저장하도록 설정 (중요!)
-    private ProductCategory productTag; // 💾 카테고리 (Enum)
+    @Enumerated(EnumType.STRING)
+    private ProductCategory productTag;
 
     public void removeStock(int quantity) {
         int restStock = this.stock - quantity;
@@ -42,21 +42,21 @@ public class Product {
         this.stock += quantity;
     }
 
-    // ✅ Review 연관 관계 설정 시작
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-    // 편의 메서드: Product에 Review를 추가
+
     public void addReview(Review review) {
         this.reviews.add(review);
         review.setProduct(this);
     }
 
-    // 편의 메서드: Product에서 Review를 제거
+
     public void removeReview(Review review) {
         this.reviews.remove(review);
         review.setProduct(null);
     }
-    // ✅ Review 연관 관계 설정 끝
+
 
 }
