@@ -1,11 +1,12 @@
 package com.busanit501.shoppingweb_project.domain; // ✅ 패키지 경로 확인
 
+import com.busanit501.shoppingweb_project.domain.enums.ProductCategory; // ✅ Enum 임포트 추가
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal; // BigDecimal 임포트
+import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -24,7 +25,11 @@ public class Product {
 
     private int stock; // 💾 재고 수량
 
-    // ✅ 재고 관리 메서드 추가 시작
+    // ✅ ProductCategory 필드 추가 시작
+    @Enumerated(EnumType.STRING) // Enum 타입을 DB에 문자열로 저장하도록 설정 (중요!)
+    private ProductCategory productTag; // 💾 카테고리 (Enum)
+    // ✅ ProductCategory 필드 추가 끝
+
     public void removeStock(int quantity) {
         int restStock = this.stock - quantity;
         if (restStock < 0) {
@@ -36,7 +41,6 @@ public class Product {
     public void addStock(int quantity) {
         this.stock += quantity;
     }
-    // ✅ 재고 관리 메서드 추가 끝
 
     // 나머지 필드와 메서드는 다음 단계에서 추가
 
