@@ -1,10 +1,11 @@
 package com.busanit501.shoppingweb_project.dto;
 
+import com.busanit501.shoppingweb_project.domain.Product;
+import java.math.BigDecimal;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -14,5 +15,14 @@ public class ProductResponseDto {
     private String productName;
     private BigDecimal price;
     private int stock;
-    // productTag 필드와 생성자는 다음 단계에서 추가
+    private String productTag;
+
+
+    public ProductResponseDto(Product product) {
+        this.productId = product.getProductId();
+        this.productName = product.getProductName();
+        this.price = product.getPrice();
+        this.stock = product.getStock();
+        this.productTag = product.getProductTag() != null ? product.getProductTag().getKoreanName() : null;
+    }
 }
