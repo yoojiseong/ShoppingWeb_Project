@@ -11,26 +11,30 @@ import java.time.LocalDateTime; // LocalDateTime 임포트
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "reviews") // DB 테이블 이름을 'reviews'로 명시
+@Table(name = "reviews")
 public class Review {
 
-    @Id // 기본 키(Primary Key)임을 명시
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ID 자동 생성 전략 (DB에 위임)
-    private Long reviewId; // 리뷰 고유 식별자 (PK)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long reviewId;
 
-    @Column(nullable = false) // 컬럼 설정: null 값 허용 안 함
-    private String reviewContent; // 리뷰 내용
+    @Column(nullable = false)
+    private String reviewContent;
 
-    @Column(nullable = false) // 컬럼 설정: null 값 허용 안 함
-    private int rating; // 별점 (1~5)
+    @Column(nullable = false)
+    private int rating;
 
-    @Column(nullable = false, updatable = false) // 컬럼 설정: null 값 허용 안 함, 업데이트 불가능
-    private LocalDateTime createdAt; // 리뷰 생성 시간
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     // Product와의 연관 관계는 다음 단계에서 추가
-    // @ManyToOne
-    // private Product product;
 
-    // @PrePersist 메서드는 다음 단계에서 추가
-    // public void prePersist() { ... }
+    // ✅ 생성 시간 자동화 메서드 추가 시작
+    // 엔티티가 영속성 컨텍스트에 저장되기 전에 실행되는 콜백 메서드.
+    // 즉, DB에 INSERT 되기 직전에 createdAt 필드에 현재 시간을 자동으로 설정.
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+    // ✅ 생성 시간 자동화 메서드 추가 끝
 }
