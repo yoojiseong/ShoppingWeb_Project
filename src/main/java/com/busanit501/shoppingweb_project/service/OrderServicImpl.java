@@ -3,7 +3,10 @@ package com.busanit501.shoppingweb_project.service;
 import com.busanit501.shoppingweb_project.domain.CartItem;
 import com.busanit501.shoppingweb_project.domain.Order;
 import com.busanit501.shoppingweb_project.domain.OrderItem;
+import com.busanit501.shoppingweb_project.domain.Product;
 import com.busanit501.shoppingweb_project.repository.CartItemRepository;
+import com.busanit501.shoppingweb_project.repository.OrderRepository;
+import com.busanit501.shoppingweb_project.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,8 @@ import java.util.List;
 public class OrderServicImpl implements OrderService {
 
     private final CartItemRepository cartItemRepository;
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
 
     @Override
     public void PurchaseFromCart(Long memberId) {
@@ -36,11 +41,11 @@ public class OrderServicImpl implements OrderService {
                 .build();
 
         for(CartItem cart : cartItems){
-            Product product = productRepository.findBtId(cart.getProduct())
-                    .orElseThrow(() -> new IllegalArgumentException("상품 없음"));
+            Product product = cart.getProduct();
+
 
             OrderItem orderItem = OrderItem.builder()
-                    .productId(cart.getProductId())
+                    .productId(product.getProductId())
                     .quantity(cart.getQuantity())
                     .price(product.getPrice())
                     .build();
@@ -51,7 +56,7 @@ public class OrderServicImpl implements OrderService {
         orderRepository.save(order);
 
         // 5. 장바구니 비우기
-        cartRepository.deleteByMemberId(memberId);
+//        cartRepository.deleteByMemberId(memberId);
 
     }
 }

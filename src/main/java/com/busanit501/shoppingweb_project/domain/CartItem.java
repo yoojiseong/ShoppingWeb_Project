@@ -1,10 +1,16 @@
 package com.busanit501.shoppingweb_project.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,10 +21,20 @@ public class CartItem {
     private Long memberId;
 
     // 상품 ID
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     // 수량
     @Column(nullable = false)
     private int quantity;
+
+    public void setCartItems(Product product) {
+        this.product = product;
+
+        // 양방향이니까 Order에도 나(this)를 추가해줘야 함
+        if (!product.addCartItem().contains(this)) {
+            product.addCartItem().add(this);
+        }
+    }
 }
