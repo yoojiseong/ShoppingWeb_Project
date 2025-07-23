@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime; // LocalDateTime 임포트
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -27,14 +27,17 @@ public class Review {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // Product와의 연관 관계는 다음 단계에서 추가
+    // ✅ Product 엔티티와 연관 관계 설정 시작
+    // ManyToOne: 여러 Review가 하나의 Product에 연결될 수 있어.
+    // fetch = FetchType.LAZY: Product 정보를 즉시 가져오지 않고, 실제로 필요할 때 가져오도록 설정. 성능상 이점!
+    // @JoinColumn: 외래 키(FK) 매핑. review 테이블에 'product_id' 컬럼이 생성돼.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false) // 'product_id'라는 이름으로 외래 키 컬럼 생성, null 허용 안 함
+    private Product product; // 이 리뷰가 달린 상품 (외래 키 역할)
+    // ✅ Product 엔티티와 연관 관계 설정 끝
 
-    // ✅ 생성 시간 자동화 메서드 추가 시작
-    // 엔티티가 영속성 컨텍스트에 저장되기 전에 실행되는 콜백 메서드.
-    // 즉, DB에 INSERT 되기 직전에 createdAt 필드에 현재 시간을 자동으로 설정.
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
-    // ✅ 생성 시간 자동화 메서드 추가 끝
 }
