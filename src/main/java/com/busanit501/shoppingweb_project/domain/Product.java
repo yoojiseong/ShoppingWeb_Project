@@ -24,6 +24,20 @@ public class Product {
 
     private int stock; // 💾 재고 수량
 
+    // ✅ 재고 관리 메서드 추가 시작
+    public void removeStock(int quantity) {
+        int restStock = this.stock - quantity;
+        if (restStock < 0) {
+            throw new IllegalArgumentException("재고가 부족합니다. 현재 재고: " + this.stock);
+        }
+        this.stock = restStock;
+    }
+
+    public void addStock(int quantity) {
+        this.stock += quantity;
+    }
+    // ✅ 재고 관리 메서드 추가 끝
+
     // 나머지 필드와 메서드는 다음 단계에서 추가
 
 }
