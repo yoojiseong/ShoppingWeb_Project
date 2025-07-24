@@ -38,7 +38,6 @@ public class ReviewService {
         return new ReviewResponseDto(savedReview);
     }
 
-
     public List<ReviewResponseDto> getAllReviewsByProductId(Long productId) {
         List<Review> reviews = reviewRepository.findByProduct_ProductId(productId);
 
@@ -53,6 +52,22 @@ public class ReviewService {
         return new ReviewResponseDto(review);
     }
 
+    // updateReview, deleteReview 메서드 추가 시작
+    public ReviewResponseDto updateReview(Long reviewId, ReviewRequestDto requestDto) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. 리뷰 ID: " + reviewId));
 
-    // 다른 메서드들은 다음 단계에서 추가
+        review.setReviewContent(requestDto.getReviewContent());
+        review.setRating(requestDto.getRating());
+
+        return new ReviewResponseDto(review);
+    }
+
+    public void deleteReview(Long reviewId) {
+        if (!reviewRepository.existsById(reviewId)) {
+            throw new IllegalArgumentException("삭제할 리뷰를 찾을 수 없습니다. 리뷰 ID: " + reviewId);
+        }
+        reviewRepository.deleteById(reviewId);
+    }
+
 }
