@@ -11,7 +11,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,22 @@ public class ReviewService {
 
         return new ReviewResponseDto(savedReview);
     }
+
+
+    public List<ReviewResponseDto> getAllReviewsByProductId(Long productId) {
+        List<Review> reviews = reviewRepository.findByProduct_ProductId(productId);
+
+        return reviews.stream()
+                .map(ReviewResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public ReviewResponseDto getReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. 리뷰 ID: " + reviewId));
+        return new ReviewResponseDto(review);
+    }
+
 
     // 다른 메서드들은 다음 단계에서 추가
 }
