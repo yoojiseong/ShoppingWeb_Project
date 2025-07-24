@@ -10,4 +10,5 @@ import java.util.List;
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     @Query("select b from CartItem b where b.memberId = :memberId")
     List<CartItem> findByMemberId(@Param("memberId")Long memberId);
+    void deleteByMemberId(@Param("memberId")Long memberId);
 }
