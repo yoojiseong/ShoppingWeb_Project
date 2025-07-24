@@ -1,30 +1,27 @@
-package com.busanit501.shoppingweb_project.domain; // ✅ 패키지 경로 확인
+package com.busanit501.shoppingweb_project.domain;
 
-import com.busanit501.shoppingweb_project.domain.enums.ProductCategory; // ✅ 임포트 경로 확인
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Data
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "products")
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
     private String productName;
-
     private BigDecimal price;
-
     private int stock;
 
     @Enumerated(EnumType.STRING)
@@ -41,7 +38,14 @@ public class Product {
     public void addStock(int quantity) {
         this.stock += quantity;
     }
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CartItem> cartItems = new ArrayList<>();
 
+    public void addCartItem(CartItem cartItem) {
+        this.cartItems.add(cartItem);
+        cartItem.setCartItems(this); // FK 설정
+    }
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
@@ -57,6 +61,7 @@ public class Product {
         this.reviews.remove(review);
         review.setProduct(null);
     }
+}
 
 
 }

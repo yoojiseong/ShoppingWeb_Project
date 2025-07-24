@@ -27,6 +27,7 @@ public class Order {
     private LocalDateTime orderDate;
 
     @Column(name = "status")
+    @Builder.Default
     private Boolean status = false;
 
     // 양방향 연관관계 설정 - 비주인
