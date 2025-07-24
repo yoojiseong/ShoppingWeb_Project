@@ -10,6 +10,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,20 @@ public class ProductService {
         Product savedProduct = productRepository.save(product);
         return new ProductResponseDto(savedProduct);
     }
+
+
+    public List<ProductResponseDto> getAllProducts() {
+        return productRepository.findAll().stream()
+                .map(ProductResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public ProductResponseDto getProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. 상품 ID: " + productId));
+        return new ProductResponseDto(product);
+    }
+
 
     // 다른 메서드들은 다음 단계에서 추가
 }
