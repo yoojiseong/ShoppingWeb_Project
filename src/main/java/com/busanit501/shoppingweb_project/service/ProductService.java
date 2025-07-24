@@ -31,7 +31,6 @@ public class ProductService {
         return new ProductResponseDto(savedProduct);
     }
 
-
     public List<ProductResponseDto> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(ProductResponseDto::new)
@@ -45,5 +44,23 @@ public class ProductService {
     }
 
 
-    // 다른 메서드들은 다음 단계에서 추가
+    public ProductResponseDto updateProduct(Long productId, ProductRequestDto requestDto) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. 상품 ID: " + productId));
+
+        product.setProductName(requestDto.getProductName());
+        product.setPrice(requestDto.getPrice());
+        product.setStock(requestDto.getStock());
+        product.setProductTag(ProductCategory.fromKoreanName(requestDto.getProductTag()));
+
+        return new ProductResponseDto(product);
+    }
+
+    public void deleteProduct(Long productId) {
+        if (!productRepository.existsById(productId)) {
+            throw new IllegalArgumentException("삭제할 상품을 찾을 수 없습니다. 상품 ID: " + productId);
+        }
+        productRepository.deleteById(productId);
+    }
+
 }
