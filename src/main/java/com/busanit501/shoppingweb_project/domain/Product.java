@@ -1,5 +1,6 @@
 package com.busanit501.shoppingweb_project.domain;
 
+import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -64,4 +65,3 @@ public class Product {
 }
 
 
-}
