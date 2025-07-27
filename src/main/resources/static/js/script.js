@@ -1,18 +1,18 @@
 // 샘플 상품 데이터
-const products = [
-    { id: 1, name: '클래식 청바지', category: '바지', price: 89000, image: '👖' },
-    { id: 2, name: '슬림핏 치노', category: '바지', price: 65000, image: '👖' },
-    { id: 3, name: '운동화', category: '신발', price: 120000, image: '👟' },
-    { id: 4, name: '구두', category: '신발', price: 150000, image: '👞' },
-    { id: 5, name: '면 티셔츠', category: '상의', price: 35000, image: '👕' },
-    { id: 6, name: '셔츠', category: '상의', price: 55000, image: '👔' },
-    { id: 7, name: '겨울 코트', category: '아우터', price: 200000, image: '🧥' },
-    { id: 8, name: '후드집업', category: '아우터', price: 85000, image: '🧥' },
-    { id: 9, name: '스키니 진', category: '바지', price: 75000, image: '👖' },
-    { id: 10, name: '하이탑 스니커즈', category: '신발', price: 95000, image: '👟' },
-    { id: 11, name: '폴로 셔츠', category: '상의', price: 45000, image: '👕' },
-    { id: 12, name: '바람막이', category: '아우터', price: 110000, image: '🧥' }
-];
+// const products = [
+//     {id: 1, name: '클래식 청바지', category: '바지', price: 89000, image: '👖'},
+//     {id: 2, name: '슬림핏 치노', category: '바지', price: 65000, image: '👖'},
+//     {id: 3, name: '운동화', category: '신발', price: 120000, image: '👟'},
+//     {id: 4, name: '구두', category: '신발', price: 150000, image: '👞'},
+//     {id: 5, name: '면 티셔츠', category: '상의', price: 35000, image: '👕'},
+//     {id: 6, name: '셔츠', category: '상의', price: 55000, image: '👔'},
+//     {id: 7, name: '겨울 코트', category: '아우터', price: 200000, image: '🧥'},
+//     {id: 8, name: '후드집업', category: '아우터', price: 85000, image: '🧥'},
+//     {id: 9, name: '스키니 진', category: '바지', price: 75000, image: '👖'},
+//     {id: 10, name: '하이탑 스니커즈', category: '신발', price: 95000, image: '👟'},
+//     {id: 11, name: '폴로 셔츠', category: '상의', price: 45000, image: '👕'},
+//     {id: 12, name: '바람막이', category: '아우터', price: 110000, image: '🧥'}
+// ];
 
 // 전역 변수
 let currentUser = null;
@@ -105,10 +105,10 @@ function displayProducts(productsToShow) {
         const productCard = document.createElement('div');
         productCard.className = 'product-card';
         productCard.innerHTML = `
-            <div class="product-image">${product.image}</div>
+            <div class="product-image">${product.image || '이미지 없음'}</div>
             <div class="product-info">
-                <h3 onclick="goToProductDetail(${product.id})">${product.name}</h3>
-                <p>카테고리: ${product.category}</p>
+                <h3 onclick="goToProductDetail(${product.id})">${product.productName}</h3>
+                <p>카테고리: ${product.productTag}</p>
                 <div class="product-price">${product.price.toLocaleString()}원</div>
                 <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
                     장바구니 담기
@@ -118,7 +118,6 @@ function displayProducts(productsToShow) {
         productGrid.appendChild(productCard);
     });
 }
-
 // 상품 상세 페이지로 이동
 function goToProductDetail(productId) {
     localStorage.setItem('selectedProductId', productId);

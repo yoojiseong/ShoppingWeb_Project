@@ -75,7 +75,13 @@
         <p>&copy; 2024 Fashion Store. All rights reserved.</p>
     </div>
 </footer>
-
+<script th:inline="javascript">
+    const products = /*[[${products}]]*/ [];
+    console.log("📦 products from server:", products);
+</script>
 <script src="/js/script.js"></script>
+<script>
+    displayProducts(products);
+</script>
 </body>
 </html>
