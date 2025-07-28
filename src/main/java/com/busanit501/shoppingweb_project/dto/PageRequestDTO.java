@@ -29,11 +29,25 @@ public class PageRequestDTO {
     @Builder.Default
     private int size = 10;
 
+    // 검색 타입 ('t', 'c', 'w', 'tc', 'tcw')
+    private String type;
+
+    // 검색 키워드
+    private String keyword;
+
+    /**
+     * 검색 조건(keyword)의 존재 여부를 반환합니다.
+     * @return keyword가 비어있지 않으면 true
+     */
+    public boolean hasKeyword() {
+        return keyword != null && !keyword.isBlank();
+    }
+
     /**
      * [핵심 로직] 이 DTO의 정보를 바탕으로 Spring Data JPA가 사용하는 Pageable 객체를 생성.
      * 역할: 순수한 요청 데이터(page, size)를 JPA가 이해할 수 있는 형식(Pageable)으로 변환하는 다리 역할.
      * 서비스 로직에서는 이 메소드를 호출하여 JPA에 페이징과 정렬을 요청하게 됩니다.
-     * 
+     *
      * @param props 정렬 기준으로 사용할 엔티티의 속성 이름들 (예: "productId", "reviewId")
      * @return 정렬 조건이 포함된 Pageable 객체
      */
