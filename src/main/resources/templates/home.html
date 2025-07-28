@@ -130,6 +130,10 @@
         });
     }
 
+    function goToProductDetail(productId) {
+        window.location.href = `/products/${productId}`; // 또는 /product-detail/${productId}
+    }
+
     function filterByCategory(category) {
 
         fetch(`/api/products?category=${encodeURIComponent(category)}`)

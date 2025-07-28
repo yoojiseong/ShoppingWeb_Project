@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -52,8 +53,9 @@ public class HomeController {
         return "mypage";
     }
 
-    @GetMapping("/product-detail")
-    public String productDetail() {
+    @GetMapping("/products/{id}")
+    public String productDetail(@PathVariable Long id , Model model) {
+        model.addAttribute("productId", id);
         return "product-detail";
     }
 }

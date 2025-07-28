@@ -34,9 +34,16 @@ public class ProductController {
 
     @GetMapping("/search")
     public List<ProductDTO> searchProducts(@RequestParam String keyword){
+        // @RequestParam => URL 에 붙은 ?key=value형식의 값을 받아오게 암시해주는 어노테이션
         List<ProductDTO> products = productService.searchProducts(keyword);
         log.info(keyword + "가 포함된 데이터 : "+keyword);
         return products;
+    }
+
+    @GetMapping("/{productId}")
+    public ProductDTO getProductById(@PathVariable Long productId){
+        // @PathVariable => URL에 포함된 변수를 메서드 파라미터로 매핑해주는 어노테이션
+        return productService.getProductById(productId);
     }
 
 //    @PostMapping
