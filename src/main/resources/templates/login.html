@@ -46,5 +46,31 @@
 </main>
 
 <script th:src="@{/js/script.js}"></script>
+<script>// 로그인 처리 (login.html)
+function handleLogin(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.email === email && u.password === password);
+    if (user) {
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        alert(`${user.name}님, 환영합니다!`);
+        window.location.href = '/';
+    } else {
+        alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+    }
+}
+
+// 로그아웃 (모든 페이지의 네비게이션에서 사용)
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    alert('로그아웃되었습니다.');
+    window.location.href = '/';
+}
+</script>
 </body>
 </html>

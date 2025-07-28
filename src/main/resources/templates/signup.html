@@ -58,5 +58,36 @@
 </main>
 
 <script th:src="@{/js/script.js}"></script>
+<script>
+    // 회원가입 처리 (signup.html)
+    function handleSignup(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const password = formData.get('password');
+        const confirmPassword = formData.get('confirmPassword');
+        if (password !== confirmPassword) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+        const userData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: password,
+            phone: formData.get('phone'),
+            joinDate: new Date().toLocaleDateString()
+        };
+        // 기존 사용자 확인
+        const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+        if (existingUsers.find(user => user.email === userData.email)) {
+            alert('이미 가입된 이메일입니다.');
+            return;
+        }
+        // 사용자 저장
+        existingUsers.push(userData);
+        localStorage.setItem('users', JSON.stringify(existingUsers));
+        alert('회원가입이 완료되었습니다.');
+        window.location.href = '/login';
+    }
+</script>
 </body>
 </html>

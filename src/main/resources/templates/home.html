@@ -39,7 +39,7 @@
         <section class="categories">
             <h2>카테고리</h2>
             <div class="category-grid">
-                <div class="category-card" onclick="filterByCategory('바지')">
+                <div class="category-card" onclick="filterByCategory('하의')">
                     <h3>바지</h3>
                     <p>편안한 바지 컬렉션</p>
                 </div>
@@ -54,6 +54,22 @@
                 <div class="category-card" onclick="filterByCategory('아우터')">
                     <h3>아우터</h3>
                     <p>따뜻한 아우터</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('원피스')">
+                    <h3>원피스</h3>
+                    <p>지금 아니면 못사즌 원피스</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('가방')">
+                    <h3>가방</h3>
+                    <p>아직도 백팩 매고 다니게?</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('액세서리')">
+                    <h3>악세서리</h3>
+                    <p>악세서리 하나만으로 분위기를 다르게</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('기타/알 수 없음')">
+                    <h3>기타/알 수 없음</h3>
+                    <p>다른 쇼핑몰 갈 필요 없이 여기서 원클릭으로!</p>
                 </div>
             </div>
         </section>
@@ -75,13 +91,68 @@
         <p>&copy; 2024 Fashion Store. All rights reserved.</p>
     </div>
 </footer>
-<script th:inline="javascript">
+
+
+<script layout:fragment="script" th:inline="javascript">
     const products = /*[[${products}]]*/ [];
     console.log("📦 products from server:", products);
+
+    displayProducts(products);
+
+    // 상품 표시 (home.html)
+    function displayProducts(productsToShow) {
+        const productGrid = document.getElementById('productGrid');
+        if (!productGrid) return;
+        productGrid.innerHTML = '';
+        productsToShow.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+            <div class="product-image">${product.image || '이미지 없음'}</div>
+            <div class="product-info">
+                <h3 onclick="goToProductDetail(${product.id})">${product.productName}</h3> <!-- product.name으로 변경 -->
+                <p>카테고리: ${product.productTag}</p> <!-- product.category로 변경 -->
+                <div class="product-price">${product.price.toLocaleString()}원</div>
+                <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
+                    장바구니 담기
+                </button>
+            </div>
+        `;
+            productGrid.appendChild(productCard);
+        });
+    }
+
+    function filterByCategory(category) {
+
+        let filteredProducts = products.filter(product => {
+            return product.productTag === category;
+        });
+
+        displayProducts(filteredProducts);
+    }
+
+
+    // 전체 상품 보기 (home.html)
+    function showAllProducts() {
+        filteredProducts = products;
+        displayProducts(products);
+    }
+
+    // 상품 검색 (home.html)
+    function searchProducts() {
+        const searchInput = document.getElementById('searchInput');
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        if (searchTerm === '') {
+            displayProducts(products);
+            return;
+        }
+        const searchResults = products.filter(product =>
+            product.name.toLowerCase().includes(searchTerm) ||
+            product.category.toLowerCase().includes(searchTerm)
+        );
+        displayProducts(searchResults);
+    }
 </script>
 <script src="/js/script.js"></script>
-<script>
-    displayProducts(products);
-</script>
 </body>
 </html>

@@ -51,5 +51,84 @@
 </main>
 
 <script th:src="@{/js/script.js}"></script>
+<script>
+    // 사용자 정보 표시 (mypage.html)
+    function displayUserInfo() {
+        const userInfo = document.getElementById('userInfo');
+        if (!userInfo || !currentUser) return;
+        userInfo.innerHTML = `
+        <div class="user-detail"><strong>이름:</strong> ${currentUser.name}</div>
+        <div class="user-detail"><strong>이메일:</strong> ${currentUser.email}</div>
+        <div class="user-detail"><strong>전화번호:</strong> ${currentUser.phone}</div>
+        <div class="user-detail"><strong>가입일:</strong> ${currentUser.joinDate}</div>
+    `;
+    }
+
+    // 주문 내역 표시 (mypage.html)
+    function displayOrderHistory() {
+        const orderHistory = document.getElementById('orderHistory');
+        if (!orderHistory) return;
+        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        if (orders.length === 0) {
+            orderHistory.innerHTML = '<p>주문 내역이 없습니다.</p>';
+            return;
+        }
+        orderHistory.innerHTML = '';
+        orders.reverse().forEach(order => {
+            const orderItem = document.createElement('div');
+            orderItem.className = 'order-item';
+            orderItem.innerHTML = `
+            <div class="order-date">주문일: ${order.date}</div>
+            <div class="order-items">
+                ${order.items.map(item => `${item.name} x ${item.quantity}`).join(', ')}
+            </div>
+            <div class="order-total">총 금액: ${order.total.toLocaleString()}원</div>
+        `;
+            orderHistory.appendChild(orderItem);
+        });
+    }
+
+    // 프로필 수정 (mypage.html)
+    function editProfile() {
+        alert('프로필 수정 기능은 추후 구현 예정입니다.');
+    }
+
+
+    // ====================================================================================================
+    // 네비게이션 함수들 (모든 HTML 페이지의 네비게이션 버튼에서 사용)
+    // ====================================================================================================
+
+    function goToLogin() {
+        if (currentUser) {
+            alert('이미 로그인되어 있습니다.');
+            return;
+        }
+        window.location.href = '/login';
+    }
+
+    function goToSignup() {
+        window.location.href = '/signup';
+    }
+
+    function goToCart() {
+        window.location.href = '/cart';
+    }
+
+    function goToMyPage() {
+        if (!currentUser) {
+            alert('로그인이 필요합니다.');
+            goToLogin();
+            return;
+        }
+        window.location.href = '/mypage';
+    }
+
+    // 엔터 키로 검색 (home.html의 검색창에서 사용)
+    document.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter' && event.target.id === 'searchInput') {
+            searchProducts();
+        }
+    });
+</script>
 </body>
 </html>

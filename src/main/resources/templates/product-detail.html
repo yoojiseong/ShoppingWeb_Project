@@ -116,5 +116,203 @@
 </main>
 
 <script th:src="@{/js/script.js}"></script>
+<script>
+    // 상품 상세 페이지로 이동 (home.html, product-detail.html 등에서 사용)
+    function goToProductDetail(productId) {
+        localStorage.setItem('selectedProductId', productId);
+        window.location.href = '/product-detail';
+    }
+
+    // 뒤로가기 (product-detail.html)
+    function goBack() {
+        window.location.href = '/';
+    }
+
+    // 상품 상세 페이지 초기화 (product-detail.html)
+    function initializeProductDetail() {
+        const productId = parseInt(localStorage.getItem('selectedProductId'));
+        if (!productId) {
+            window.location.href = '/';
+            return;
+        }
+        // products 배열은 home.html에서 정의된 임시 데이터입니다.
+        // 실제로는 API 호출로 해당 상품 정보를 가져와야 합니다.
+        const product = products.find(p => p.id === productId);
+        if (!product) {
+            window.location.href = '/';
+            return;
+        }
+        displayProductDetail(product);
+        displayProductReviews(productId);
+        initializeReviewForm();
+    }
+
+    // 상품 상세 정보 표시 (product-detail.html)
+    function displayProductDetail(product) {
+        document.getElementById('productImageLarge').textContent = product.image;
+        document.getElementById('productCategory').textContent = product.category;
+        document.getElementById('productTitle').textContent = product.name;
+        document.getElementById('productPriceLarge').textContent = product.price.toLocaleString() + '원';
+        // 상품 설명 설정
+        const descriptions = {
+            '바지': '편안한 착용감과 스타일을 동시에 만족시키는 바지입니다. 다양한 상황에서 활용할 수 있는 베이직한 디자인으로 제작되었습니다.',
+            '신발': '발의 편안함을 최우선으로 고려한 신발입니다. 고품질 소재를 사용하여 내구성과 스타일을 모두 갖추었습니다.',
+            '상의': '부드러운 소재와 세련된 디자인이 특징인 상의입니다. 일상복으로도, 외출복으로도 완벽한 아이템입니다.',
+            '아우터': '추운 날씨에도 따뜻함을 유지해주는 아우터입니다. 실용성과 패션성을 모두 고려한 디자인입니다.'
+        };
+        document.getElementById('productDescription').textContent = descriptions[product.category] || '고품질 상품입니다.';
+        // 평점 정보 업데이트
+        updateProductRating(product.id);
+    }
+
+    // 상품 평점 정보 업데이트 (product-detail.html)
+    function updateProductRating(productId) {
+        const productReviews = reviews.filter(review => review.productId === productId);
+        const averageRating = productReviews.length > 0
+            ? productReviews.reduce((sum, review) => sum + review.rating, 0) / productReviews.length
+            : 0;
+        const starsContainer = document.getElementById('averageStars');
+        const ratingScore = document.getElementById('averageRating');
+        const reviewCount = document.getElementById('reviewCount');
+        starsContainer.innerHTML = renderStars(Math.round(averageRating));
+        ratingScore.textContent = averageRating.toFixed(1);
+        reviewCount.textContent = `(${productReviews.length}개 리뷰)`;
+    }
+
+    // 별점 렌더링 (product-detail.html)
+    function renderStars(rating) {
+        let starsHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                starsHTML += '<span class="star">★</span>';
+            } else {
+                starsHTML += '<span class="star empty">★</span>';
+            }
+        }
+        return starsHTML;
+    }
+
+    // 상품 리뷰 표시 (product-detail.html)
+    function displayProductReviews(productId) {
+        const productReviews = reviews.filter(review => review.productId === productId);
+        const reviewList = document.getElementById('reviewList');
+        if (productReviews.length === 0) {
+            reviewList.innerHTML = `
+            <div class="no-reviews">
+                <p>아직 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!</p>
+            </div>
+        `;
+            return;
+        }
+        reviewList.innerHTML = '';
+        productReviews.slice().reverse().forEach(review => {
+            const reviewItem = document.createElement('div');
+            reviewItem.className = 'review-item';
+            reviewItem.innerHTML = `
+            <div class="review-header">
+                <div class="review-user-info">
+                    <div class="review-user-name">${review.userName}</div>
+                    <div class="review-date">${review.date}</div>
+                </div>
+                <div class="review-rating">${renderStars(review.rating)}</div>
+            </div>
+            <div class="review-comment">${review.comment}</div>
+        `;
+            reviewList.appendChild(reviewItem);
+        });
+    }
+
+    // 리뷰 폼 초기화 (product-detail.html)
+    function initializeReviewForm() {
+        const reviewWriteContainer = document.getElementById('reviewWriteContainer');
+        const loginRequired = document.getElementById('loginRequired');
+        if (currentUser) {
+            reviewWriteContainer.style.display = 'block';
+            loginRequired.style.display = 'none';
+            // 별점 클릭 이벤트 설정
+            const stars = document.querySelectorAll('.star-rating .star');
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    selectedRating = index + 1;
+                    updateStarRating();
+                });
+                star.addEventListener('mouseover', () => {
+                    highlightStars(index + 1);
+                });
+            });
+            document.querySelector('.star-rating').addEventListener('mouseleave', () => {
+                updateStarRating();
+            });
+            updateStarRating();
+        } else {
+            reviewWriteContainer.style.display = 'none';
+            loginRequired.style.display = 'block';
+        }
+    }
+
+    // 별점 업데이트 (product-detail.html)
+    function updateStarRating() {
+        const stars = document.querySelectorAll('.star-rating .star');
+        stars.forEach((star, index) => {
+            if (index < selectedRating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
+
+    // 별점 하이라이트 (product-detail.html)
+    function highlightStars(rating) {
+        const stars = document.querySelectorAll('.star-rating .star');
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
+
+    // 리뷰 제출 (product-detail.html)
+    function submitReview(event) {
+        event.preventDefault();
+        if (!currentUser) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+        const productId = parseInt(localStorage.getItem('selectedProductId'));
+        const comment = document.getElementById('reviewComment').value.trim();
+        if (!comment) {
+            alert('리뷰 내용을 입력해주세요.');
+            return;
+        }
+        const newReview = {
+            id: Date.now(),
+            productId: productId,
+            userId: currentUser.email,
+            userName: currentUser.name,
+            rating: selectedRating,
+            comment: comment,
+            date: new Date().toLocaleDateString()
+        };
+        reviews.push(newReview);
+        localStorage.setItem('reviews', JSON.stringify(reviews));
+        // 폼 초기화
+        document.getElementById('reviewComment').value = '';
+        selectedRating = 5;
+        updateStarRating();
+        // 리뷰 목록 및 평점 업데이트
+        displayProductReviews(productId);
+        updateProductRating(productId);
+        alert('리뷰가 등록되었습니다.');
+    }
+
+    // 상세 페이지에서 장바구니 담기 (product-detail.html)
+    function addToCartFromDetail() {
+        const productId = parseInt(localStorage.getItem('selectedProductId'));
+        addToCart(productId);
+    }
+</script>
 </body>
 </html>
