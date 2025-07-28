@@ -94,10 +94,17 @@
 
 
 <script layout:fragment="script" th:inline="javascript">
-    const products = /*[[${products}]]*/ [];
-    console.log("📦 products from server:", products);
 
-    displayProducts(products);
+
+    window.onload = function(){
+        fetch('/api/products')
+            .then(response => response.json())
+            .then(data => {
+                console.log("전체 상품 : ", data);
+                displayProducts(data);
+                window.allProducts = data;
+            });
+    }
 
     // 상품 표시 (home.html)
     function displayProducts(productsToShow) {
@@ -107,13 +114,14 @@
         productsToShow.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
+
             productCard.innerHTML = `
             <div class="product-image">${product.image || '이미지 없음'}</div>
             <div class="product-info">
-                <h3 onclick="goToProductDetail(${product.id})">${product.productName}</h3> <!-- product.name으로 변경 -->
+                <h3 onclick="goToProductDetail(${product.productId})">${product.productName}</h3> <!-- product.name으로 변경 -->
                 <p>카테고리: ${product.productTag}</p> <!-- product.category로 변경 -->
-                <div class="product-price">${product.price.toLocaleString()}원</div>
-                <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
+                <div class="product-price">${Number(product.price).toLocaleString()}원</div>
+                <button class="add-to-cart-btn" onclick="addToCart(${product.productId})">
                     장바구니 담기
                 </button>
             </div>
@@ -124,18 +132,20 @@
 
     function filterByCategory(category) {
 
-        let filteredProducts = products.filter(product => {
-            return product.productTag === category;
-        });
-
-        displayProducts(filteredProducts);
+        fetch(`/api/products?category=${encodeURIComponent(category)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("📂 카테고리 결과:", data);
+                displayProducts(data);
+            });
     }
 
 
     // 전체 상품 보기 (home.html)
     function showAllProducts() {
-        filteredProducts = products;
-        displayProducts(products);
+        fetch('/api/products')
+            .then(response => response.json())
+            .then(data => displayProducts(data));
     }
 
     // 상품 검색 (home.html)
@@ -143,14 +153,18 @@
         const searchInput = document.getElementById('searchInput');
         const searchTerm = searchInput.value.toLowerCase().trim();
         if (searchTerm === '') {
-            displayProducts(products);
+            fetch('/api/products')
+                .then(res => res.json())
+                .then(data => displayProducts(data));
             return;
         }
-        const searchResults = products.filter(product =>
-            product.name.toLowerCase().includes(searchTerm) ||
-            product.category.toLowerCase().includes(searchTerm)
-        );
-        displayProducts(searchResults);
+
+        fetch(`/api/products/search?keyword=${encodeURIComponent(searchTerm)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(" 검색 결과 :", data)
+                displayProducts(data);
+            })
     }
 </script>
 <script src="/js/script.js"></script>

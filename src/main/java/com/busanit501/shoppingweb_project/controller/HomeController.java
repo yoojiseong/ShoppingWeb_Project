@@ -1,7 +1,7 @@
 package com.busanit501.shoppingweb_project.controller;
 
 import com.busanit501.shoppingweb_project.domain.Product;
-import com.busanit501.shoppingweb_project.dto.ProductResponseDto;
+import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -24,8 +24,8 @@ public class HomeController {
 
     @GetMapping("/home")
     public String home(Model model) {
-        List<ProductResponseDto> products = productService.getAllProducts();
-        for(ProductResponseDto product : products){
+        List<ProductDTO> products = productService.getAllProducts();
+        for(ProductDTO product : products){
             log.info("Controller 에서 product 이름 확인하는중 : " +  product.getProductName());
         }
         model.addAttribute("products", products);
