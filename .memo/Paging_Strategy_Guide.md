@@ -148,3 +148,64 @@
   - **이유(매우 중요):** 만약 실제 마지막 페이지가 `8`인데, UI 끝 번호가 `10`으로 계산되었다면, 화면에 `9`, `10`이라는 유령 페이지 버튼이 표시되면 안 된다. 따라서 둘 중 더 작은 값(`8`)을 최종 `end` 값으로 선택하여, 항상 유효한 페이지 번호만 표시되도록 보장한다.
 
 ---
+
+
+---
+
+### **[2025-07-28] 페이징 공통 모듈 설계 (3단계) - Repository 확장**
+
+- **담당자:** (본인 이름)
+- **관련 파일:** `...repository.search.ProductRepositoryCustom.java`
+
+#### **1. `ProductRepositoryCustom` 인터페이스를 분리한 이유 (The "Why")**
+
+- **(생각)** "Spring Data JPA가 기본으로 제공하는 `JpaRepository`는 `findById`, `save` 같은 간단한 CRUD 메소드에 최적화되어 있다. 하지만 우리는 '검색어'와 '검색 타입'에 따라 쿼리가 계속 바뀌는 **동적 쿼리**가 필요하다. 이 복잡한 로직을 기존 `ProductRepository`에 다 섞어버리면, 역할이 불분명해지고 코드가 지저분해진다."
+- **(생각)** "그래서 **'역할과 책임의 분리(Separation of Concerns)'** 원칙에 따라, 기본 CRUD는 `ProductRepository`에 그대로 두고, 우리가 직접 만들 복잡한 동적 쿼리는 `ProductRepositoryCustom`이라는 별도의 '설계도'에 정의하기로 했다. 이렇게 하면 관리가 훨씬 쉬워진다."
+
+#### **2. Spring Data JPA와의 상호작용 방식**
+
+- **(핵심 원리)** Spring Data JPA는 아주 똑똑해서, 우리가 `[기존 리포지토리 이름]Custom` 과 `[기존 리포지토리 이름]CustomImpl` 이라는 이름 규칙만 지켜주면, **자동으로 두 개의 인터페이스와 구현체를 하나로 합쳐준다.**
+- **(동작 순서)**
+  1. `ProductRepository`가 `ProductRepositoryCustom`을 `extends` (상속)한다.
+  2. 우리는 `ProductRepositoryCustomImpl` 클래스에 `@Repository` 어노테이션을 붙여서 Bean으로 등록한다.
+  3. Spring이 실행될 때, `ProductRepository`의 프록시(Proxy) 객체를 만들면서, `ProductRepositoryCustomImpl`에 구현된 메소드(`search()`)를 자동으로 합쳐준다.
+- **(결론)** 상품 관련 코드를 담당하는 **주현씨와 찬우씨**는 `ProductRepository` 하나만 주입(`@Autowired`)받으면, `findById` 같은 기본 메소드와 우리가 만들 `search()` 메소드를 모두 사용할 수 있게 된다. 이것이 바로 프레임워크를 올바르게 활용하는 방법이다.
+
+---
+
+
+---
+
+### **[2025-07-28] 페이징 공통 모듈 설계 (4단계) - Custom Repository 구현**
+
+- **담당자:** (본인 이름)
+- **관련 파일:** `...repository.search.ProductRepositoryCustomImpl.java`
+
+#### **1. `ProductRepositoryCustomImpl`의 역할 (The "Why")**
+
+- **(생각)** "이 클래스는 `ProductRepositoryCustom`이라는 '설계도'를 보고 실제 '건물'을 짓는 곳이다. 즉, Querydsl을 사용하여 복잡한 동적 쿼리를 실제로 구현하는 책임은 오직 이 클래스만이 가진다."
+- **(생각)** "특히 `PageRequestDTO`로부터 `type`과 `keyword`를 받아, 어떤 조건으로 검색할지를 `if`문으로 분기 처리하는 로직이 여기에 들어간다. 이것이 바로 **'동적 쿼리'**의 핵심이다. 예를 들어, `type`이 't'이면 상품명(`productName`)에서만 검색하고, 'c'이면 상품 설명(`productTag`)에서 검색하도록 만들 수 있다."
+
+#### **2. 핵심 코드 분석**
+
+- **`private final JPAQueryFactory queryFactory;`**
+  - **역할:** Querydsl 쿼리를 생성하고 실행하는 핵심 팩토리 클래스.
+  - **이유:** 생성자에서 `EntityManager`를 주입받아 초기화하며, 이 `queryFactory`를 통해 모든 DB 조작이 이루어진다.
+
+- **`QProduct product = QProduct.product;`**
+  - **역할:** Querydsl이 `Product` 엔티티를 기반으로 자동 생성한 Q-Type 클래스.
+  - **이유:** `product.productName.contains(keyword)` 와 같이, 문자열이 아닌 자바 코드로 컬럼에 접근할 수 있게 해준다. 이는 컴파일 시점에 오타나 문법 오류를 잡아낼 수 있어 **타입 안정성(Type Safety)**을 획기적으로 높여준다.
+
+- **`BooleanBuilder booleanBuilder = new BooleanBuilder();`**
+  - **역할:** `where` 절에 들어갈 여러 검색 조건을 담는 컨테이너.
+  - **이유:** `if` 문을 통해 특정 조건이 참일 때만 `booleanBuilder.and(...)` 또는 `booleanBuilder.or(...)`를 사용하여 조건을 동적으로 추가할 수 있다. 모든 조건이 조립된 후, `query.where(booleanBuilder)` 한 줄로 `where` 절을 완성할 수 있어 코드가 매우 깔끔해진다.
+
+- **`query.offset(pageable.getOffset()).limit(pageable.getPageSize());`**
+  - **역할:** 페이징 처리의 핵심.
+  - **상호작용:** `PageRequestDTO`로부터 만들어진 `Pageable` 객체의 정보를 사용하여, "몇 번째 데이터부터 몇 개를 가져올지"를 DB에 정확히 알려준다.
+
+- **`new PageImpl<>(content, pageable, total);`**
+  - **역할:** 조회된 데이터 목록(`content`), 원본 페이징 정보(`pageable`), 그리고 전체 개수(`total`)를 합쳐 Spring Data JPA가 사용하는 `Page` 객체로 만들어 반환한다.
+  - **상호작용:** 이 `Page<Product>` 객체는 `Service` 계층으로 전달되어, 최종적으로 `PageResponseDTO`를 만드는 데 사용된다.
+
+---
