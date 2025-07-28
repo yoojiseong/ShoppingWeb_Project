@@ -44,6 +44,7 @@ public class ProductController {
     public ProductDTO getProductById(@PathVariable Long productId){
         // @PathVariable => URL에 포함된 변수를 메서드 파라미터로 매핑해주는 어노테이션
         return productService.getProductById(productId);
+//        productService.getProductById(productId) => productDTO
     }
 
 //    @PostMapping

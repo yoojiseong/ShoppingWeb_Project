@@ -25,11 +25,11 @@ public class HomeController {
 
     @GetMapping("/home")
     public String home(Model model) {
-        List<ProductDTO> products = productService.getAllProducts();
-        for(ProductDTO product : products){
-            log.info("Controller 에서 product 이름 확인하는중 : " +  product.getProductName());
-        }
-        model.addAttribute("products", products);
+//        List<ProductDTO> products = productService.getAllProducts();
+//        for(ProductDTO product : products){
+//            log.info("Controller 에서 product 이름 확인하는중 : " +  product.getProductName());
+//        }
+//        model.addAttribute("products", products);
         return "home";
     }
 
@@ -57,5 +57,6 @@ public class HomeController {
     public String productDetail(@PathVariable Long id , Model model) {
         model.addAttribute("productId", id);
         return "product-detail";
+        // 화면만 그렸음 대신( productId라는 데이터 하나만 가지고)
     }
 }

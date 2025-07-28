@@ -11,8 +11,10 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    // 기본적인 CRUD
     @Query("select b from Product b where b.productId = :productId")
     Product findByProductId(@Param("productId")Long productId);
+    //SELECT * FROM PRODUCT WHERE PRODUCTID = porductId
     List<Product> findByProductTag(ProductCategory productTag);
     @Query("SELECT p FROM Product p WHERE p.productName LIKE %:keyword%")
     List<Product> searchByKeyword(@Param("keyword") String keyword);
