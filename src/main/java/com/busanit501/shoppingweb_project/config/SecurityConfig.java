@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 허용할 경로
-                        .requestMatchers("/signup", "/login", "/css/**", "/js/**", "/api/check-id").permitAll()
+                        .requestMatchers("/home","/signup", "/login", "/css/**", "/js/**", "/api/check-id").permitAll()
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
@@ -42,8 +42,12 @@ public class SecurityConfig {
                 )
                 .rememberMe(rememberMe -> rememberMe
                         .key("uniqueAndSecretKey")
+                        .rememberMeParameter("remember-Me")
                         .tokenValiditySeconds(7 * 24 * 60 * 60)
                         .userDetailsService(customUserDetailsService) // UserDetailsService 명확히 지정
+                )
+                .sessionManagement(session -> session
+                        .sessionFixation().migrateSession()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
