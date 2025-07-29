@@ -120,6 +120,88 @@ function updateUI() {
 // signup.html (회원가입 페이지) 관련 JavaScript 함수
 // ====================================================================================================
 
+// 주소 검색 API
+function loadDaumPostcodeScript(callback) {
+    if (window.daum && window.daum.Postcode) {
+        callback();
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+    script.onload = () => {
+        console.log('다음 주소 API 로드 완료');
+        callback();
+    };
+    script.onerror = () => {
+        alert('주소 검색 스크립트를 불러오는 데 실패했습니다.');
+    };
+    document.head.appendChild(script);
+}
+
+function execDaumPostcode() {
+    loadDaumPostcodeScript(() => {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                document.getElementById('zipcode').value = data.zonecode;
+                document.getElementById('addressId').value = data.roadAddress;
+                document.getElementById('addressLine').focus();
+            }
+        }).open();
+    });
+}
+
+// 아이디 중복 확인
+function checkDuplicateId() {
+    const memberId = document.getElementById('memberId').value;
+    const resultDiv = document.getElementById('idCheckResult');
+
+    if (!memberId) {
+        resultDiv.textContent = '아이디를 입력하세요';
+        resultDiv.style.color = 'red';
+        return;
+    }
+
+    fetch(`/api/check-id?memberId=${encodeURIComponent(memberId)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.duplicate) {
+                resultDiv.textContent = '이미 사용 중인 아이디입니다.';
+                resultDiv.style.color = 'red';
+            } else {
+                resultDiv.textContent = '사용 가능한 아이디입니다.';
+                resultDiv.style.color = 'green';
+            }
+        })
+        .catch(() => {
+            resultDiv.textContent = '서버 오류';
+            resultDiv.style.color = 'red';
+        });
+}
+
+// 비밀번호 확인 및 폼 제출 검증
+document.addEventListener('DOMContentLoaded', () => {
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const passwordHelp = document.getElementById('passwordHelp');
+
+    confirmPassword.addEventListener('input', function() {
+        if (password.value !== confirmPassword.value) {
+            passwordHelp.style.display = 'block';
+        } else {
+            passwordHelp.style.display = 'none';
+        }
+    });
+
+    const form = document.getElementById('signupForm');
+    form.addEventListener('submit', function(e) {
+        if (password.value !== confirmPassword.value) {
+            e.preventDefault();
+            alert('비밀번호가 일치하지 않습니다.');
+            confirmPassword.focus();
+        }
+    });
+});
 
 
 
