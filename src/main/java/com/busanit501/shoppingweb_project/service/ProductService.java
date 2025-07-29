@@ -2,6 +2,9 @@ package com.busanit501.shoppingweb_project.service;
 
 import com.busanit501.shoppingweb_project.domain.Product;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
+import com.busanit501.shoppingweb_project.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -18,6 +21,7 @@ public interface ProductService {
     // 키워드 검색
     List<ProductDTO> searchProducts(String keyword);
 
+    void saveProduct(Product product);
     default Product dtoToEntity(ProductDTO productDTO){
         Product product = Product.builder()
                 .productId(productDTO.getProductId())
@@ -36,4 +40,5 @@ public interface ProductService {
                 .build();
         return productDTO;
     }
+
 }

@@ -1,9 +1,7 @@
 package com.busanit501.shoppingweb_project.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Table(name = "reviews")
+@Builder
+@AllArgsConstructor
 public class Review {
 
     @Id
