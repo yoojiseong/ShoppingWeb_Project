@@ -26,74 +26,29 @@
         <div class="auth-container">
             <div class="auth-form">
                 <h2>회원가입</h2>
-                <form id="signupForm" th:action="@{/signup}" method="post">
-                    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
-
-                    <div class="mb-3">
-                        <label for="memberId" class="form-label">아이디</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="memberId" name="memberId" placeholder="아이디 입력" required />
-                            <button type="button" class="btn btn-outline-secondary" onclick="checkDuplicateId()">중복확인</button>
-                        </div>
-                        <div id="idCheckResult" class="form-text mt-1"></div>
+                <form id="signupForm" onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label for="name">이름</label>
+                        <input type="text" id="name" name="name" required>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label">비밀번호</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호 입력" required />
+                    <div class="form-group">
+                        <label for="email">이메일</label>
+                        <input type="email" id="email" name="email" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">비밀번호 확인</label>
-                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="비밀번호 확인 입력" required />
-                        <div id="passwordHelp" class="form-text text-danger" style="display:none;">비밀번호가 일치하지 않습니다.</div>
+                    <div class="form-group">
+                        <label for="password">비밀번호</label>
+                        <input type="password" id="password" name="password" required minlength="6">
                     </div>
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label">이메일</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="이메일 입력" required />
+                    <div class="form-group">
+                        <label for="confirmPassword">비밀번호 확인</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="userName" class="form-label">이름</label>
-                        <input type="text" class="form-control" id="userName" name="userName" placeholder="이름 입력" required />
+                    <div class="form-group">
+                        <label for="phone">전화번호</label>
+                        <input type="tel" id="phone" name="phone" required>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="birthDate" class="form-label">생년월일</label>
-                        <input type="date" class="form-control" id="birthDate" name="birthDate" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">전화번호</label>
-                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="전화번호 입력" required />
-                    </div>
-
-                    <hr />
-
-                    <div class="mb-3">
-                        <label for="zipcode" class="form-label">우편번호</label>
-                        <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="우편번호 입력" required />
-                        <button type="button" onclick="execDaumPostcode()" class="btn btn-secondary mt-1">주소 검색</button>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="addressId" class="form-label">도로명 주소</label>
-                        <input type="text" class="form-control" id="addressId" name="addressId" placeholder="도로명 주소 입력" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="addressLine" class="form-label">상세 주소</label>
-                        <input type="text" class="form-control" id="addressLine" name="addressLine" placeholder="상세 주소 입력" required />
-                    </div>
-
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="registerAddress" name="registerAddress" />
-                        <label class="form-check-label" for="registerAddress">이 주소로 기본 배송지 등록</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">회원가입</button>
+                    <button type="submit" class="auth-btn">회원가입</button>
                 </form>
-
                 <div class="auth-links">
                     <p>이미 계정이 있으신가요? <a th:href="@{/login}">로그인</a></p>
                 </div>
@@ -103,5 +58,36 @@
 </main>
 
 <script th:src="@{/js/script.js}"></script>
+<script>
+    // 회원가입 처리 (signup.html)
+    function handleSignup(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const password = formData.get('password');
+        const confirmPassword = formData.get('confirmPassword');
+        if (password !== confirmPassword) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+        const userData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: password,
+            phone: formData.get('phone'),
+            joinDate: new Date().toLocaleDateString()
+        };
+        // 기존 사용자 확인
+        const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+        if (existingUsers.find(user => user.email === userData.email)) {
+            alert('이미 가입된 이메일입니다.');
+            return;
+        }
+        // 사용자 저장
+        existingUsers.push(userData);
+        localStorage.setItem('users', JSON.stringify(existingUsers));
+        alert('회원가입이 완료되었습니다.');
+        window.location.href = '/login';
+    }
+</script>
 </body>
 </html>
