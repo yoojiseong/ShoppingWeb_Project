@@ -36,6 +36,9 @@ public class Member {
     @Column(nullable = false)
     private String role;
 
+    @Column(nullable = false)
+    private boolean social;
+
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
