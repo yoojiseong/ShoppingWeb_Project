@@ -23,15 +23,13 @@ public class CartController {
     private final CartItemService cartItemService;
 
     @PostMapping
-    public ResponseEntity<CartItemDTO> addToCart(@RequestBody CartItemDTO dto) {
-        log.info("화면에서 받아온 dto확인중 : " +dto);
-        CartItemDTO saved = cartItemService.addToCart(dto);
     public ResponseEntity<CartItemDTO> addToCart(@RequestBody CartItemDTO dto,
                                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("화면에서 받아온 dto확인중 : " +dto);
         Long memberId = userDetails.getMemberId();
         dto.setMemberId(memberId);
 
-        CartItemDTO saved = orderService.AddCartItemFromProductDetail(dto);
+        CartItemDTO saved = cartItemService.addToCart(dto);
         return ResponseEntity.ok(saved);
     }
 }
