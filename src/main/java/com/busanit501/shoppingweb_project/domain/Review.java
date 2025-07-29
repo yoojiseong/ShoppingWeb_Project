@@ -42,5 +42,6 @@ public class Review {
         this.product = product;
         if (!product.getReviews().contains(this)) {
             product.getReviews().add(this);
-        }    }
+        }
+    }
 }

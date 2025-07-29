@@ -17,7 +17,6 @@
 let currentUser = null; // 현재 로그인된 사용자 정보 (localStorage에서 로드)
 let cart = [];          // 장바구니 아이템 (localStorage에서 로드)
 let reviews = [];       // 상품 리뷰 (localStorage에서 로드)
-let filteredProducts = products; // 상품 필터링 결과 (home.html에서 사용)
 let selectedRating = 5; // 리뷰 작성 시 선택된 별점 (product-detail.html에서 사용)
 
 // 페이지 로드 시 초기화 함수 (모든 HTML 페이지의 <script> 태그 내부에 포함)
