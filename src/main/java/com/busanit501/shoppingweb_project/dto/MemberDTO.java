@@ -1,5 +1,8 @@
 package com.busanit501.shoppingweb_project.dto;
 
+import com.busanit501.shoppingweb_project.domain.Address;
+import com.busanit501.shoppingweb_project.domain.Member;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -18,4 +21,6 @@ public class MemberDTO {
     private String addressLine;
     private String addressId;
     private boolean registerAddress;
+
+
 }

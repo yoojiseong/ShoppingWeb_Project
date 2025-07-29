@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -94,5 +95,16 @@ public class OrderServicImpl implements OrderService {
 
         cartItemRepository.save(cartItem);
         return cartItemDTO;
+    }
+
+    @Override
+    public List<OrderDTO> getOrderHistoryByMemberId(Long memberId) {
+        log.info("OrderService에서 작업중 넘어온 memberId : " + memberId);
+        List<Order> orders = orderRepository.findByMemberId(memberId);
+        List<OrderDTO> orderDTOList = orders.stream()
+                .map(order -> modelMapper.map(order, OrderDTO.class))
+                .collect(Collectors.toList());
+        log.info("OrderService에서 작업중 orderDTO : " + orderDTOList);
+        return orderDTOList;
     }
 }
