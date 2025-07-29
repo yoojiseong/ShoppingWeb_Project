@@ -30,6 +30,12 @@ public class Order {
     @Builder.Default
     private Boolean status = false;
 
+    private String address;
+    private String address_detail;
+    @Builder.Default
+    private int totalPrice=0;
+    private String receiverName;
+    private String receiverPhone;
     // 양방향 연관관계 설정 - 비주인
     @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -39,5 +45,8 @@ public class Order {
     public void addOrderItem(OrderItem orderItem) {
         this.orderItems.add(orderItem);
         orderItem.setOrder(this); // FK 설정
+    }
+    public void setTotalPrice(int totalPrice){
+        this.totalPrice = totalPrice;
     }
 }

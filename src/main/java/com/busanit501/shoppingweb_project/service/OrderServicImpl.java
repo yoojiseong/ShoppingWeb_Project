@@ -1,12 +1,12 @@
 package com.busanit501.shoppingweb_project.service;
 
-import com.busanit501.shoppingweb_project.domain.CartItem;
-import com.busanit501.shoppingweb_project.domain.Order;
-import com.busanit501.shoppingweb_project.domain.OrderItem;
-import com.busanit501.shoppingweb_project.domain.Product;
+import com.busanit501.shoppingweb_project.domain.*;
 import com.busanit501.shoppingweb_project.dto.CartItemDTO;
+import com.busanit501.shoppingweb_project.dto.MemberDTO;
+import com.busanit501.shoppingweb_project.dto.OrderDTO;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.repository.CartItemRepository;
+import com.busanit501.shoppingweb_project.repository.MemberRepository;
 import com.busanit501.shoppingweb_project.repository.OrderRepository;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -27,44 +28,65 @@ import java.util.List;
 @Transactional()
 public class OrderServicImpl implements OrderService {
 
+    private final ModelMapper modelMapper;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final CartItemRepository cartRepository;
+    private final MemberRepository memberRepository;
 
     @Override
-    public void PurchaseFromCart(Long memberId) {
+    public OrderDTO PurchaseFromCart(Long memberId) {
         List<CartItem> cartItems = cartItemRepository.findByMemberId(memberId);
+        Optional<Member> member = memberRepository.findById(memberId);
+        MemberDTO memberDTO = modelMapper.map(member, MemberDTO.class);
 
-
-        if(cartItems.isEmpty()){
+        if (cartItems.isEmpty()) {
             throw new IllegalStateException("장바구니가 비어 있습니다.");
         }
 
+        // 총합 계산
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        // 주문 객체 생성
         Order order = Order.builder()
                 .memberId(memberId)
                 .orderDate(LocalDateTime.now())
-                .status(true)
+                .status(true) // 또는 enum 사용 시 OrderStatus.ORDERED
+                .address(memberDTO.getAddressId())
+                .address_detail(memberDTO.getAddressLine())
+                .receiverName(memberDTO.getUserName())
+                .receiverPhone(memberDTO.getPhone())
                 .build();
 
-        for(CartItem cart : cartItems){
+        for (CartItem cart : cartItems) {
             Product product = cart.getProduct();
 
+            BigDecimal itemTotal = product.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity()));
+            total = total.add(itemTotal);
 
             OrderItem orderItem = OrderItem.builder()
                     .productId(product.getProductId())
                     .quantity(cart.getQuantity())
-                    .price(product.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
+                    .price(itemTotal)
                     .build();
 
-            order.addOrderItem(orderItem);
+            order.addOrderItem(orderItem); // 연관관계 설정
         }
-        // 4. 주문 저장
-        orderRepository.save(order);
 
-        // 5. 장바구니 비우기
-//        cartRepository.deleteByMemberId(memberId);
+        order.setTotalPrice(total.intValue()); // Order에 총합 저장
 
+        // 주문 저장
+        Order savedOrder = orderRepository.save(order);
+
+        // 장바구니 비우기
+        cartItemRepository.deleteByMemberId(memberId);
+
+        // DTO 매핑은 저장 후!
+        return modelMapper.map(savedOrder, OrderDTO.class);
     }
+
 
     @Override
     public CartItemDTO AddCartItemFromProductDetail(CartItemDTO cartItemDTO) {

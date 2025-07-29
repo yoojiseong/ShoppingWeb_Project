@@ -28,4 +28,9 @@ public class OrderDTO {
     private LocalDateTime orderdate;
 
     private boolean status;
+    private String address;
+    private String address_detail;
+    private int totalPrice;
+    private String receiverName;
+    private String receiverPhone;
 }
