@@ -40,7 +40,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // 일반 사용자 계정이 이미 존재하는지 확인
-        if (!memberRepository.existsByMemberId("memberId")) {
+        if (!memberRepository.existsByMemberId("user")) {
             Member user = Member.builder()
                     .memberId("user")
                     .password(passwordEncoder.encode("1234"))

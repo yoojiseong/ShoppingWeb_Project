@@ -41,4 +41,12 @@ public interface ProductService {
         return productDTO;
     }
 
+    // [추가] 새 상품 등록 메서드 시그니처 추가
+    ProductDTO createProduct(ProductDTO productDTO);
+
+    // [추가] 상품 수정 메서드 시그니처 추가
+    ProductDTO updateProduct(Long productId, ProductDTO productDTO);
+
+    // [추가] 상품 삭제 메서드 시그니처 추가
+    void deleteProduct(Long productId);
 }

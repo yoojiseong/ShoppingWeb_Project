@@ -87,4 +87,31 @@ public class ProductServiceImpl implements ProductService {
     public void saveProduct(Product product){
         productRepository.save(product);
     }
+
+    // [추가] 새 상품 등록 메서드 구현
+    @Override
+    public ProductDTO createProduct(ProductDTO productDTO) {
+        Product product = dtoToEntity(productDTO);
+        Product saved = productRepository.save(product);
+        return entityToDto(saved);
+    }
+
+    // [추가] 상품 수정 메서드 구현
+    @Override
+    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다. id=" + productId));
+        product.setProductName(productDTO.getProductName());
+        product.setPrice(productDTO.getPrice());
+        product.setStock(productDTO.getStock());
+        Product updated = productRepository.save(product);
+        return entityToDto(updated);
+    }
+
+    // [추가] 상품 삭제 메서드 구현
+    @Override
+    public void deleteProduct(Long productId) {
+        productRepository.deleteById(productId);
+    }
+
 }
