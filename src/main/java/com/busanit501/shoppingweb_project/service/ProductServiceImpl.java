@@ -80,4 +80,9 @@ public class ProductServiceImpl implements ProductService {
                         .build())
                 .toList();
     }
+
+    @Override
+    public void saveProduct(Product product){
+        productRepository.save(product);
+    }
 }

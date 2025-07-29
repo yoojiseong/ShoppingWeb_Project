@@ -63,6 +63,14 @@ public class Product {
         this.reviews.remove(review);
         review.setProduct(null);
     }
+
+    public void changeTitleContent(String productName, BigDecimal price, int stock, ProductCategory productTag) {
+        this.productName = productName;
+        this.price = price;
+        this.stock = stock;
+        this.productTag = productTag;
+    }
+
 }
 
 
