@@ -18,7 +18,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,9 +56,13 @@ public class CartController {
     }
     @PatchMapping("/{productId}")
     public ResponseEntity<CartItemDTO> updateQuantity(@PathVariable Long productId,
-                                                      @RequestBody CartItemDTO change,
+                                                      @RequestBody Map<String, Integer> request,
                                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
-        CartItemDTO updated = cartItemService.updateQuantity( productId, change.getQuantity());
+        int quantityChange = request.get("quantityChange");
+        Long memberId = userDetails.getMemberId();
+
+        CartItemDTO updated = cartItemService.updateQuantity(memberId, productId , quantityChange);
+        log.info("CartController에서 작업중 업데이트된 CartItemDTO : " + updated);
         return ResponseEntity.ok(updated);
     }
 
@@ -64,12 +70,16 @@ public class CartController {
     public ResponseEntity<?> removeFromCart(@PathVariable Long productId,
                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
         cartItemService.removeFromCart(userDetails.getMemberId(), productId);
-        return ResponseEntity.ok().build();
+        Map<String, String> result = new HashMap<>();
+        result.put("message", "삭제 성공");
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/clear")
     public ResponseEntity<?> clearCart(@AuthenticationPrincipal CustomUserDetails userDetails) {
         cartItemService.clearCart(userDetails.getMemberId());
-        return ResponseEntity.ok().build();
+        Map<String, String> response = new HashMap<>();
+        response.put("result", "success");
+        return ResponseEntity.ok(response);
     }
 }

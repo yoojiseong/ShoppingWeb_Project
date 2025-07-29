@@ -73,14 +73,13 @@ public class CartItemServiceImpl implements CartItemService {
 
     // 수량 변경
     @Transactional
-    public CartItemDTO updateQuantity( Long productId ,int change) {
-        Long memberId = getCurrentMemberId();
+    public CartItemDTO updateQuantity( Long memberId , Long productId ,int change) {
         Product product = productRepository.findByProductId(productId);
         ProductDTO productDTO = productService.getProductById(productId);
 
         CartItem item = cartItemRepository.findByMemberIdAndProduct(memberId, product)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니에 해당 상품이 없습니다."));
-
+        log.info("CartController에서 작업중 업데이트되기 전 CartItemDTO : " + item);
         item.increaseQuantity(change);
         if (item.getQuantity() <= 0) {
             cartItemRepository.delete(item);
@@ -101,9 +100,12 @@ public class CartItemServiceImpl implements CartItemService {
     public void removeFromCart(Long memberId, Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
-
-        Optional<CartItem> cartItemOpt = cartItemRepository.findByMemberIdAndProduct(memberId, product);
-        cartItemOpt.ifPresent(cartItemRepository::delete);
+        log.info("CartItemService에서 작업중 삭제한 product : " + product.getProductName());
+        Optional<CartItem> cartItem = cartItemRepository.findByMemberIdAndProduct(memberId, product);
+        cartItem.ifPresent(cartItemRepository::delete);
+        // cartItem.ifPresent(cartItem -> {
+        //    cartItemRepository.delete(cartItem);
+        //}); 이거랑 똑같은 기능
     }
     // 단일 삭제
     public void deleteCartItem(Long productId) {

@@ -90,7 +90,8 @@
                     <button class="remove-btn" onclick="removeFromCart(${item.productId})">삭제</button>
                 `;
                     cartItems.appendChild(cartItem);
-                    total += item.price * item.quantity;
+                    total += item.productDTO.price * item.quantity;
+                    document.getElementById('totalPrice').textContent = total;
                 });
 
                 if (totalPrice) {
