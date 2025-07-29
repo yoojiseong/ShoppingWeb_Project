@@ -26,9 +26,16 @@
             <div class="nav-buttons">
                 <button onclick="goToMyPage()">마이페이지</button>
                 <button onclick="goToCart()">장바구니 (<span id="cartCount">0</span>)</button>
-                <button onclick="goToLogin()" id="loginBtn">로그인</button>
-                <button onclick="goToSignup()">회원가입</button>
-                <button onclick="logout()" id="logoutBtn" style="display: none;">로그아웃</button>
+
+                <div sec:authorize="isAuthenticated()">
+                    <span sec:authentication="name">사용자 이메일</span>
+                    <a class="nav-link" href="/member/logout">로그아웃</a>
+                </div>
+
+                <div sec:authorize="!isAuthenticated()">
+                    <button onclick="goToLogin()" id="loginBtn">로그인</button>
+                    <button onclick="goToSignup()">회원가입</button>
+                </div>
             </div>
         </nav>
     </div>
