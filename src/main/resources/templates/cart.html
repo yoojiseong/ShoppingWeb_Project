@@ -51,129 +51,124 @@
 <script th:src="@{/js/script.js}"></script>
 
 <script>
-    // 장바구니에 상품 추가 (home.html, product-detail.html)
-    function addToCart(productId) {
-        const product = products.find(p => p.id === productId);
-        if (!product) return;
-        const existingItem = cart.find(item => item.id === productId);
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            cart.push({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                quantity: 1
-            });
-        }
-        saveCartData();
-        updateUI();
-        alert(`${product.name}이(가) 장바구니에 추가되었습니다.`);
-    }
+    window.addEventListener('DOMContentLoaded', () => {
+        displayCartItems();
+    });
 
-    // 장바구니 데이터 저장 (cart.html, home.html, product-detail.html)
-    function saveCartData() {
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }
-
-    // 장바구니 아이템 표시 (cart.html)
+    // 장바구니 목록 불러오기
     function displayCartItems() {
-        const cartItems = document.getElementById('cartItems');
-        const totalPrice = document.getElementById('totalPrice');
-        if (!cartItems) return;
-        if (cart.length === 0) {
-            cartItems.innerHTML = '<p>장바구니가 비어있습니다.</p>';
-            if (totalPrice) totalPrice.textContent = '0';
-            return;
-        }
-        cartItems.innerHTML = '';
-        let total = 0;
-        cart.forEach(item => {
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-item';
-            cartItem.innerHTML = `
-            <div class="cart-item-image">${item.image}</div>
-            <div class="cart-item-info">
-                <h4>${item.name}</h4>
-                <div class="cart-item-price">${item.price.toLocaleString()}원</div>
-                <div class="quantity-controls">
-                    <button onclick="updateQuantity(${item.id}, -1)">-</button>
-                    <span>${item.quantity}</span>
-                    <button onclick="updateQuantity(${item.id}, 1)">+</button>
-                </div>
-            </div>
-            <button class="remove-btn" onclick="removeFromCart(${item.id})">삭제</button>
-        `;
-            cartItems.appendChild(cartItem);
-            total += item.price * item.quantity;
-        });
-        if (totalPrice) {
-            totalPrice.textContent = total.toLocaleString();
-        }
+        fetch('/api/cart')
+            .then(res => res.json())
+            .then(data => {
+                const cartItems = document.getElementById('cartItems');
+                const totalPrice = document.getElementById('totalPrice');
+                if (!cartItems) return;
+
+                if (data.length === 0) {
+                    cartItems.innerHTML = '<p>장바구니가 비어있습니다.</p>';
+                    if (totalPrice) totalPrice.textContent = '0';
+                    return;
+                }
+                console.log("CartItem : ", data);
+                cartItems.innerHTML = '';
+                let total = 0;
+
+                data.forEach(item => {
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                    <div class="cart-item-image">${item.image || '이미지 없음'}</div>
+                    <div class="cart-item-info">
+                        <h4>${item.productDTO.productName}</h4>
+                        <div class="cart-item-price">${item.productDTO.price.toLocaleString()}원</div>
+                        <div class="quantity-controls">
+                            <button onclick="updateQuantity(${item.productId}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.productId}, 1)">+</button>
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeFromCart(${item.productId})">삭제</button>
+                `;
+                    cartItems.appendChild(cartItem);
+                    total += item.price * item.quantity;
+                });
+
+                if (totalPrice) {
+                    totalPrice.textContent = total.toLocaleString();
+                }
+            });
     }
 
-    // 수량 업데이트 (cart.html)
+
+    // 수량 업데이트
     function updateQuantity(productId, change) {
-        const item = cart.find(item => item.id === productId);
-        if (!item) return;
-        item.quantity += change;
-        if (item.quantity <= 0) {
-            removeFromCart(productId);
-        } else {
-            saveCartData();
-            displayCartItems();
-            updateUI();
-        }
+        fetch(`/api/cart/${productId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quantityChange: change })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('수량 변경 실패');
+                return res.json();
+            })
+            .then(() => displayCartItems())
+            .catch(err => {
+                console.error(err);
+                alert('수량을 변경하는 데 실패했습니다.');
+            });
     }
 
-    // 장바구니에서 상품 제거 (cart.html)
+    // 장바구니에서 상품 제거
     function removeFromCart(productId) {
-        cart = cart.filter(item => item.id !== productId);
-        saveCartData();
-        displayCartItems();
-        updateUI();
+        fetch(`/api/cart/${productId}`, { method: 'DELETE' })
+            .then(res => {
+                if (!res.ok) throw new Error('삭제 실패');
+                return res.json();
+            })
+            .then(() => displayCartItems())
+            .catch(err => {
+                console.error(err);
+                alert('상품 삭제 중 오류 발생');
+            });
     }
 
-    // 장바구니 비우기 (cart.html)
+
+    // 장바구니 전체 비우기
     function clearCart() {
-        if (confirm('장바구니를 비우시겠습니까?')) {
-            cart = [];
-            saveCartData();
-            displayCartItems();
-            updateUI();
-        }
+        if (!confirm('장바구니를 비우시겠습니까?')) return;
+        fetch('/api/cart/clear', { method: 'DELETE' })
+            .then(res => {
+                if (!res.ok) throw new Error('비우기 실패');
+                return res.json();
+            })
+            .then(() => displayCartItems())
+            .catch(err => {
+                console.error(err);
+                alert('장바구니 비우기 실패');
+            });
     }
 
-    // 주문하기 (cart.html)
+    // 주문하기
     function checkout() {
-        if (!currentUser) {
-            alert('로그인이 필요합니다.');
-            goToLogin();
-            return;
-        }
-        if (cart.length === 0) {
-            alert('장바구니가 비어있습니다.');
-            return;
-        }
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const orderData = {
-            id: Date.now(),
-            date: new Date().toLocaleDateString(),
-            items: [...cart],
-            total: total
-        };
-        // 주문 내역 저장
-        let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-        orders.push(orderData);
-        localStorage.setItem('orders', JSON.stringify(orders));
-        // 장바구니 비우기
-        cart = [];
-        saveCartData();
-        alert(`주문이 완료되었습니다. 총 금액: ${total.toLocaleString()}원`);
-        displayCartItems();
-        updateUI();
+        fetch('/api/orders', {
+            method: 'POST'
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('주문 실패');
+                return res.json();
+            })
+            .then(order => {
+                alert(`주문이 완료되었습니다. 총 금액: ${order.totalPrice.toLocaleString()}원`);
+                displayCartItems();
+            })
+            .catch(err => {
+                console.error(err);
+                alert('주문 중 오류 발생');
+            });
     }
+
 </script>
 </body>
 </html>

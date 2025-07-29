@@ -179,28 +179,28 @@ function checkDuplicateId() {
 }
 
 // 비밀번호 확인 및 폼 제출 검증
-document.addEventListener('DOMContentLoaded', () => {
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('confirmPassword');
-    const passwordHelp = document.getElementById('passwordHelp');
+// document.addEventListener('DOMContentLoaded', () => {
+//     const password = document.getElementById('password');
+//     const confirmPassword = document.getElementById('confirmPassword');
+//     const passwordHelp = document.getElementById('passwordHelp');
+//
+//     confirmPassword.addEventListener('input', function() {
+//         if (password.value !== confirmPassword.value) {
+//             passwordHelp.style.display = 'block';
+//         } else {
+//             passwordHelp.style.display = 'none';
+//         }
+//     });
 
-    confirmPassword.addEventListener('input', function() {
-        if (password.value !== confirmPassword.value) {
-            passwordHelp.style.display = 'block';
-        } else {
-            passwordHelp.style.display = 'none';
-        }
-    });
-
-    const form = document.getElementById('signupForm');
-    form.addEventListener('submit', function(e) {
-        if (password.value !== confirmPassword.value) {
-            e.preventDefault();
-            alert('비밀번호가 일치하지 않습니다.');
-            confirmPassword.focus();
-        }
-    });
-});
+//     const form = document.getElementById('signupForm');
+//     form.addEventListener('submit', function(e) {
+//         if (password.value !== confirmPassword.value) {
+//             e.preventDefault();
+//             alert('비밀번호가 일치하지 않습니다.');
+//             confirmPassword.focus();
+//         }
+//     });
+// });
 
 
 // ====================================================================================================

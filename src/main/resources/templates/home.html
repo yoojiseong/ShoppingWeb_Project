@@ -115,6 +115,31 @@
             });
     }
     // products라는 데이터가 전달 됨 List형식
+    // 페이지 로딩 시 장바구니 개수 업데이트
+    document.addEventListener('DOMContentLoaded', function () {
+        updateCartCount();
+    });
+
+    function updateCartCount() {
+        fetch('/api/cart')
+            .then(res => {
+                if (!res.ok) throw new Error('장바구니 불러오기 실패');
+                return res.json();
+            })
+            .then(data => {
+                const count = data.length;
+                document.getElementById('cartCount').textContent = count;
+            })
+            .catch(err => {
+                console.error(err);
+                // 오류 시 0으로 설정
+                document.getElementById('cartCount').textContent = 0;
+            });
+    }
+
+    function goToCart() {
+        window.location.href = '/cart';
+    }
 
     // 상품 표시 (home.html)
     function displayProducts(productsToShow) {
