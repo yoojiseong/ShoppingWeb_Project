@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional; // Optional 임포트 추가
 import java.util.stream.Collectors;
 
 @Service

@@ -87,7 +87,6 @@
                 <button onclick="showAllProducts()" class="show-all-btn">전체 보기</button>
             </div>
             <div class="product-grid" id="productGrid">
-                <!-- 상품들이 JavaScript로 동적 생성됩니다 -->
             </div>
         </section>
     </div>
@@ -125,23 +124,30 @@
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
 
+            // --- 이 부분만 수정했어! ---
+            // product.thumbnailUrl을 사용하고, 없을 경우 기본 이미지로 대체
+            const thumbnailUrl = product.thumbnailUrl || '/images/default_product.png'; // 기본 이미지 경로를 꼭 확인해줘!
+
             productCard.innerHTML = `
-            <div class="product-image">${product.image || '이미지 없음'}</div>
-            <div class="product-info">
-                <h3 onclick="goToProductDetail(${product.productId})">${product.productName}</h3> <!-- product.name으로 변경 -->
-                <p>카테고리: ${product.productTag}</p> <!-- product.category로 변경 -->
-                <div class="product-price">${Number(product.price).toLocaleString()}원</div>
-                <button class="add-to-cart-btn" onclick="addToCart(${product.productId})">
-                    장바구니 담기
-                </button>
-            </div>
-        `;
+                <div class="product-image-container">
+                    <img src="${thumbnailUrl}" alt="${product.productName} 썸네일" class="product-thumbnail">
+                </div>
+                <div class="product-info">
+                    <h3 onclick="goToProductDetail(${product.productId})">${product.productName}</h3>
+                    <p>카테고리: ${product.productTag}</p>
+                    <div class="product-price">${Number(product.price).toLocaleString()}원</div>
+                    <button class="add-to-cart-btn" onclick="addToCart(${product.productId})">
+                        장바구니 담기
+                    </button>
+                </div>
+            `;
+            // --- 여기까지 수정! ---
             productGrid.appendChild(productCard);
         });
     }
 
     function goToProductDetail(productId) {
-        window.location.href = `/products/${productId}`; // 또는 /product-detail/${productId}
+        window.location.href = `/products/${productId}`;
         // 이 주소에 대한 Controller을 안만들었어요
     }
 
@@ -168,10 +174,10 @@
             .then(data => {
                 alert(`🛒 ${data.productName}이(가) 장바구니에 추가되었습니다.`);
                 // 필요시 UI 업데이트 or 장바구니 수량 갱신
-                updateCartCount();
+                // updateCartCount(); // 현재는 구현되어 있지 않으니 주석 처리 유지
             })
             .catch(err => {
-                console.error(err);
+                console.error('장바구니 추가 중 오류 발생:', err);
                 alert('장바구니 추가 중 오류가 발생했습니다.');
             });
     }
@@ -212,6 +218,31 @@
                 displayProducts(data);
             })
     }
+    // --- 기타 네비게이션 함수들 (기존 함수는 그대로 유지) ---
+    function goToMyPage() {
+        alert('마이페이지로 이동');
+        // 실제 마이페이지 URL로 변경
+        // window.location.href = '/mypage';
+    }
+
+    function goToCart() {
+        alert('장바구니로 이동');
+        // 실제 장바구니 URL로 변경
+        // window.location.href = '/cart';
+    }
+
+    function goToLogin() {
+        alert('로그인 페이지로 이동');
+        // 실제 로그인 페이지 URL로 변경
+        window.location.href = '/member/login';
+    }
+
+    function goToSignup() {
+        alert('회원가입 페이지로 이동');
+        // 실제 회원가입 페이지 URL로 변경
+        window.location.href = '/member/register';
+    }
+    // --- 기타 네비게이션 함수들 끝 ---
 </script>
 <script src="/js/script.js"></script>
 </body>

@@ -18,6 +18,8 @@ public interface ProductService {
     // 키워드 검색
     List<ProductDTO> searchProducts(String keyword);
 
+    ProductDTO registerProduct(ProductDTO productDTO);
+
     default Product dtoToEntity(ProductDTO productDTO){
         Product product = Product.builder()
                 .productId(productDTO.getProductId())
