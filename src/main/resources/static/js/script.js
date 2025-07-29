@@ -1,3 +1,4 @@
+// 샘플 상품 데이터
 // const products = [
 //     {id: 1, name: '클래식 청바지', category: '바지', price: 89000, image: '👖'},
 //     {id: 2, name: '슬림핏 치노', category: '바지', price: 65000, image: '👖'},
@@ -33,6 +34,7 @@ function initializePage() {
 
     // 현재 페이지에 따라 초기화 로직 분기
     const currentPath = window.location.pathname;
+
     if (currentPath === '/' || currentPath.includes('home')) {
         // home.html (메인 페이지)
         displayProducts(products); // 상품 목록 표시
@@ -74,7 +76,7 @@ function loadReviewData() {
     }
 }
 
-// UI 업데이트 (모든 페이지에서 사용)
+// UI 업데이트
 function updateUI() {
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -89,37 +91,199 @@ function updateUI() {
             logoutBtn.style.display = 'none';
         }
     }
+
     if (cartCount) {
         cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
     }
 }
 
+// 상품 표시
+function displayProducts(productsToShow) {
+    const productGrid = document.getElementById('productGrid');
+    if (!productGrid) return;
+
+    productGrid.innerHTML = '';
+
+    productsToShow.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.innerHTML = `
+            <div class="product-image">${product.image || '이미지 없음'}</div>
+            <div class="product-info">
+                <h3 onclick="goToProductDetail(${product.id})">${product.productName}</h3>
+                <p>카테고리: ${product.productTag}</p>
+                <div class="product-price">${product.price.toLocaleString()}원</div>
+                <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
+                    장바구니 담기
+                </button>
+            </div>
+        `;
+        productGrid.appendChild(productCard);
+    });
+}
+// 상품 상세 페이지로 이동
+function goToProductDetail(productId) {
+    localStorage.setItem('selectedProductId', productId);
+    window.location.href = '/product-detail';
+}
+
+// 뒤로가기
+function goBack() {
+    window.location.href = '/';
+}
 
 // ====================================================================================================
 // home.html (메인 페이지) 관련 JavaScript 함수
 // ====================================================================================================
 
+    const product = products.find(p => p.id === productId);
+    if (!product) {
+        window.location.href = '/';
+        return;
+    }
 
+    displayProductDetail(product);
+    displayProductReviews(productId);
+    initializeReviewForm();
+}
 
+// 상품 상세 정보 표시
+function displayProductDetail(product) {
+    document.getElementById('productImageLarge').textContent = product.image;
+    document.getElementById('productCategory').textContent = product.category;
+    document.getElementById('productTitle').textContent = product.name;
+    document.getElementById('productPriceLarge').textContent = product.price.toLocaleString() + '원';
 
 // ====================================================================================================
 // product-detail.html (상품 상세 페이지) 관련 JavaScript 함수
 // ====================================================================================================
 
+    document.getElementById('productDescription').textContent = descriptions[product.category] || '고품질 상품입니다.';
 
+    // 평점 정보 업데이트
+    updateProductRating(product.id);
+}
 
+// 상품 평점 정보 업데이트
+function updateProductRating(productId) {
+    const productReviews = reviews.filter(review => review.productId === productId);
+    const averageRating = productReviews.length > 0
+        ? productReviews.reduce((sum, review) => sum + review.rating, 0) / productReviews.length
+        : 0;
 
 // ====================================================================================================
 // cart.html (장바구니 페이지) 관련 JavaScript 함수
 // ====================================================================================================
 
+    starsContainer.innerHTML = renderStars(Math.round(averageRating));
+    ratingScore.textContent = averageRating.toFixed(1);
+    reviewCount.textContent = `(${productReviews.length}개 리뷰)`;
+}
 
+// 별점 렌더링
+function renderStars(rating) {
+    let starsHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= rating) {
+            starsHTML += '<span class="star">★</span>';
+        } else {
+            starsHTML += '<span class="star empty">★</span>';
+        }
+    }
+    return starsHTML;
+}
 
+// 상품 리뷰 표시
+function displayProductReviews(productId) {
+    const productReviews = reviews.filter(review => review.productId === productId);
+    const reviewList = document.getElementById('reviewList');
 
 // ====================================================================================================
 // signup.html (회원가입 페이지) 관련 JavaScript 함수
 // ====================================================================================================
 
+// 주소 검색 API
+function loadDaumPostcodeScript(callback) {
+    if (window.daum && window.daum.Postcode) {
+        callback();
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+    script.onload = () => {
+        console.log('다음 주소 API 로드 완료');
+        callback();
+    };
+    script.onerror = () => {
+        alert('주소 검색 스크립트를 불러오는 데 실패했습니다.');
+    };
+    document.head.appendChild(script);
+}
+
+function execDaumPostcode() {
+    loadDaumPostcodeScript(() => {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                document.getElementById('zipcode').value = data.zonecode;
+                document.getElementById('addressId').value = data.roadAddress;
+                document.getElementById('addressLine').focus();
+            }
+        }).open();
+    });
+}
+
+// 아이디 중복 확인
+function checkDuplicateId() {
+    const memberId = document.getElementById('memberId').value;
+    const resultDiv = document.getElementById('idCheckResult');
+
+    if (!memberId) {
+        resultDiv.textContent = '아이디를 입력하세요';
+        resultDiv.style.color = 'red';
+        return;
+    }
+
+    fetch(`/api/check-id?memberId=${encodeURIComponent(memberId)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.duplicate) {
+                resultDiv.textContent = '이미 사용 중인 아이디입니다.';
+                resultDiv.style.color = 'red';
+            } else {
+                resultDiv.textContent = '사용 가능한 아이디입니다.';
+                resultDiv.style.color = 'green';
+            }
+        })
+        .catch(() => {
+            resultDiv.textContent = '서버 오류';
+            resultDiv.style.color = 'red';
+        });
+}
+
+// 비밀번호 확인 및 폼 제출 검증
+document.addEventListener('DOMContentLoaded', () => {
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const passwordHelp = document.getElementById('passwordHelp');
+
+    confirmPassword.addEventListener('input', function() {
+        if (password.value !== confirmPassword.value) {
+            passwordHelp.style.display = 'block';
+        } else {
+            passwordHelp.style.display = 'none';
+        }
+    });
+
+    const form = document.getElementById('signupForm');
+    form.addEventListener('submit', function(e) {
+        if (password.value !== confirmPassword.value) {
+            e.preventDefault();
+            alert('비밀번호가 일치하지 않습니다.');
+            confirmPassword.focus();
+        }
+    });
+});
 
 
 
@@ -128,6 +292,8 @@ function updateUI() {
 // ====================================================================================================
 
 
+
+// 로그인 처리
 
 // ====================================================================================================
 // mypage.html (마이페이지) 관련 JavaScript 함수
