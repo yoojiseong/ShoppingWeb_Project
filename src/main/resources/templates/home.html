@@ -29,6 +29,20 @@
                 <button onclick="goToLogin()" id="loginBtn">로그인</button>
                 <button onclick="goToSignup()">회원가입</button>
                 <button onclick="logout()" id="logoutBtn" style="display: none;">로그아웃</button>
+                <!-- 관리자 페이지 버튼 (기본 숨김) -->
+                <button sec:authorize="hasRole('ADMIN')" onclick="goToAdmin()">관리자 페이지</button>
+
+                <script>
+                    function goToAdmin() {
+                        window.location.href = '/admin';
+                    }
+
+                    function logout() {
+                        localStorage.removeItem('currentUser');
+                        alert('로그아웃 되었습니다.');
+                        window.location.href = '/login';
+                    }
+                </script>
             </div>
         </nav>
     </div>

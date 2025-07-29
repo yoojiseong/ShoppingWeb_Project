@@ -20,12 +20,14 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-
+    private final ModelMapper modelMapper;
 
     @Override
     public ProductDTO getProductById(Long productId) {
         log.info("ProductService 에서 받아온 Id확인중 : " + productId);
-        ProductDTO productDTO = new ModelMapper().map(productRepository.findById(productId).get(), ProductDTO.class);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
+        ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
         log.info("ProductService 에서 받아온 pproductDTO확인 : " + productDTO);
         return productDTO;
     }
