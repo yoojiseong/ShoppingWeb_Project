@@ -262,8 +262,7 @@
       }
 
       function goToProductDetail(productId) {
-        window.location.href = `/products/${productId}`; // 또는 /product-detail/${productId}
-        // 이 주소에 대한 Controller을 안만들었어요
+        window.location.href = `/products/${productId}`;
       }
 
       function addToCart(productId, productName) {
@@ -288,8 +287,6 @@
           .then((data) => {
             alert(`🛒 ${productName}이(가) 장바구니에 추가되었습니다.`);
             updateCartCount();
-            // 필요시 UI 업데이트 or 장바구니 수량 갱신
-            // updateCartCount();
           })
           .catch((err) => {
             console.error(err);
@@ -298,26 +295,35 @@
       }
 
       function filterByCategory(category) {
-        fetch(`/api/products?category=${encodeURIComponent(category)}`)
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("📂 카테고리 결과:", data);
-            displayProducts(data);
-          });
+        // [lsr/feature/paging] 카테고리 필터링도 페이징과 연동되도록 추후 수정 필요
+        console.log(
+          `'${category}' 카테고리 필터링 기능은 페이징과 연동해야 합니다.`
+        );
+        // fetch(`/api/products?category=${encodeURIComponent(category)}`)
+        //   .then((response) => response.json())
+        //   .then((data) => {
+        //     console.log("📂 카테고리 결과:", data);
+        //     displayProducts(data);
+        //   });
       }
 
       // 전체 상품 보기 (home.html)
       function showAllProducts() {
-        fetch("/api/products")
-          .then((response) => response.json())
-          .then((data) => displayProducts(data));
+        document.getElementById("searchInput").value = ""; // 검색어 초기화
+        getProducts(1);
       }
 
       // 상품 검색 (home.html)
       function searchProducts() {
-        // [lsr/feature/paging] 검색 시, 새로운 페이징 함수를 첫 페이지부터 호출하도록 수정
         getProducts(1);
       }
+
+      // [lsr/feature/paging] 팀원의 '엔터 키 검색' 기능 추가
+      document.addEventListener("keypress", function (event) {
+        if (event.key === "Enter" && event.target.id === "searchInput") {
+          searchProducts();
+        }
+      });
     </script>
     <script src="/js/script.js"></script>
   </body>

@@ -95,7 +95,21 @@ function updateUI() {
     );
   }
 }
+function goToLogin() {
+  window.location.href = "/login";
+}
 
+function goToSignup() {
+  window.location.href = "/signup";
+}
+
+function goToCart() {
+  window.location.href = "/cart";
+}
+
+function goToMyPage() {
+  window.location.href = "/mypage";
+}
 // ====================================================================================================
 // home.html (메인 페이지) 관련 JavaScript 함수
 // ====================================================================================================
