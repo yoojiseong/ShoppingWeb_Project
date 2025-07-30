@@ -24,7 +24,7 @@ public class ProductServiceTests {
     public void testProductInsert() {
         // 상품 등록 테스트
         Product product = Product.builder()
-                .productName("테스트")
+                .productName("상품등록 테스트")
                 .price(BigDecimal.valueOf(100000))
                 .stock(50)
                 .productTag(ProductCategory.TOP)
@@ -43,7 +43,7 @@ public class ProductServiceTests {
     @Test
     public void testSelectProduct() {
         // 상품 조회 테스트
-        Long productId = 7L; // 조회하고 싶은 상품 ID
+        Long productId = 9L; // 조회하고 싶은 상품 ID
 
         // Repository에서 특정 상품 ID로 조회
         Optional<Product> result = productRepository.findById(productId);
@@ -61,7 +61,7 @@ public class ProductServiceTests {
     @Test
     public void testUpdateProducts() {
         // 상품 수정 테스트
-        Long productId = 7L; // 수정할 상품의 ID
+        Long productId = 9L; // 수정할 상품의 ID
 
         // 상품을 ID로 조회 (Optional로 감싸서 예외 처리)
         Optional<Product> result = productRepository.findById(productId);
@@ -76,7 +76,7 @@ public class ProductServiceTests {
         log.info("카테고리 (Tag) : " + product.getProductTag());
 
         // 상품 내용 수정 (아래 메서드는 직접 구현해야 합니다)
-        product.changeTitleContent("테스트 수정", new BigDecimal("55000"), 20, ProductCategory.OUTER);
+        product.changeTitleContent("테스트 수정", new BigDecimal("50000"), 20, ProductCategory.OUTER);
 
         // 수정된 상품 저장 (JPA가 update 쿼리 자동 실행)
         productRepository.save(product);
@@ -90,7 +90,7 @@ public class ProductServiceTests {
 
     @Test
     public void testDeleteProduct() {
-        Long productId = 6L; // 삭제할 상품 ID
+        Long productId = 8L; // 삭제할 상품 ID
 
         // 삭제 전 존재 여부 확인 (Optional로 안전하게 처리)
         Optional<Product> result = productRepository.findById(productId);

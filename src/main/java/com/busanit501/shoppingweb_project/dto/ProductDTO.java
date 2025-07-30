@@ -33,6 +33,7 @@ public class ProductDTO {
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .stock(product.getStock())
+                .image(product.getImage())
                 .productTag(ProductCategory.valueOf(product.getProductTag().name())) // Enum을 문자열로 변환
                 .build();
     }

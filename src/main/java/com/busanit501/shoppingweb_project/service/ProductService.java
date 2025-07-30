@@ -28,6 +28,7 @@ public interface ProductService {
                 .productName(productDTO.getProductName())
                 .price(productDTO.getPrice())
                 .stock(productDTO.getStock())
+                .image(productDTO.getImage())
                 .build();
         return product;
     }
@@ -37,6 +38,7 @@ public interface ProductService {
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .stock(product.getStock())
+                .image(product.getImage())
                 .build();
         return productDTO;
     }
