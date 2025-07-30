@@ -16,9 +16,12 @@ public class CustomUserDetails implements UserDetails {
         this.member = member;
     }
 
-    @Override
+    @Override // 사용자에게 권한 부여
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(member.getRole()));
+    }
+    public Long getMemberId(){
+        return member.getId();
     }
 
     @Override
