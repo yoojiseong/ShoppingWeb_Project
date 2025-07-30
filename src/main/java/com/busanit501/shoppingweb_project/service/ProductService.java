@@ -23,24 +23,24 @@ public interface ProductService {
     List<ProductDTO> searchProducts(String keyword);
 
     void saveProduct(Product product);
-    default Product dtoToEntity(ProductDTO productDTO){
+
+    default Product dtoToEntity(ProductDTO productDTO) {
         Product product = Product.builder()
                 .productId(productDTO.getProductId())
                 .productName(productDTO.getProductName())
                 .price(productDTO.getPrice())
                 .stock(productDTO.getStock())
                 .productTag(productDTO.getProductTag())
-                .image(productDTO.getImage())
                 .build();
         return product;
     }
-    default ProductDTO entityToDto(Product product){
+
+    default ProductDTO entityToDto(Product product) {
         ProductDTO productDTO = ProductDTO.builder()
                 .productId(product.getProductId())
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .stock(product.getStock())
-                .image(product.getImage())
                 .productTag(ProductCategory.valueOf(product.getProductTag().name()))
                 .build();
         return productDTO;
