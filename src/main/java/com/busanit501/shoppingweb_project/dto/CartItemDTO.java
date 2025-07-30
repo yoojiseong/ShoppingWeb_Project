@@ -1,5 +1,6 @@
 package com.busanit501.shoppingweb_project.dto;
 
+import com.busanit501.shoppingweb_project.domain.CartItem;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -23,4 +24,17 @@ public class CartItemDTO {
 
     @Min(value = 1, message = "수량은 1 이상이어야 합니다.")
     private int quantity;
+
+    private ProductDTO productDTO;
+
+    public static CartItemDTO fromEntity(CartItem cartItem , ProductDTO productDTO) {
+        return CartItemDTO.builder()
+                .cartItemId(cartItem.getCartItemId())
+                .memberId(cartItem.getMemberId())
+                .productId(cartItem.getProduct().getProductId())
+                .quantity(cartItem.getQuantity())
+                .productDTO(productDTO)
+                .build();
+    }
+
 }

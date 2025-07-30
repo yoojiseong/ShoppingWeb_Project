@@ -15,14 +15,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     boolean existsByMemberId(String memberId);
 
-    @EntityGraph(attributePaths = "role")
-    @Query("select m from Member m where m.memberId = :memberId and m.social = false")
-    Optional<Member> getWithRoles(@Param("memberId") String memberId);
-
-
-    @EntityGraph(attributePaths = "role")
+    // 이메일로 회원 찾기 (roleSet이 아니라 role 필드이므로 수정)
+    @EntityGraph(attributePaths = {"role"})
     Optional<Member> findByEmail(String email);
 
+    // memberId로 회원 찾기 (social 필드는 없으니 제거)
+    @EntityGraph(attributePaths = {"role"})
+    @Query("select m from Member m where m.memberId = :memberId")
+    Optional<Member> getWithRoles(@Param("memberId") String memberId);
+
+    // 비밀번호 업데이트 (필드명 맞춤)
     @Modifying
     @Transactional
     @Query("update Member m set m.password = :password where m.memberId = :memberId")

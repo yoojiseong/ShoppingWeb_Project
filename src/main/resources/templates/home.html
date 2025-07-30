@@ -29,7 +29,7 @@
 
                 <div sec:authorize="isAuthenticated()">
                     <span sec:authentication="name">사용자 이메일</span>
-                    <a class="nav-link" href="/member/logout">로그아웃</a>
+                    <a class="nav-link" href="/logout">로그아웃</a>
                 </div>
 
                 <div sec:authorize="!isAuthenticated()">
@@ -115,6 +115,31 @@
             });
     }
     // products라는 데이터가 전달 됨 List형식
+    // 페이지 로딩 시 장바구니 개수 업데이트
+    document.addEventListener('DOMContentLoaded', function () {
+        updateCartCount();
+    });
+
+    function updateCartCount() {
+        fetch('/api/cart')
+            .then(res => {
+                if (!res.ok) throw new Error('장바구니 불러오기 실패');
+                return res.json();
+            })
+            .then(data => {
+                const count = data.length;
+                document.getElementById('cartCount').textContent = count;
+            })
+            .catch(err => {
+                console.error(err);
+                // 오류 시 0으로 설정
+                document.getElementById('cartCount').textContent = 0;
+            });
+    }
+
+    function goToCart() {
+        window.location.href = '/cart';
+    }
 
     // 상품 표시 (home.html)
     function displayProducts(productsToShow) {
@@ -131,7 +156,7 @@
                 <h3 onclick="goToProductDetail(${product.productId})">${product.productName}</h3> <!-- product.name으로 변경 -->
                 <p>카테고리: ${product.productTag}</p> <!-- product.category로 변경 -->
                 <div class="product-price">${Number(product.price).toLocaleString()}원</div>
-                <button class="add-to-cart-btn" onclick="addToCart(${product.productId})">
+                <button class="add-to-cart-btn" onclick="addToCart(${product.productId}, '${product.productName}')">
                     장바구니 담기
                 </button>
             </div>
@@ -145,10 +170,9 @@
         // 이 주소에 대한 Controller을 안만들었어요
     }
 
-    function addToCart(productId) {
+    function addToCart(productId, productName) {
         const payload = {
             productId: productId,
-            memberId: 1,
             quantity: 1
         };
 
@@ -166,9 +190,10 @@
                 return res.json();
             })
             .then(data => {
-                alert(`🛒 ${data.productName}이(가) 장바구니에 추가되었습니다.`);
-                // 필요시 UI 업데이트 or 장바구니 수량 갱신
+                alert(`🛒 ${productName}이(가) 장바구니에 추가되었습니다.`);
                 updateCartCount();
+                // 필요시 UI 업데이트 or 장바구니 수량 갱신
+                // updateCartCount();
             })
             .catch(err => {
                 console.error(err);

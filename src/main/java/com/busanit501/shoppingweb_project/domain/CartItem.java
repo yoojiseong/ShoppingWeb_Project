@@ -38,4 +38,11 @@ public class CartItem {
             product.getCartItems().add(this);
         }
     }
+    public void changeQuantity(int newQuantity) {
+        this.quantity = newQuantity;
+    }
+
+    public void increaseQuantity(int amount) {
+        this.quantity += amount;
+    }
 }
