@@ -29,10 +29,15 @@
             <button onclick="goToCart()">
               장바구니 (<span id="cartCount">0</span>)
             </button>
-            <button onclick="goToLogin()" id="loginBtn">로그인</button>
-            <button onclick="logout()" id="logoutBtn" style="display: none">
-              로그아웃
-            </button>
+            <div sec:authorize="isAuthenticated()">
+              <span sec:authentication="name">사용자 이메일</span>
+              <a class="nav-link" href="/logout">로그아웃</a>
+            </div>
+
+            <div sec:authorize="!isAuthenticated()">
+              <button onclick="goToLogin()" id="loginBtn">로그인</button>
+              <button onclick="goToSignup()">회원가입</button>
+            </div>
           </div>
         </nav>
       </div>
@@ -124,6 +129,29 @@
             </div>
           </div>
 
+          <!-- 로그인 필요 메시지 -->
+          <div class="login-required" id="loginRequired" style="display: none">
+            <div class="login-required-card">
+              <p>리뷰를 작성하려면 로그인이 필요합니다.</p>
+              <button onclick="goToLogin()">로그인하기</button>
+            </div>
+          </div>
+          <!-- 로그인 필요 메시지 -->
+          <div class="login-required" id="loginRequired" style="display: none">
+            <div class="login-required-card">
+              <p>리뷰를 작성하려면 로그인이 필요합니다.</p>
+              <button onclick="goToLogin()">로그인하기</button>
+            </div>
+          </div>
+
+          <!-- 로그인 필요 메시지 -->
+          <div class="login-required" id="loginRequired" style="display: none">
+            <div class="login-required-card">
+              <p>리뷰를 작성하려면 로그인이 필요합니다.</p>
+              <button onclick="goToLogin()">로그인하기</button>
+            </div>
+          </div>
+
           <!-- 리뷰 목록 -->
           <div class="review-list" id="reviewList">
             <!-- JavaScript로 동적 생성 -->
@@ -138,14 +166,26 @@
 
     <script th:src="@{/js/script.js}"></script>
     <script>
-      window.onload = initializeProductDetail;
-      // const urlParams = new URLSearchParams(window.location.search);
-      // const pproductId = urlPParams.get('id');
-      // fetch(`/api/products/${pproductId}`)
-      //     .then(res => res.json())
-      //     .then(product => {
-      //         document.getElementById('productName').textContent = product.productName;
-      //     })
+      let currentUser = null;
+      let currentProduct = null;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        await fetchCurrentUser(); // currentUser 먼저 세팅
+        initializeProductDetail(); // 상세 페이지 표시
+        initializeReviewForm();
+      });
+
+      async function fetchCurrentUser() {
+        try {
+          const res = await fetch("/api/members/me");
+          if (!res.ok) throw new Error("로그인 안됨");
+          currentUser = await res.json();
+          console.log("로그인 사용자:", currentUser);
+        } catch (err) {
+          console.warn("비로그인 상태", err);
+          currentUser = null;
+        }
+      }
 
       // 뒤로가기 (product-detail.html)
       function goBack() {
@@ -153,44 +193,41 @@
       }
 
       // 상품 상세 페이지 초기화 (product-detail.html)
-      function initializeProductDetail() {
-        // const params = new URLSearchParams(window.location.search);
-        // const productId = params.get('id');
+      async function initializeProductDetail() {
         const pathSegments = window.location.pathname.split("/");
         const productId = pathSegments[pathSegments.length - 1];
+
         if (!productId) {
           window.location.href = "/home";
           return;
         }
 
-        fetch(`/api/products/${productId}`) //productDTO
-          .then((res) => {
-            if (!res.ok) throw new Error("상품 정보를 불러오지 못했습니다.");
-            return res.json();
-          })
-          .then((product) => {
-            // product는 이제 reviewCount와 averageRating을 포함한 ProductDTO
-            displayProductDetail(product);
+        try {
+          const res = await fetch(`/api/products/${productId}`);
+          if (!res.ok) throw new Error("상품 정보를 불러오지 못했습니다.");
 
-            // [lsr/feature/rating] 백엔드에서 계산된 정확한 평점과 리뷰 수를 화면에 표시
-            const starsContainer = document.getElementById("averageStars");
-            const ratingScore = document.getElementById("averageRating");
-            const reviewCount = document.getElementById("reviewCount");
+          const product = await res.json();
+          console.log("product : ", product);
+          currentProduct = product;
 
-            starsContainer.innerHTML = renderStars(
-              Math.round(product.averageRating)
-            );
-            ratingScore.textContent = product.averageRating.toFixed(1);
-            reviewCount.textContent = `(${product.reviewCount}개 리뷰)`;
+          displayProductDetail(product);
 
-            // [lsr/feature/paging] 페이지 1로 새로운 리뷰 목록 조회 함수를 호출합니다.
-            displayProductReviews(product.productId, 1);
-            initializeReviewForm();
-          })
-          .catch((err) => {
-            alert(err.message);
-            window.location.href = "/";
-          });
+          // [lsr] 평점 및 리뷰 정보 표시 로직 추가
+          const starsContainer = document.getElementById("averageStars");
+          const ratingScore = document.getElementById("averageRating");
+          const reviewCount = document.getElementById("reviewCount");
+          starsContainer.innerHTML = renderStars(
+            Math.round(product.averageRating)
+          );
+          ratingScore.textContent = product.averageRating.toFixed(1);
+          reviewCount.textContent = `(${product.reviewCount}개 리뷰)`;
+          displayProductReviews(product.productId, 1);
+
+          updateCartCount();
+        } catch (err) {
+          alert(err.message);
+          window.location.href = "/";
+        }
       }
 
       // 상품 상세 정보 표시 (product-detail.html)
@@ -218,10 +255,23 @@
       }
 
       /* ==================================================
-         [lsr/feature/rating] 기존 updateProductRating 함수는 이제 필요 없으므로 보존용 주석만 남깁니다.
+         [lsr] 기존 updateProductRating 함수 보존 (주석 처리)
+         - 이유: 이 함수는 더 이상 사용되지 않으며, 평점 계산 로직은 백엔드에서 처리된 후
+                 initializeProductDetail 함수 내에서 직접 화면에 표시됩니다.
       ================================================== */
       // // 상품 평점 정보 업데이트 (product-detail.html)
-      // function updateProductRating(productId) { ... }
+      // function updateProductRating(productId) {
+      //     const productReviews = reviews.filter(review => review.productId === productId);
+      //     const averageRating = productReviews.length > 0
+      //         ? productReviews.reduce((sum, review) => sum + review.rating, 0) / productReviews.length
+      //         : 0;
+      //     const starsContainer = document.getElementById('averageStars');
+      //     const ratingScore = document.getElementById('averageRating');
+      //     const reviewCount = document.getElementById('reviewCount');
+      //     starsContainer.innerHTML = renderStars(Math.round(averageRating));
+      //     ratingScore.textContent = averageRating.toFixed(1);
+      //     reviewCount.textContent = `(${productReviews.length}개 리뷰)`;
+      // }
 
       // 별점 렌더링 (product-detail.html)
       function renderStars(rating) {
@@ -472,9 +522,52 @@
 
       // 상세 페이지에서 장바구니 담기 (product-detail.html)
       function addToCartFromDetail() {
-        const params = new URLSearchParams(window.location.search);
-        const productId = params.get("id");
-        addToCart(parseInt(productId));
+        const pathParts = window.location.pathname.split("/");
+        const productId = pathParts[pathParts.length - 1];
+        addToCart(currentProduct.productId, currentProduct.productName);
+      }
+
+      function addToCart(productId, productName) {
+        const payload = {
+          productId: productId,
+          quantity: 1,
+        };
+
+        fetch("/api/cart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error("장바구니 추가에 실패했습니다.");
+            }
+            return res.json();
+          })
+          .then((data) => {
+            alert(`🛒 ${productName}이(가) 장바구니에 추가되었습니다.`);
+            updateCartCount();
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      }
+      function updateCartCount() {
+        fetch("/api/cart")
+          .then((res) => {
+            if (!res.ok) throw new Error("장바구니 불러오기 실패");
+            return res.json();
+          })
+          .then((data) => {
+            const count = data.length;
+            document.getElementById("cartCount").textContent = count;
+          })
+          .catch((err) => {
+            console.error(err);
+            document.getElementById("cartCount").textContent = 0;
+          });
       }
     </script>
   </body>

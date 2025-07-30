@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Member {
-    //푸쉬 테스트
+    // 푸쉬 테스트
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

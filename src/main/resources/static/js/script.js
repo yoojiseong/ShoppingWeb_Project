@@ -14,7 +14,6 @@
 // ];
 
 // 전역 변수 (모든 페이지에서 사용)
-let currentUser = null; // 현재 로그인된 사용자 정보 (localStorage에서 로드)
 let cart = []; // 장바구니 아이템 (localStorage에서 로드)
 let reviews = []; // 상품 리뷰 (localStorage에서 로드)
 let selectedRating = 5; // 리뷰 작성 시 선택된 별점 (product-detail.html에서 사용)
@@ -187,28 +186,28 @@ function checkDuplicateId() {
 }
 
 // 비밀번호 확인 및 폼 제출 검증
-// document.addEventListener('DOMContentLoaded', () => {
-//     const password = document.getElementById('password');
-//     const confirmPassword = document.getElementById('confirmPassword');
-//     const passwordHelp = document.getElementById('passwordHelp');
-//
-//     confirmPassword.addEventListener('input', function() {
-//         if (password.value !== confirmPassword.value) {
-//             passwordHelp.style.display = 'block';
-//         } else {
-//             passwordHelp.style.display = 'none';
-//         }
-//     });
+document.addEventListener("DOMContentLoaded", () => {
+  const password = document.getElementById("password");
+  const confirmPassword = document.getElementById("confirmPassword");
+  const passwordHelp = document.getElementById("passwordHelp");
 
-//     const form = document.getElementById('signupForm');
-//     form.addEventListener('submit', function(e) {
-//         if (password.value !== confirmPassword.value) {
-//             e.preventDefault();
-//             alert('비밀번호가 일치하지 않습니다.');
-//             confirmPassword.focus();
-//         }
-//     });
-// });
+  confirmPassword.addEventListener("input", function () {
+    if (password.value !== confirmPassword.value) {
+      passwordHelp.style.display = "block";
+    } else {
+      passwordHelp.style.display = "none";
+    }
+  });
+
+  const form = document.getElementById("signupForm");
+  form.addEventListener("submit", function (e) {
+    if (password.value !== confirmPassword.value) {
+      e.preventDefault();
+      alert("비밀번호가 일치하지 않습니다.");
+      confirmPassword.focus();
+    }
+  });
+});
 
 // ====================================================================================================
 // login.html (로그인 페이지) 관련 JavaScript 함수
