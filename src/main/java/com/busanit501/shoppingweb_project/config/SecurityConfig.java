@@ -38,6 +38,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 허용할 경로
                         .requestMatchers("/home", "/signup", "/login", "/css/**", "/js/**", "/images/**", "/api/check-id").permitAll()
+                        // 관리자 권한 필요
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )

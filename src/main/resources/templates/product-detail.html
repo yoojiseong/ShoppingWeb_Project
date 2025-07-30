@@ -100,12 +100,14 @@
             </div>
 
             <!-- 로그인 필요 메시지 -->
-            <div class="login-required" id="loginRequired" style="display: none;">
-                <div class="login-required-card">
-                    <p>리뷰를 작성하려면 로그인이 필요합니다.</p>
-                    <button onclick="goToLogin()">로그인하기</button>
-                </div>
-            </div>
+
+                 <div class="login-required" id="loginRequired" style="display: none;">
+                    <div class="login-required-card">
+                        <p>리뷰를 작성하려면 로그인이 필요합니다.</p>
+                        <button onclick="goToLogin()">로그인하기</button>
+                    </div>
+                 </div>
+
 
             <!-- 리뷰 목록 -->
             <div class="review-list" id="reviewList">
@@ -117,6 +119,7 @@
 
 <script th:src="@{/js/script.js}"></script>
 <script>
+    let currentProduct = null;
     window.onload = initializeProductDetail;
     // const urlParams = new URLSearchParams(window.location.search);
     // const pproductId = urlPParams.get('id');
@@ -148,10 +151,12 @@
                 return res.json();
             })
             .then(product => {
+                currentProduct = product;
                 displayProductDetail(product);
                 updateProductRating(product.productId); // 리뷰쪽은 추후 연결
                 displayProductReviews(product.productId);
                 initializeReviewForm();
+                updateCartCount();
             })
             .catch(err => {
                 alert(err.message);
@@ -176,6 +181,7 @@
         // 평점 정보 업데이트
         updateProductRating(product.id);
     }
+
 
     // 상품 평점 정보 업데이트 (product-detail.html)
     function updateProductRating(productId) {
@@ -322,9 +328,56 @@
 
     // 상세 페이지에서 장바구니 담기 (product-detail.html)
     function addToCartFromDetail() {
-        const params = new URLSearchParams(window.location.search);
-        const productId = params.get('id');
-        addToCart(parseInt(productId));
+        const pathParts = window.location.pathname.split('/');
+        const productId = pathParts[pathParts.length - 1];
+        addToCart(currentProduct.productId , currentProduct.productName);
+    }
+
+    function addToCart(productId, productName) {
+        const payload = {
+            productId: productId,
+            quantity: 1
+        };
+
+        fetch('/api/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('장바구니 추가에 실패했습니다.');
+                }
+                return res.json();
+            })
+            .then(data => {
+                alert(`🛒 ${productName}이(가) 장바구니에 추가되었습니다.`);
+                updateCartCount();
+                // 필요시 UI 업데이트 or 장바구니 수량 갱신
+                // updateCartCount();
+            })
+            .catch(err => {
+                console.error(err);
+
+            });
+    }
+    function updateCartCount() {
+        fetch('/api/cart')
+            .then(res => {
+                if (!res.ok) throw new Error('장바구니 불러오기 실패');
+                return res.json();
+            })
+            .then(data => {
+                const count = data.length;
+                document.getElementById('cartCount').textContent = count;
+            })
+            .catch(err => {
+                console.error(err);
+                // 오류 시 0으로 설정
+                document.getElementById('cartCount').textContent = 0;
+            });
     }
 </script>
 </body>

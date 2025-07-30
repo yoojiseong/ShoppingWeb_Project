@@ -18,6 +18,7 @@ public class OrderItemDTO {
 
     private Long productid; // camelCase
 
+    private String productName;
 
     @Builder.Default
     private int quantity=1;

@@ -92,7 +92,21 @@ function updateUI() {
         cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
     }
 }
+function goToLogin() {
+    window.location.href = '/login';
+}
 
+function goToSignup() {
+    window.location.href = '/signup';
+}
+
+function goToCart() {
+    window.location.href = '/cart';
+}
+
+function goToMyPage() {
+    window.location.href = '/mypage';
+}
 
 // ====================================================================================================
 // home.html (메인 페이지) 관련 JavaScript 함수
@@ -179,28 +193,28 @@ function checkDuplicateId() {
 }
 
 // 비밀번호 확인 및 폼 제출 검증
-// document.addEventListener('DOMContentLoaded', () => {
-//     const password = document.getElementById('password');
-//     const confirmPassword = document.getElementById('confirmPassword');
-//     const passwordHelp = document.getElementById('passwordHelp');
-//
-//     confirmPassword.addEventListener('input', function() {
-//         if (password.value !== confirmPassword.value) {
-//             passwordHelp.style.display = 'block';
-//         } else {
-//             passwordHelp.style.display = 'none';
-//         }
-//     });
+document.addEventListener('DOMContentLoaded', () => {
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const passwordHelp = document.getElementById('passwordHelp');
 
-//     const form = document.getElementById('signupForm');
-//     form.addEventListener('submit', function(e) {
-//         if (password.value !== confirmPassword.value) {
-//             e.preventDefault();
-//             alert('비밀번호가 일치하지 않습니다.');
-//             confirmPassword.focus();
-//         }
-//     });
-// });
+    confirmPassword.addEventListener('input', function() {
+        if (password.value !== confirmPassword.value) {
+            passwordHelp.style.display = 'block';
+        } else {
+            passwordHelp.style.display = 'none';
+        }
+    });
+
+    const form = document.getElementById('signupForm');
+    form.addEventListener('submit', function(e) {
+        if (password.value !== confirmPassword.value) {
+            e.preventDefault();
+            alert('비밀번호가 일치하지 않습니다.');
+            confirmPassword.focus();
+        }
+    });
+});
 
 
 // ====================================================================================================
