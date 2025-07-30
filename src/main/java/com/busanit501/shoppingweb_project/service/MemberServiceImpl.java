@@ -30,8 +30,13 @@ public class MemberServiceImpl implements MemberService {
         Member member = MemberMapper.toMemberEntity(dto, encodedPassword);
 
         // 기본 권한 세팅
-        member.setRole("ROLE_USER");
-        member.setRole("ROLE_ADMIN");
+        boolean isAdmin = false;
+
+        if (isAdmin) {
+            member.setRole("ROLE_ADMIN");
+        } else {
+            member.setRole("ROLE_USER");
+        }
 
         // 주소가 있다면 Address도 생성 후 관계 연결
         if (dto.isRegisterAddress()) {
