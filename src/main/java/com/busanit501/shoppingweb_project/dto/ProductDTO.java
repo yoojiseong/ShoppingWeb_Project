@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.math.BigDecimal;
 
 @Data
@@ -26,6 +28,8 @@ public class ProductDTO {
     private int stock;
     private ProductCategory productTag;
 
+    @Builder.Default
+    private List<String> detailImageFileNames = new ArrayList<>();
     private String imageFileName; // 이미지 파일 이름 담을 필드 추가
 
     public static ProductDTO fromEntity(Product product) {
