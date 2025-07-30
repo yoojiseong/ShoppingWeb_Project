@@ -22,8 +22,15 @@
             <div class="nav-buttons">
                 <button onclick="goToMyPage()">마이페이지</button>
                 <button onclick="goToCart()">장바구니 (<span id="cartCount">0</span>)</button>
-                <button onclick="goToLogin()" id="loginBtn">로그인</button>
-                <button onclick="logout()" id="logoutBtn" style="display: none;">로그아웃</button>
+                <div sec:authorize="isAuthenticated()">
+                    <span sec:authentication="name">사용자 이메일</span>
+                    <a class="nav-link" href="/logout">로그아웃</a>
+                </div>
+
+                <div sec:authorize="!isAuthenticated()">
+                    <button onclick="goToLogin()" id="loginBtn">로그인</button>
+                    <button onclick="goToSignup()">회원가입</button>
+                </div>
             </div>
         </nav>
     </div>
@@ -119,15 +126,27 @@
 
 <script th:src="@{/js/script.js}"></script>
 <script>
+    let currentUser = null;
     let currentProduct = null;
-    window.onload = initializeProductDetail;
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const pproductId = urlPParams.get('id');
-    // fetch(`/api/products/${pproductId}`)
-    //     .then(res => res.json())
-    //     .then(product => {
-    //         document.getElementById('productName').textContent = product.productName;
-    //     })
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        await fetchCurrentUser();         // currentUser 먼저 세팅
+        initializeProductDetail();        // 상세 페이지 표시
+        initializeReviewForm();
+    });
+
+    async function fetchCurrentUser() {
+        try {
+            const res = await fetch('/api/members/me');
+            if (!res.ok) throw new Error('로그인 안됨');
+            currentUser = await res.json();
+            console.log('로그인 사용자:', currentUser);
+        } catch (err) {
+            console.warn('비로그인 상태', err);
+            currentUser = null;
+        }
+    }
+
 
     // 뒤로가기 (product-detail.html)
     function goBack() {
@@ -135,33 +154,29 @@
     }
 
     // 상품 상세 페이지 초기화 (product-detail.html)
-    function initializeProductDetail() {
-        // const params = new URLSearchParams(window.location.search);
-        // const productId = params.get('id');
+    async function initializeProductDetail() {
         const pathSegments = window.location.pathname.split('/');
         const productId = pathSegments[pathSegments.length - 1];
+
         if (!productId) {
             window.location.href = '/home';
             return;
         }
 
-        fetch(`/api/products/${productId}`) //productDTO
-            .then(res => {
-                if (!res.ok) throw new Error('상품 정보를 불러오지 못했습니다.');
-                return res.json();
-            })
-            .then(product => {
-                currentProduct = product;
-                displayProductDetail(product);
-                updateProductRating(product.productId); // 리뷰쪽은 추후 연결
-                displayProductReviews(product.productId);
-                initializeReviewForm();
-                updateCartCount();
-            })
-            .catch(err => {
-                alert(err.message);
-                window.location.href = '/';
-            });
+        try {
+            const res = await fetch(`/api/products/${productId}`);
+            if (!res.ok) throw new Error('상품 정보를 불러오지 못했습니다.');
+
+            const product = await res.json();
+            console.log("product : ", product);
+            currentProduct = product;
+
+            displayProductDetail(product);
+            updateCartCount();
+        } catch (err) {
+            alert(err.message);
+            window.location.href = '/';
+        }
     }
 
     // 상품 상세 정보 표시 (product-detail.html)
