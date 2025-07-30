@@ -27,6 +27,10 @@ public class ProductDTO {
     private String image;
     private ProductCategory productTag;
 
+    // [lsr/feature/rating] 리뷰 개수와 평균 평점을 담을 필드 추가
+    private long reviewCount;
+    private double averageRating;
+
     public static ProductDTO fromEntity(Product product) {
         return ProductDTO.builder()
                 .productId(product.getProductId())
