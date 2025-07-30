@@ -24,6 +24,7 @@ public class ProductDTO {
     @NotNull
     private BigDecimal price;
     private int stock;
+    private String image;
     private ProductCategory productTag;
 
     public static ProductDTO fromEntity(Product product) {

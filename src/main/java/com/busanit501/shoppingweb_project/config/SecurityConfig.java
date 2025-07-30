@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 허용할 경로
-                        .requestMatchers("/signup", "/login", "/css/**", "/js/**", "/api/check-id").permitAll()
+                        .requestMatchers("/signup", "/login", "/css/**", "/js/**", "/api/check-id", "/api/**").permitAll()
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )

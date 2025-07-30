@@ -160,6 +160,22 @@
 
     // 페이지 로드 시 상품 목록 자동 호출
     window.onload = fetchProducts;
+
+    // input[type=file] 에서 선택한 파일 업로드 함수 예시
+    function uploadImage(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        return fetch('/api/files/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('이미지 업로드 실패');
+                return res.text();  // 서버에서 반환한 이미지 URL
+            });
+    }
+
 </script>
 
 </body>
