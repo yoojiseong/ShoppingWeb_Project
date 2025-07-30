@@ -123,8 +123,8 @@
       // html이 렌더링 되기 전에 이 함수를 실행시켜라
       // fetch -> RestAPI를 실행시키기 위한 명령어
       window.onload = function () {
-        // [lsr/feature/paging] 페이지 로딩 시, 전체 목록 대신 첫 페이지를 가져오도록 수정
-        getProducts(1);
+        // [lsr/feature/paging] 페이지 로딩 시, 검색 조건 없이 첫 페이지를 가져옵니다.
+        getProducts(1, "", "");
       };
       // products라는 데이터가 전달 됨 List형식
       // 페이지 로딩 시 장바구니 개수 업데이트
@@ -196,20 +196,25 @@
       }
 
       /**
-       * [lsr/feature/paging] 특정 페이지의 상품 목록을 가져오는 메인 함수 (신규)
+       * [lsr/feature/paging] 상품 목록을 가져오는 메인 함수 (확장)
+       * 이유: 일반 목록 조회, 검색, 카테고리 필터링을 모두 처리하기 위해 type과 keyword를 파라미터로 받도록 확장합니다.
        * @param page 요청할 페이지 번호
+       * @param type 검색 타입 (n: 이름, t: 태그/카테고리)
+       * @param keyword 검색어
        */
-      function getProducts(page) {
-        const searchInput = document.getElementById("searchInput");
-        const keyword = searchInput.value;
-        // 현재는 이름(n)으로만 검색 타입을 고정합니다. 추후 확장 가능합니다.
-        const type = "n";
+      function getProducts(page, type, keyword) {
+        // 파라미터가 없으면 빈 문자열로 초기화
+        const pageNum = page || 1;
+        const searchType = type || "";
+        const searchKeyword = keyword || "";
 
-        fetch(`/api/products?page=${page}&type=${type}&keyword=${keyword}`)
+        fetch(
+          `/api/products?page=${pageNum}&type=${searchType}&keyword=${searchKeyword}`
+        )
           .then((response) => response.json())
           .then((pageData) => {
             displayProducts(pageData);
-            renderProductPagination(pageData);
+            renderProductPagination(pageData, searchType, searchKeyword); // 페이지네이션에도 검색 조건 전달
           })
           .catch((error) =>
             console.error("상품 정보를 불러오는 중 오류 발생:", error)
@@ -220,7 +225,14 @@
        * [lsr/feature/paging] 상품 목록 페이지네이션 UI를 생성하는 함수 (신규)
        * @param pageData PageResponseDTO 객체
        */
-      function renderProductPagination(pageData) {
+      /**
+       * [lsr/feature/paging] 페이지네이션 UI를 생성하는 함수 (수정)
+       * 이유: 페이지 이동 시에도 현재의 검색 조건을 유지하기 위해 type과 keyword를 함께 전달합니다.
+       * @param pageData PageResponseDTO 객체
+       * @param type 현재 검색 타입
+       * @param keyword 현재 검색어
+       */
+      function renderProductPagination(pageData, type, keyword) {
         const pagination = document.getElementById("productPagination");
         pagination.innerHTML = "";
 
@@ -230,7 +242,7 @@
           prevBtn.innerText = "이전";
           prevBtn.onclick = (e) => {
             e.preventDefault();
-            getProducts(pageData.prevPage);
+            getProducts(pageData.prevPage, type, keyword);
           };
           pagination.appendChild(prevBtn);
         }
@@ -244,7 +256,7 @@
           }
           pageBtn.onclick = (e) => {
             e.preventDefault();
-            getProducts(pageNum);
+            getProducts(pageNum, type, keyword);
           };
           pagination.appendChild(pageBtn);
         });
@@ -255,7 +267,7 @@
           nextBtn.innerText = "다음";
           nextBtn.onclick = (e) => {
             e.preventDefault();
-            getProducts(pageData.nextPage);
+            getProducts(pageData.nextPage, type, keyword);
           };
           pagination.appendChild(nextBtn);
         }
@@ -295,16 +307,9 @@
       }
 
       function filterByCategory(category) {
-        // [lsr/feature/paging] 카테고리 필터링도 페이징과 연동되도록 추후 수정 필요
-        console.log(
-          `'${category}' 카테고리 필터링 기능은 페이징과 연동해야 합니다.`
-        );
-        // fetch(`/api/products?category=${encodeURIComponent(category)}`)
-        //   .then((response) => response.json())
-        //   .then((data) => {
-        //     console.log("📂 카테고리 결과:", data);
-        //     displayProducts(data);
-        //   });
+        // [lsr/feature/paging] 카테고리 필터링 시, 검색어를 비우고 타입 't'로 조회
+        document.getElementById("searchInput").value = "";
+        getProducts(1, "t", category);
       }
 
       // 전체 상품 보기 (home.html)
@@ -315,7 +320,9 @@
 
       // 상품 검색 (home.html)
       function searchProducts() {
-        getProducts(1);
+        // [lsr/feature/paging] 상품명 검색 시, 타입 'n'으로 조회
+        const keyword = document.getElementById("searchInput").value;
+        getProducts(1, "n", keyword);
       }
 
       // [lsr/feature/paging] 팀원의 '엔터 키 검색' 기능 추가
