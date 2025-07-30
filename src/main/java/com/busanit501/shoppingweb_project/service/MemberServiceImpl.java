@@ -10,6 +10,7 @@ import com.busanit501.shoppingweb_project.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ public class MemberServiceImpl implements MemberService {
     private final AddressRepository addressRepository;
 
     @Override
+    @Transactional
     public void register(MemberDTO dto) {
         // 비밀번호 인코딩
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
