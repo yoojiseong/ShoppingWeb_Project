@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -18,19 +19,21 @@ import java.time.LocalDateTime;
 @EntityListeners(value = {AuditingEntityListener.class})
 public class OrderDTO {
 
-    private Long orderid;
+    private Long orderId;
     // 나중에 어떤 order을 가져올지 알아야 해서
 
-    private Long memberid;
+    private Long memberId;
 
     @CreatedDate
     @Column(name = "regDate", updatable = true)
-    private LocalDateTime orderdate;
+    private LocalDateTime orderDate;
 
     private boolean status;
     private String address;
-    private String address_detail;
+    private String addressDetail;
     private int totalPrice;
     private String receiverName;
     private String receiverPhone;
+
+    private List<OrderItemDTO> orderItems;
 }

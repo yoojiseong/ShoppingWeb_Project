@@ -97,6 +97,7 @@
                 <div class="order-date">주문일: ${new Date(order.orderDate).toLocaleDateString()}</div>
                 <div class="order-items">${itemList}</div>
                 <div class="order-total">총 금액: ${order.totalPrice.toLocaleString()}원</div>
+                <div class="order-address">배송지 : ${order.address},${order.addressDetail}</div>
             `;
                     orderHistory.appendChild(orderItem);
                 });
@@ -110,6 +111,11 @@
     function editProfile() {
         alert('프로필 수정 기능은 추후 구현 예정입니다.');
     }
+    // 페이지 로딩 시 사용자 정보 및 주문 내역 표시
+    document.addEventListener('DOMContentLoaded', () => {
+        displayUserInfo();
+        displayOrderHistory();
+    });
 
 
     // ====================================================================================================

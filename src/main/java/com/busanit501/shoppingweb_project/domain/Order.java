@@ -31,7 +31,7 @@ public class Order {
     private Boolean status = false;
 
     private String address;
-    private String address_detail;
+    private String addressDetail;
     @Builder.Default
     private int totalPrice=0;
     private String receiverName;

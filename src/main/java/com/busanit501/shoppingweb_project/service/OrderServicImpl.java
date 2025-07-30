@@ -1,14 +1,8 @@
 package com.busanit501.shoppingweb_project.service;
 
 import com.busanit501.shoppingweb_project.domain.*;
-import com.busanit501.shoppingweb_project.dto.CartItemDTO;
-import com.busanit501.shoppingweb_project.dto.MemberDTO;
-import com.busanit501.shoppingweb_project.dto.OrderDTO;
-import com.busanit501.shoppingweb_project.dto.ProductDTO;
-import com.busanit501.shoppingweb_project.repository.CartItemRepository;
-import com.busanit501.shoppingweb_project.repository.MemberRepository;
-import com.busanit501.shoppingweb_project.repository.OrderRepository;
-import com.busanit501.shoppingweb_project.repository.ProductRepository;
+import com.busanit501.shoppingweb_project.dto.*;
+import com.busanit501.shoppingweb_project.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,12 +30,17 @@ public class OrderServicImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CartItemRepository cartRepository;
     private final MemberRepository memberRepository;
+    private final AddressRepository addressRepository;
 
     @Override
     public OrderDTO PurchaseFromCart(Long memberId) {
         List<CartItem> cartItems = cartItemRepository.findByMemberId(memberId);
-        Optional<Member> member = memberRepository.findById(memberId);
-        MemberDTO memberDTO = modelMapper.map(member, MemberDTO.class);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("OrderServcie에서 작업중 member객체에 null값이 있습니다."));
+
+
+        Address address = addressRepository.findByMemberAndIsDefaultTrue(member);
+        UserinfoDTO userinfoDTo = UserinfoDTO.toUserinfoDTO(member,address);
 
         if (cartItems.isEmpty()) {
             throw new IllegalStateException("장바구니가 비어 있습니다.");
@@ -55,10 +55,10 @@ public class OrderServicImpl implements OrderService {
                 .memberId(memberId)
                 .orderDate(LocalDateTime.now())
                 .status(true) // 또는 enum 사용 시 OrderStatus.ORDERED
-                .address(memberDTO.getAddressId())
-                .address_detail(memberDTO.getAddressLine())
-                .receiverName(memberDTO.getUserName())
-                .receiverPhone(memberDTO.getPhone())
+                .address(userinfoDTo.getAddressId())
+                .addressDetail(userinfoDTo.getAddressLine())
+                .receiverName(userinfoDTo.getUserName())
+                .receiverPhone(userinfoDTo.getPhone())
                 .build();
 
         for (CartItem cart : cartItems) {
@@ -101,9 +101,24 @@ public class OrderServicImpl implements OrderService {
     public List<OrderDTO> getOrderHistoryByMemberId(Long memberId) {
         log.info("OrderService에서 작업중 넘어온 memberId : " + memberId);
         List<Order> orders = orderRepository.findByMemberId(memberId);
-        List<OrderDTO> orderDTOList = orders.stream()
-                .map(order -> modelMapper.map(order, OrderDTO.class))
-                .collect(Collectors.toList());
+        List<OrderDTO> orderDTOList = orders.stream().map(order -> {
+            OrderDTO orderDTO = modelMapper.map(order, OrderDTO.class);
+
+            List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
+                    .map(orderItem -> {
+                        OrderItemDTO dto = modelMapper.map(orderItem, OrderItemDTO.class);
+
+                        // 🔽 productId로 Product 조회해서 productName 세팅
+                        productRepository.findById(orderItem.getProductId())
+                                .ifPresent(product -> dto.setProductName(product.getProductName()));
+
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+
+            orderDTO.setOrderItems(orderItemDTOs);
+            return orderDTO;
+        }).collect(Collectors.toList());
         log.info("OrderService에서 작업중 orderDTO : " + orderDTOList);
         return orderDTOList;
     }
