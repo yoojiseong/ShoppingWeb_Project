@@ -35,3 +35,31 @@ out/
 
 ### VS Code ###
 .vscode/
+.memo/Commit_Convention_Guide.md
+.memo/home.html
+.memo/HomeController.class
+.memo/HomeController.java
+.memo/product-detail.html
+.memo/product-paging.js
+.memo/Product.java
+.memo/ProductController_Analysis.md
+.memo/ProductController.java
+.memo/ProductRepositoryCustom.java
+.memo/ProductRepositoryCustomImpl.java
+.memo/ProductRepositoryTests.java
+.memo/ProductService_Impl_Analysis.md
+.memo/ProductService.java
+.memo/ProductServiceImpl.java
+.memo/review-paging.js
+.memo/Review.java
+.memo/ReviewController.java
+.memo/ReviewRepositoryCustom.java
+.memo/ReviewRepositoryCustomImpl.java
+.memo/ReviewService.java
+.memo/ReviewServiceImpl.java
+.memo/roo_task_jul-29-2025_1-11-29-am.md
+.memo/script.js
+.memo/style.css
+.memo/Today_Summary.md
+.gitignore
+.gitignore
