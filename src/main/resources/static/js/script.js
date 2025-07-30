@@ -92,7 +92,21 @@ function updateUI() {
         cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
     }
 }
+function goToLogin() {
+    window.location.href = '/login';
+}
 
+function goToSignup() {
+    window.location.href = '/signup';
+}
+
+function goToCart() {
+    window.location.href = '/cart';
+}
+
+function goToMyPage() {
+    window.location.href = '/mypage';
+}
 
 // ====================================================================================================
 // home.html (메인 페이지) 관련 JavaScript 함수

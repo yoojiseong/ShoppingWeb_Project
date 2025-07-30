@@ -22,10 +22,15 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ModelMapper modelMapper;
     private final ProductImageRepository productImageRepository;
 
     @Override
     public ProductDTO getProductById(Long productId) {
+        log.info("ProductService 에서 받아온 Id확인중 : " + productId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
+        ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
         // ModelMapper를 사용해서 기본 매핑
         Optional<Product> productOptional = productRepository.findById(productId);
         if (productOptional.isEmpty()) {
@@ -104,4 +109,62 @@ public class ProductServiceImpl implements ProductService {
                         .build())
                 .toList();
     }
+
+    @Override
+    public void saveProduct(Product product){
+        productRepository.save(product);
+    }
+
+    // [추가] 새 상품 등록 메서드 구현
+    @Override
+    public ProductDTO createProduct(ProductDTO productDTO) {
+        if (productDTO.getProductTag() == null) {
+            productDTO.setProductTag(ProductCategory.UNKNOWN);
+        }
+        Product product = dtoToEntity(productDTO);
+        Product saved = productRepository.save(product);
+        return entityToDto(saved);
+    }
+
+    // [추가] 상품 수정 메서드 구현
+    @Override
+    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다. id=" + productId));
+        product.setProductName(productDTO.getProductName());
+        product.setPrice(productDTO.getPrice());
+        product.setStock(productDTO.getStock());
+        Product updated = productRepository.save(product);
+        return entityToDto(updated);
+    }
+
+    // [추가] 상품 삭제 메서드 구현
+    @Override
+    public void deleteProduct(Long productId) {
+        productRepository.deleteById(productId);
+    }
+
+    // DTO → Entity 변환
+    public Product dtoToEntity(ProductDTO dto) {
+        return Product.builder()
+                .productName(dto.getProductName())
+                .price(dto.getPrice())
+                .stock(dto.getStock())
+                .image(dto.getImage())
+                .productTag(dto.getProductTag())
+                .build();
+    }
+
+    // Entity → DTO 변환
+    public ProductDTO entityToDto(Product product) {
+        return ProductDTO.builder()
+                .productId(product.getProductId())
+                .productName(product.getProductName())
+                .price(product.getPrice())
+                .stock(product.getStock())
+                .image(product.getImage())
+                .productTag(product.getProductTag())
+                .build();
+    }
+
 }

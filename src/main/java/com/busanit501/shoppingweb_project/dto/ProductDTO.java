@@ -24,6 +24,7 @@ public class ProductDTO {
     @NotNull
     private BigDecimal price;
     private int stock;
+    private String image;
     private ProductCategory productTag;
 
     private String imageFileName; // 이미지 파일 이름 담을 필드 추가
@@ -34,6 +35,7 @@ public class ProductDTO {
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .stock(product.getStock())
+                .image(product.getImage())
                 .productTag(ProductCategory.valueOf(product.getProductTag().name())) // Enum을 문자열로 변환
                 .build();
     }
