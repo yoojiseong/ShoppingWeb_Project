@@ -11,14 +11,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Member {
-    //푸쉬 테스트
+    // 푸쉬 테스트
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

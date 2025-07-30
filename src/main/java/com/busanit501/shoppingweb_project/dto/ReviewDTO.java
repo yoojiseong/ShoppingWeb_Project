@@ -5,9 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -20,7 +17,6 @@ public class ReviewDTO {
     @NotEmpty
     private int rating;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    private String createdAt;
     private Long productId; // productId 필드 추가
 }
