@@ -6,6 +6,7 @@ import com.busanit501.shoppingweb_project.dto.PageRequestDTO;
 import com.busanit501.shoppingweb_project.dto.PageResponseDTO;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
+import com.busanit501.shoppingweb_project.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ReviewRepository reviewRepository; // 리뷰 정보 계산을 위해 주입
     private final ModelMapper modelMapper;
 
     @Override
@@ -30,7 +32,17 @@ public class ProductServiceImpl implements ProductService {
         log.info("ProductService 에서 받아온 Id확인중 : " + productId);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
-        ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
+
+        // Entity -> DTO 변환
+        ProductDTO productDTO = entityToDto(product);
+
+        // [lsr/feature/rating] 리뷰 개수와 평균 평점 계산 및 DTO에 설정
+        long reviewCount = reviewRepository.countByProduct(product);
+        Double avgRating = reviewRepository.findAverageRatingByProduct(product);
+
+        productDTO.setReviewCount(reviewCount);
+        productDTO.setAverageRating(avgRating != null ? avgRating : 0.0);
+
         log.info("ProductService 에서 받아온 pproductDTO확인 : " + productDTO);
         return productDTO;
     }
