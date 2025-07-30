@@ -26,6 +26,8 @@ public class ProductDTO {
     private int stock;
     private ProductCategory productTag;
 
+    private String imageFileName; // 이미지 파일 이름 담을 필드 추가
+
     public static ProductDTO fromEntity(Product product) {
         return ProductDTO.builder()
                 .productId(product.getProductId())

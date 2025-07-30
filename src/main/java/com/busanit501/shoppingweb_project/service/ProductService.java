@@ -2,7 +2,7 @@ package com.busanit501.shoppingweb_project.service;
 
 import com.busanit501.shoppingweb_project.domain.Product;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
-
+import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import java.util.List;
 
 public interface ProductService {
@@ -24,6 +24,7 @@ public interface ProductService {
                 .productName(productDTO.getProductName())
                 .price(productDTO.getPrice())
                 .stock(productDTO.getStock())
+                .productTag(productDTO.getProductTag())
                 .build();
         return product;
     }
