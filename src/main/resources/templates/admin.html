@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>관리자 페이지 - 상품 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<header class="container mt-3 mb-3">
+    <h1>관리자 상품 관리</h1>
+    <button onclick="goHome()" class="btn btn-secondary">홈으로</button>
+    <button onclick="logout()" class="btn btn-danger">로그아웃</button>
+</header>
+
+<main class="container">
+    <h2>상품 목록</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>상품명</th>
+            <th>가격</th>
+            <th>수정</th>
+            <th>삭제</th>
+        </tr>
+        </thead>
+        <tbody id="productTableBody">
+        <!-- 상품 목록이 자바스크립트로 동적 생성됩니다 -->
+        </tbody>
+    </table>
+
+    <h2>새 상품 등록</h2>
+    <form id="addProductForm" class="mb-5">
+        <div class="mb-3">
+            <label for="newProductName" class="form-label">상품명</label>
+            <input type="text" id="newProductName" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="newProductPrice" class="form-label">가격</label>
+            <input type="number" id="newProductPrice" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="newProductImage" class="form-label">이미지 URL</label>
+            <input type="text" id="newProductImage" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">상품 등록</button>
+    </form>
+</main>
+
+<script>
+    // 서버에서 가져올 상품 데이터 (초기화는 빈 배열)
+    let products = [];
+
+    // 서버에서 상품 리스트를 불러오는 함수
+    function fetchProducts() {
+        fetch('/api/products') // 상품 목록 API 주소
+            .then(res => {
+                if (!res.ok) throw new Error('상품 목록을 불러오는데 실패했습니다.');
+                return res.json();
+            })
+            .then(data => {
+                products = data;
+                renderProducts();
+            })
+            .catch(err => alert(err.message));
+    }
+
+    // 상품 목록을 화면에 출력하는 함수
+    function renderProducts() {
+        const tbody = document.getElementById('productTableBody');
+        tbody.innerHTML = '';
+
+        products.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${p.productId}</td>
+                <td><input type="text" value="${p.productName}" id="name-${p.productId}" /></td>
+                <td><input type="number" value="${p.price}" id="price-${p.productId}" /></td>
+                <td><button onclick="updateProduct(${p.productId})" class="btn btn-sm btn-success">수정</button></td>
+                <td><button onclick="deleteProduct(${p.productId})" class="btn btn-sm btn-danger">삭제</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 상품 수정 요청 보내는 함수
+    function updateProduct(id) {
+        const name = document.getElementById(`name-${id}`).value.trim();
+        const price = Number(document.getElementById(`price-${id}`).value);
+
+        if (!name || price <= 0) {
+            alert('상품명과 가격을 올바르게 입력해주세요.');
+            return;
+        }
+
+        fetch(`/api/products/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productName: name, price: price })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('상품 수정에 실패했습니다.');
+                alert('상품이 수정되었습니다.');
+                fetchProducts();
+            })
+            .catch(err => alert(err.message));
+    }
+
+    // 상품 삭제 요청 보내는 함수
+    function deleteProduct(id) {
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+
+        fetch(`/api/products/${id}`, { method: 'DELETE' })
+            .then(res => {
+                if (!res.ok) throw new Error('상품 삭제에 실패했습니다.');
+                alert('상품이 삭제되었습니다.');
+                fetchProducts();
+            })
+            .catch(err => alert(err.message));
+    }
+
+    // 새 상품 등록 요청 보내는 함수
+    document.getElementById('addProductForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('newProductName').value.trim();
+        const price = Number(document.getElementById('newProductPrice').value);
+        const image = document.getElementById('newProductImage').value.trim();
+
+        if (!name || price <= 0) {
+            alert('상품명과 가격을 올바르게 입력해주세요.');
+            return;
+        }
+
+        fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productName: name, price: price, image: image })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('상품 등록에 실패했습니다.');
+                alert('새 상품이 등록되었습니다.');
+                this.reset();
+                fetchProducts();
+            })
+            .catch(err => alert(err.message));
+    });
+
+    // 홈으로 가기
+    function goHome() {
+        window.location.href = '/home';
+    }
+
+    // 로그아웃 처리
+    function logout() {
+        localStorage.removeItem('currentUser');
+        alert('로그아웃 되었습니다.');
+        window.location.href = '/login';
+    }
+
+    // 페이지 로드 시 상품 목록 자동 호출
+    window.onload = fetchProducts;
+
+    // input[type=file] 에서 선택한 파일 업로드 함수 예시
+    function uploadImage(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        return fetch('/api/files/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('이미지 업로드 실패');
+                return res.text();  // 서버에서 반환한 이미지 URL
+            });
+    }
+
+</script>
+
+</body>
+</html>
