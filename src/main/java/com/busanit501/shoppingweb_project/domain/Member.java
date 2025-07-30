@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Table(name = "shop_member")
 @Entity
 @Data
 @Builder
@@ -22,7 +23,9 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String memberId;
+
     private String email;
     private String password;
 
@@ -35,6 +38,9 @@ public class Member {
 
     @Column(nullable = false)
     private String role;
+
+    @Column(nullable = false)
+    private boolean social;
 
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
