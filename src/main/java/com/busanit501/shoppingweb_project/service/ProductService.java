@@ -34,6 +34,7 @@ public interface ProductService {
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .stock(product.getStock())
+                .productTag(ProductCategory.valueOf(product.getProductTag().name()))
                 .build();
         return productDTO;
     }

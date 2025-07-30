@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,21 +26,43 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO getProductById(Long productId) {
-        log.info("ProductService 에서 받아온 Id확인중 : " + productId);
-        ProductDTO productDTO = new ModelMapper().map(productRepository.findById(productId).get(), ProductDTO.class);
+        // ModelMapper를 사용해서 기본 매핑
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if (productOptional.isEmpty()) {
+            throw new RuntimeException("상품을 찾을 수 없습니다: " + productId);
+        }
+        Product product = productOptional.get();
+        ProductDTO productDTO = new ModelMapper().map(product, ProductDTO.class); // ModelMapper 사용
+
         log.info("ProductService 에서 받아온 pproductDTO확인 : " + productDTO);
+
+        //  단일 상품 조회 시에도 이미지 파일명 채우기
+        productImageRepository.findByProductIdAndThumbnail(product.getProductId(), true)
+                .ifPresent(productImage -> {
+                    productDTO.setImageFileName(productImage.getFileName());
+                    log.info("상품 ID " + productId + "의 이미지 파일명 설정: " + productImage.getFileName());
+                });
         return productDTO;
     }
 
     @Override
     public List<ProductDTO> getAllProducts() {
+        log.info("getAllProducts 호출: 모든 상품 불러오기 시작");
         List<Product> products = productRepository.findAll();
-        log.info("ProductService에서 모든 Product 받아오는 중 " + products);
-        List<ProductDTO> productDTO = products.stream()
-                .map(ProductDTO::fromEntity) // 위에서 만든 정적 팩토리 메서드 사용
+
+        List<ProductDTO> productDTOs = products.stream()
+                .map(product -> {
+                    ProductDTO dto = entityToDto(product);
+
+                    productImageRepository.findByProductIdAndThumbnail(product.getProductId(), true)
+                            .ifPresent(productImage -> dto.setImageFileName(productImage.getFileName()));
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
 
-        return productDTO;
+        log.info("모든 상품 DTO 변환 완료, 개수: " + productDTOs.size());
+        return productDTOs;
     }
 
     @Override
