@@ -2,6 +2,7 @@ package com.busanit501.shoppingweb_project.repository.search;
 
 import com.busanit501.shoppingweb_project.domain.Product;
 import com.busanit501.shoppingweb_project.domain.QProduct;
+import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import com.busanit501.shoppingweb_project.dto.PageRequestDTO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -42,7 +43,12 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 conditionBuilder.or(product.productName.containsIgnoreCase(keyword));
             }
             if (type.contains("t")) { // 상품 태그 (productTag)
-                conditionBuilder.or(product.productTag.stringValue().containsIgnoreCase(keyword));
+                try {
+                    ProductCategory categoryEnum = ProductCategory.fromKoreanName(keyword);
+                    conditionBuilder.or(product.productTag.eq(categoryEnum));
+                } catch (IllegalArgumentException e) {
+                    // 변환에 실패하면 (예: '하의'가 아닌 일반 검색어) 무시하고 넘어감
+                }
             }
             // 다른 검색 조건(예: 내용 'c')이 필요하면 여기에 추가할 수 있습니다.
 
