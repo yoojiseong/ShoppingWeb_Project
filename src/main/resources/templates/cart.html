@@ -21,8 +21,10 @@
         <nav class="nav">
             <div class="nav-buttons">
                 <button onclick="goToMyPage()">마이페이지</button>
+                    <div sec:authorize="!isAuthenticated()">
                 <button onclick="goToLogin()" id="loginBtn">로그인</button>
                 <button onclick="logout()" id="logoutBtn" style="display: none;">로그아웃</button>
+                    </div>
             </div>
         </nav>
     </div>

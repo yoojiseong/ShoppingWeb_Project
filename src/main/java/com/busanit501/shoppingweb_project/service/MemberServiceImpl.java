@@ -3,11 +3,15 @@ package com.busanit501.shoppingweb_project.service;
 import com.busanit501.shoppingweb_project.dto.MemberDTO;
 import com.busanit501.shoppingweb_project.domain.Address;
 import com.busanit501.shoppingweb_project.domain.Member;
+import com.busanit501.shoppingweb_project.dto.UserinfoDTO;
 import com.busanit501.shoppingweb_project.mapper.MemberMapper;
+import com.busanit501.shoppingweb_project.repository.AddressRepository;
 import com.busanit501.shoppingweb_project.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +19,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AddressRepository addressRepository;
 
     @Override
     public void register(MemberDTO dto) {
@@ -45,5 +50,14 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean isMemberIdDuplicated(String memberId) {
         return memberRepository.existsByMemberId(memberId);
+    }
+
+    @Override
+    public UserinfoDTO getUserinfoDTOById(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalStateException("Member not found with memberId: " + memberId));
+        Address address = addressRepository.findByMemberAndIsDefaultTrue(member);
+        UserinfoDTO dto = UserinfoDTO.toUserinfoDTO(member, address);
+        return dto;
     }
 }
