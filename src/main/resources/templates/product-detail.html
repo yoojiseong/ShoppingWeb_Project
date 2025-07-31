@@ -90,6 +90,11 @@
                 </div>
             </div>
 
+            <!-- 제품 상세 이미지 파트 -->
+            <div class="product-detail-images" id="productDetailImages" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <!-- 상세 이미지들이 여기에 들어갑니다 -->
+            </div>
+
             <!-- 리뷰 섹션 -->
             <div class="review-section">
                 <h2>상품 리뷰</h2>
@@ -150,7 +155,9 @@
 
         async function fetchCurrentUser() {
             try {
-                const res = await fetch('/api/members/me');
+                const res = await fetch('/api/members/me', {
+                    credentials: 'include'
+                });
                 if (!res.ok) throw new Error('로그인 안됨');
                 currentUser = await res.json();
                 console.log('로그인 사용자:', currentUser);
@@ -195,7 +202,7 @@
         // 상품 상세 정보 표시 (product-detail.html)
         function displayProductDetail(product) {
             const productImageLarge = document.getElementById('productImageLarge');
-            const imageUrl = product.imageFileName ? `/api/image/display/${product.imageFileName}` : '/images/default_product.png';
+            const imageUrl = product.thumbnailFileName != null ? '/api/image/display/' + product.thumbnailFileName : '/images/default_product.png';
             productImageLarge.innerHTML = `<img src="${imageUrl}" alt="${product.productName}">`;
             document.getElementById('productCategory').textContent = product.productTag;
             document.getElementById('productTitle').textContent = product.productName;
@@ -208,6 +215,25 @@
                 '아우터': '추운 날씨에도 따뜻함을 유지해주는 아우터입니다. 실용성과 패션성을 모두 고려한 디자인입니다.'
             };
             document.getElementById('productDescription').textContent = descriptions[product.category] || '고품질 상품입니다.';
+
+            const container = document.getElementById('productDetailImages');
+            container.innerHTML = '';  // 기존 내용 비우기
+            console.log("fileNames 확인:", product.fileNames);
+            if (!product.fileNames || product.fileNames.length === 0) {
+                container.innerHTML = '<p>상세 이미지가 없습니다.</p>';
+                return;
+            }
+
+            product.fileNames.forEach(fileName => {
+                const img = document.createElement('img');
+                img.src = `/api/image/display/${fileName}`;
+                img.alt = '제품 상세 이미지';
+                img.addEventListener('click', () => {
+                    // 클릭 시 큰 이미지 보여주기 등 추가 기능 가능
+                    alert('이미지 클릭됨: ' + fileName);
+                });
+                container.appendChild(img);
+            });
             // 평점 정보 업데이트
             updateProductRating(product.id);
         }

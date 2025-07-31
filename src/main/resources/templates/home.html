@@ -169,9 +169,11 @@
         productsToShow.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
-
+            console.log(product.thumbnailFileName);
                 productCard.innerHTML = `
-            <img src="${product.imageFileName ? '/api/image/display/' + product.imageFileName : '/images/default_product.png'}" alt="${product.productName}" class="product-image">
+            <img src="${product.thumbnailFileName != null ? '/api/image/display/' + product.thumbnailFileName : '/images/default_product.png'}"
+     th:alt="${product.productName}"
+     class="product-image" />
             <div class="product-info">
                 <h3 onclick="goToProductDetail(${product.productId})">${product.productName}</h3> <!-- product.name으로 변경 -->
                 <p>카테고리: ${product.productTag}</p> <!-- product.category로 변경 -->

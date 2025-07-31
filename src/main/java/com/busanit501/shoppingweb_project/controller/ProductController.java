@@ -72,8 +72,8 @@ public ResponseEntity<?> createProduct(
 
     @GetMapping("/{productId}")
     public ResponseEntity<ProductDTO> getProduct(@PathVariable Long productId) {
-        ProductDTO product = productService.getProductById(productId);
-        return ResponseEntity.ok(product);
+        ProductDTO productDTO = productService.getProductById(productId);
+        return ResponseEntity.ok(productDTO);
     }
 
 

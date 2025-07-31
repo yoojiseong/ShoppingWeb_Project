@@ -1,5 +1,6 @@
 package com.busanit501.shoppingweb_project.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,8 +19,6 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
 
     @Column(name = "file_name", length = 500, nullable = false)
     private String fileName;
@@ -28,10 +27,21 @@ public class ProductImage {
     @Builder.Default
     private int ord = 0;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    @JsonBackReference
+    private Product product;
+
     @Column(name = "is_thumbnail", nullable = false)
     @Builder.Default
     private boolean thumbnail = false;
 
+    public void setProduct(Product product) {
+        this.product = product;
+        if (!product.getImageSet().contains(this)) {
+            product.getImageSet().add(this);
+        }
+    }
     public void changeFileName(String fileName) {
         this.fileName = fileName;
     }
@@ -44,7 +54,4 @@ public class ProductImage {
         this.thumbnail = thumbnail;
     }
 
-    public static String generateRandomUUID() {
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 16);
-    }
 }

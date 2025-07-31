@@ -26,18 +26,13 @@ public class ProductDTO {
     private BigDecimal price;
     private int stock;
     private ProductCategory productTag;
-    private String imageFileName; // 이미지 파일 이름 담을 필드 추가
+    private String thumbnailFileName; // 이미지 파일 이름 담을 필드 추가
 
     private List<String> fileNames;
 
-    public static ProductDTO fromEntity(Product product) {
-        return ProductDTO.builder()
-                .productId(product.getProductId())
-                .productName(product.getProductName())
-                .price(product.getPrice())
-                .stock(product.getStock())
-                .productTag(ProductCategory.valueOf(product.getProductTag().name())) // Enum을 문자열로 변환
-                .build();
+    public void setImageFileName(String fileName)
+    {
+        this.thumbnailFileName = fileName;
     }
 
 }

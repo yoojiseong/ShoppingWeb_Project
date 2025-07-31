@@ -1,6 +1,7 @@
 package com.busanit501.shoppingweb_project.service;
 
 import com.busanit501.shoppingweb_project.domain.Product;
+import com.busanit501.shoppingweb_project.domain.ProductImage;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,27 +28,8 @@ public interface ProductService {
 
     void saveProduct(Product product);
 
-    default Product dtoToEntity(ProductDTO productDTO) {
-        Product product = Product.builder()
-                .productId(productDTO.getProductId())
-                .productName(productDTO.getProductName())
-                .price(productDTO.getPrice())
-                .stock(productDTO.getStock())
-                .productTag(productDTO.getProductTag())
-                .build();
-        return product;
-    }
 
-    default ProductDTO entityToDto(Product product) {
-        ProductDTO productDTO = ProductDTO.builder()
-                .productId(product.getProductId())
-                .productName(product.getProductName())
-                .price(product.getPrice())
-                .stock(product.getStock())
-                .productTag(product.getProductTag())
-                .build();
-        return productDTO;
-    }
+
 
     // 새 상품 등록 메서드 시그니처 추가
     ProductDTO createProduct(ProductDTO productDTO);
