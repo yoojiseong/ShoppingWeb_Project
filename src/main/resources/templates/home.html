@@ -22,7 +22,7 @@
                     <input type="text" id="searchInput" placeholder="상품을 검색하세요...">
                     <button onclick="searchProducts()">검색</button>
                 </div>
-                <div class="nav-buttons">
+                <div class="nav-buttons">ㅐ
                     <button onclick="goToMyPage()">마이페이지</button>
                     <button onclick="goToCart()">장바구니 (<span id="cartCount">0</span>)</button>
 
@@ -84,6 +84,11 @@
                 <div class="products-header">
                     <h2>상품 목록</h2>
                     <button onclick="showAllProducts()" class="show-all-btn">전체 보기</button>
+                </div>
+                <div sec:authorize="hasRole('ADMIN')">
+                    <span style="color: red; font-weight: bold;">관리자 계정입니다</span>
+                    <a href="/admin" class="btn btn-sm btn-warning ms-2">관리자 페이지</a>
+                    <a href="/admin/products/register" class="btn btn-sm btn-success ms-2">상품 등록</a>
                 </div>
                 <div class="product-grid" id="productGrid">
                     <!-- 상품들이 JavaScript로 동적 생성됩니다 -->

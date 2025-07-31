@@ -86,6 +86,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
+    // 새 상품 등록 메서드 구현
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
         if (productDTO.getProductTag() == null) {
@@ -96,6 +97,7 @@ public class ProductServiceImpl implements ProductService {
         return entityToDto(savedProduct);
     }
 
+    // 상품 수정 메서드 구현
     @Override
     public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
         Product product = productRepository.findById(productId)
@@ -109,6 +111,7 @@ public class ProductServiceImpl implements ProductService {
         return entityToDto(updatedProduct);
     }
 
+    // 상품 삭제 메서드 구현
     @Override
     public void deleteProduct(Long productId) {
         productRepository.deleteById(productId);

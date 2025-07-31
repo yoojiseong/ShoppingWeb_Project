@@ -27,6 +27,7 @@ public class ProductDTO {
     private BigDecimal price;
     private int stock;
     private ProductCategory productTag;
+    private String image;
 
     @Builder.Default
     private List<String> detailImageFileNames = new ArrayList<>();
@@ -39,6 +40,7 @@ public class ProductDTO {
                 .price(product.getPrice())
                 .stock(product.getStock())
                 .productTag(ProductCategory.valueOf(product.getProductTag().name())) // Enum을 문자열로 변환
+                .image(product.getImage())
                 .build();
     }
 
