@@ -3,9 +3,11 @@ package com.busanit501.shoppingweb_project.mapper;
 import com.busanit501.shoppingweb_project.dto.MemberDTO;
 import com.busanit501.shoppingweb_project.domain.Address;
 import com.busanit501.shoppingweb_project.domain.Member;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Component
 public class MemberMapper {
     public static Member toMemberEntity(MemberDTO dto, String encodedPassword) {
         return Member.builder()

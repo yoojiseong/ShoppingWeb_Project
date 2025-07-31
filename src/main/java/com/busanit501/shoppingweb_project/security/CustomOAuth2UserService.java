@@ -4,6 +4,7 @@ import com.busanit501.shoppingweb_project.domain.Member;
 import com.busanit501.shoppingweb_project.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -18,12 +19,16 @@ import java.util.Optional;
 import java.util.*;
 
 @Log4j2
-@Service
-@RequiredArgsConstructor
+
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public CustomOAuth2UserService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+        this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
@@ -60,6 +65,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .email(email)
                     .userName(nickname)
                     .role("ROLE_USER")
+                    .social(true)
                     .build();
 
             memberRepository.save(member);

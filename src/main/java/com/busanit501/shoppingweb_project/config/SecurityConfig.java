@@ -2,7 +2,10 @@ package com.busanit501.shoppingweb_project.config;
 
 import com.busanit501.shoppingweb_project.repository.MemberRepository;
 import com.busanit501.shoppingweb_project.security.CustomOAuth2UserService;
+import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,22 +16,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+@Log4j2
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final UserDetailsService customUserDetailsService;
-
-    @Bean
-    public CustomOAuth2UserService customOAuth2UserService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
-        return new CustomOAuth2UserService(memberRepository, passwordEncoder);
-    }
+    private final MemberRepository memberRepository;
 
     // 비밀번호 암호화에 사용될 Bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CustomOAuth2UserService customOAuth2UserService() {
+        return new CustomOAuth2UserService(memberRepository, passwordEncoder());
     }
 
     // 보안 필터 체인 설정 (접근 권한, 로그인/로그아웃 설정 등)
@@ -67,10 +72,23 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
                 )
-                .oauth2Login(oauthLogin -> oauthLogin
+                .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService(null, null)))
-                        .defaultSuccessUrl("/home", true)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService())
+                        )
+                        .successHandler((request, response, authentication) -> {
+                            Object principal = authentication.getPrincipal();
+                            log.info("Principal class: " + principal.getClass().getName());
+
+                            if (principal instanceof MemberSecurityDTO user) {
+                                if (user.isSocial() && user.isProfileIncomplete()) {
+                                    response.sendRedirect("/complete-profile");
+                                    return;
+                                }
+                            }
+                            response.sendRedirect("/home");
+                        })
                 );
 
         return http.build();
