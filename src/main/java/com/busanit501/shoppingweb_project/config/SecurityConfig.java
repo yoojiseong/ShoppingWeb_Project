@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 허용할 경로
+                        .requestMatchers(HttpMethod.GET, "/api/image/display/{fileName}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/{productId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/{id}").permitAll()
