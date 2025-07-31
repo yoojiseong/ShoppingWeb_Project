@@ -3,6 +3,8 @@ package com.busanit501.shoppingweb_project.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "product_image")
 @Getter
@@ -40,5 +42,9 @@ public class ProductImage {
 
     public void changeThumbnail(boolean thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public static String generateRandomUUID() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 16);
     }
 }

@@ -27,14 +27,13 @@ public class Product {
     private String productName;
     private BigDecimal price;
     private int stock;
-    private String image;
 
-    @OneToMany(mappedBy = "products" , cascade = {CascadeType.ALL}
+    @OneToMany(mappedBy = "product" , cascade = {CascadeType.ALL}
     , fetch = FetchType.LAZY,
     orphanRemoval = true)
     @Builder.Default
     @BatchSize(size = 20)
-    private Set<ProductImgDetail> imageSet = new HashSet<>();
+    private Set<ProductImage> imageSet = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private ProductCategory productTag;
