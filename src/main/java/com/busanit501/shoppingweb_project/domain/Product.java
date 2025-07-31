@@ -64,12 +64,10 @@ public class Product {
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
-
     public void addReview(Review review) {
         this.reviews.add(review);
         review.setProduct(this);
     }
-
 
     public void removeReview(Review review) {
         this.reviews.remove(review);
@@ -86,5 +84,3 @@ public class Product {
 
 
 }
-
-

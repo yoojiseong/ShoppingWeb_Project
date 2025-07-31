@@ -170,8 +170,8 @@
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
 
-            productCard.innerHTML = `
-            <div class="product-image">${product.image || '이미지 없음'}</div>
+                productCard.innerHTML = `
+            <img src="${product.imageFileName ? '/api/image/display/' + product.imageFileName : '/images/default_product.png'}" alt="${product.productName}" class="product-image">
             <div class="product-info">
                 <h3 onclick="goToProductDetail(${product.productId})">${product.productName}</h3> <!-- product.name으로 변경 -->
                 <p>카테고리: ${product.productTag}</p> <!-- product.category로 변경 -->
