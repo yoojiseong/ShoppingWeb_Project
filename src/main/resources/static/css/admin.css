@@ -1,0 +1,199 @@
+:root {
+    --primary-color: #4a90e2; /* 산뜻한 파랑 */
+    --secondary-color: #6c757d; /* 회색 */
+    --success-color: #28a745; /* 초록 */
+    --danger-color: #dc3545; /* 빨강 */
+    --light-bg: #f5f7fa; /* 연한 배경색 */
+    --card-bg: #ffffff; /* 카드 배경색 */
+    --border-color: #e0e6ed; /* 테두리색 */
+    --text-color: #333333; /* 기본 텍스트 색상 */
+    --light-text-color: #666666; /* 연한 텍스트 색상 */
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
+/* 헤더 스타일 */
+header {
+    background-color: var(--card-bg); /* 흰색 배경 */
+    color: var(--text-color); /* 텍스트 색상 */
+    padding: 25px 30px;
+    margin-bottom: 40px;
+    border-radius: 12px; /* 더 둥근 모서리 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--primary-color); /* 타이틀 색상 변경 */
+}
+
+header .btn {
+    min-width: 120px; /* 버튼 최소 너비 */
+    padding: 10px 15px;
+    border-radius: 8px; /* 버튼 모서리 둥글게 */
+    font-weight: 600;
+    transition: all 0.2s ease-in-out; /* 호버 효과 */
+}
+
+header .btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+header .btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+header .btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px); /* 살짝 위로 이동 */
+}
+
+/* 메인 콘텐츠 영역 스타일 */
+main {
+    background-color: var(--card-bg);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color); /* 하단 라인 추가 */
+    padding-bottom: 10px;
+    display: inline-block; /* 라인 길이를 텍스트에 맞춤 */
+}
+
+/* 테이블 스타일 */
+.table {
+    margin-bottom: 40px;
+    border-radius: 8px;
+    overflow: hidden; /* 테이블 둥근 모서리 적용을 위해 */
+    border: 1px solid var(--border-color); /* 테이블 전체 테두리 */
+}
+
+.table thead th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    padding: 15px 20px;
+    border-bottom: none; /* 부트스트랩 기본값 제거 */
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.table tbody tr:nth-child(even) { /* 짝수 행 배경색 */
+    background-color: #f9fbfd;
+}
+
+.table tbody tr:hover {
+    background-color: #e9f2ff; /* 밝은 파랑으로 호버 효과 */
+    cursor: pointer;
+}
+
+.table td {
+    padding: 12px 20px;
+    vertical-align: middle;
+    border-top: 1px solid var(--border-color); /* 행 구분선 */
+}
+
+/* 섹션 구분 스타일 */
+section {
+    margin-top: 60px; /* 섹션 간 더 큰 여백 */
+    padding-top: 40px; /* 내부 상단 여백 */
+    border-top: 1px solid var(--border-color); /* 얇은 구분선 */
+}
+
+/* 폼 요소 스타일 */
+.form-label {
+    font-weight: 600;
+    color: var(--light-text-color);
+    margin-bottom: 8px;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* 은은한 내부 그림자 */
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25); /* 부트스트랩 포커스 색상 조정 */
+    outline: none;
+}
+
+/* 버튼 스타일 */
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    min-width: 100px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+.btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 이미지 미리보기 */
+#currentProductImagePreview {
+    width: 100%; /* 부모 너비에 맞춤 */
+    height: auto;
+    max-width: 200px; /* 최대 너비 설정 */
+    max-height: 200px; /* 최대 높이 설정 */
+    object-fit: contain; /* 이미지 비율 유지하면서 컨테이너에 맞춤 */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 5px;
+    background-color: var(--light-bg);
+    margin-bottom: 15px; /* 이미지 아래 여백 */
+}
+
+/* 이미지와 폼 필드를 수평으로 정렬하기 위한 Flexbox 또는 Grid 설정 */
+/* editProductForm 내부에 .row를 사용하여 이미지와 폼 필드 컬럼을 나눕니다. */
+.image-preview-container {
+    text-align: center; /* 이미지를 중앙 정렬 */
+    padding-right: 20px; /* 폼 필드와의 간격 */
+}
+
+@media (max-width: 768px) {
+    .image-preview-container {
+        padding-right: 0; /* 모바일에서는 패딩 제거 */
+    }
+}
