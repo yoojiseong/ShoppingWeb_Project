@@ -88,7 +88,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
-    // [추가] 새 상품 등록 메서드 구현
+    // 새 상품 등록 메서드 구현
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
         if (productDTO.getProductTag() == null) {
@@ -99,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
         return entityToDto(saved);
     }
 
-    // [추가] 상품 수정 메서드 구현
+    // 상품 수정 메서드 구현
     @Override
     public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
         Product product = productRepository.findById(productId)
@@ -107,11 +107,12 @@ public class ProductServiceImpl implements ProductService {
         product.setProductName(productDTO.getProductName());
         product.setPrice(productDTO.getPrice());
         product.setStock(productDTO.getStock());
+        product.setProductTag(productDTO.getProductTag());
         Product updated = productRepository.save(product);
         return entityToDto(updated);
     }
 
-    // [추가] 상품 삭제 메서드 구현
+    // 상품 삭제 메서드 구현
     @Override
     public void deleteProduct(Long productId) {
         productRepository.deleteById(productId);

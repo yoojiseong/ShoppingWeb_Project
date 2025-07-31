@@ -12,6 +12,7 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
           crossorigin="anonymous">
 </head>
+
 <body>
 <header class="header">
     <div class="container">
@@ -36,6 +37,13 @@
                     <button onclick="goToLogin()" id="loginBtn">로그인</button>
                     <button onclick="goToSignup()">회원가입</button>
                 </div>
+
+                <div sec:authorize="hasRole('ADMIN')">
+                    <span style="color: red; font-weight: bold;">관리자 계정입니다</span>
+                    <a href="/admin" class="btn btn-sm btn-warning ms-2">관리자 페이지</a>
+                    <a href="/admin/products/register" class="btn btn-sm btn-success ms-2">상품 등록</a>
+                </div>
+
             </div>
         </nav>
     </div>
