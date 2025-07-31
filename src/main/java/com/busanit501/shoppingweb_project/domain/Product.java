@@ -4,10 +4,13 @@ import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Builder
@@ -25,6 +28,13 @@ public class Product {
     private BigDecimal price;
     private int stock;
     private String image;
+
+    @OneToMany(mappedBy = "products" , cascade = {CascadeType.ALL}
+    , fetch = FetchType.LAZY,
+    orphanRemoval = true)
+    @Builder.Default
+    @BatchSize(size = 20)
+    private Set<ProductImgDetail> imageSet = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private ProductCategory productTag;

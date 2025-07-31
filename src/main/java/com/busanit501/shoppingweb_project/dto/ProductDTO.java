@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @Builder
@@ -26,6 +27,8 @@ public class ProductDTO {
     private int stock;
     private String image;
     private ProductCategory productTag;
+
+    private List<String> fileNames;
 
     public static ProductDTO fromEntity(Product product) {
         return ProductDTO.builder()

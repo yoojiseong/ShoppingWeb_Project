@@ -13,24 +13,36 @@
           crossorigin="anonymous">
 </head>
 <body>
-<header class="header">
-    <div class="container">
+<header class="header bg-light border-bottom py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+        <!-- 로고 -->
         <div class="logo">
-            <h1><a th:href="@{/home}">Fashion Store</a></h1>
+            <h1 class="h4 mb-0">
+                <a th:href="@{/home}" class="text-decoration-none text-dark">Fashion Store</a>
+            </h1>
         </div>
+
+        <!-- 네비게이션 버튼 -->
         <nav class="nav">
-            <div class="nav-buttons">
-                <button onclick="goToMyPage()">마이페이지</button>
-                <button onclick="goToCart()">장바구니 (<span id="cartCount">0</span>)</button>
-                <div sec:authorize="isAuthenticated()">
-                    <span sec:authentication="name">사용자 이메일</span>
-                    <a class="nav-link" href="/logout">로그아웃</a>
+            <div class="d-flex align-items-center gap-3">
+
+                <button class="btn btn-outline-primary btn-sm" onclick="goToMyPage()">마이페이지</button>
+                <button class="btn btn-outline-success btn-sm" onclick="goToCart()">
+                    장바구니 (<span id="cartCount">0</span>)
+                </button>
+
+                <!-- 로그인 사용자용 -->
+                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                    <span class="text-muted small" sec:authentication="name">사용자 이메일</span>
+                    <a href="/logout" class="btn btn-outline-danger btn-sm">로그아웃</a>
                 </div>
 
-                <div sec:authorize="!isAuthenticated()">
-                    <button onclick="goToLogin()" id="loginBtn">로그인</button>
-                    <button onclick="goToSignup()">회원가입</button>
+                <!-- 비로그인 사용자용 -->
+                <div sec:authorize="!isAuthenticated()" class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="goToLogin()" id="loginBtn">로그인</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="goToSignup()">회원가입</button>
                 </div>
+
             </div>
         </nav>
     </div>
@@ -181,7 +193,21 @@
 
     // 상품 상세 정보 표시 (product-detail.html)
     function displayProductDetail(product) {
-        document.getElementById('productImageLarge').textContent = product.image;
+        const imageContainer = document.getElementById('productImageLarge');
+        imageContainer.innerHTML = '';
+
+        if(product.fileNames && product.fileNames.length > 0){
+            product.fileNames.forEach(fileName =>{
+                const img = document.createElement('img');
+                img.src = `/images/${fileName}`;
+                img.style.maxWidth = '100%';
+                img.style.marginBottom = '10px';
+                imageContainer.appendChild(img);
+            });
+        }else{
+            imageContainer.innerHTML = '<p>이미지가 없습니다.</p>';
+        }
+
         document.getElementById('productCategory').textContent = product.productTag;
         document.getElementById('productTitle').textContent = product.productName;
         document.getElementById('productPriceLarge').textContent = Number(product.price).toLocaleString() + '원';

@@ -1,6 +1,7 @@
 package com.busanit501.shoppingweb_project.service;
 
 import com.busanit501.shoppingweb_project.domain.Product;
+import com.busanit501.shoppingweb_project.domain.ProductImgDetail;
 import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
@@ -10,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,19 @@ public class ProductServiceImpl implements ProductService {
         log.info("ProductService 에서 받아온 Id확인중 : " + productId);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
-        ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
+        // product에 설정된 이미지파일을 List형식으로 만들어주기
+        List<String> imageFileNames = product.getImageSet().stream()
+                .sorted(Comparator.comparingInt(ProductImgDetail::getOrd)) // ord 기준 정렬
+                .map(ProductImgDetail::getFileName)
+                .collect(Collectors.toList());
+        // DTO로 변환
+        ProductDTO productDTO = ProductDTO.builder()
+                .productId(product.getProductId())
+                .productName(product.getProductName())
+                .price(product.getPrice())
+                .productTag(product.getProductTag())
+                .fileNames(imageFileNames)
+                .build();
         log.info("ProductService 에서 받아온 pproductDTO확인 : " + productDTO);
         return productDTO;
     }
