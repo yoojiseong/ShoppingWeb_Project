@@ -100,13 +100,12 @@ public class ProductServiceImpl implements ProductService {
     // 상품 수정 메서드 구현
     @Override
     public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
+        log.info("ProductService에서 작업중 수정된 ProductDTO : " + productDTO.getProductName());
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다. id=" + productId));
-        // ModelMapper를 사용하거나 수동으로 필드 업데이트
-        product.setProductName(productDTO.getProductName());
-        product.setPrice(productDTO.getPrice());
-        product.setStock(productDTO.getStock());
-        product.setProductTag(productDTO.getProductTag());
+        // 상품 정보 수정
+        product.changeTitleContent(productDTO);
+        log.info("ProductService에서 작업중 수정된 Product : " + product.getProductName());
         Product updatedProduct = productRepository.save(product);
         return entityToDto(updatedProduct);
     }
