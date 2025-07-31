@@ -1,8 +1,6 @@
 package com.busanit501.shoppingweb_project.controller;
 
-import com.busanit501.shoppingweb_project.domain.ProductDetailImage;
 import com.busanit501.shoppingweb_project.domain.ProductImage;
-import com.busanit501.shoppingweb_project.repository.ProductDetailImageRepository;
 import com.busanit501.shoppingweb_project.repository.ProductImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,10 +33,9 @@ public class ImageUploadController {
     private String uploadPath;
 
     private final ProductImageRepository productImageRepository;
-    private final ProductDetailImageRepository productDetailImageRepository;
 
-    @PostMapping("/upload/thumbnail")
-    public ResponseEntity<String> uploadThumbnailImage(@RequestParam("file") MultipartFile file,
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file,
             @RequestParam("productId") Long productId) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("파일을 선택해 주세요.", HttpStatus.BAD_REQUEST);
@@ -64,7 +61,7 @@ public class ImageUploadController {
 
             productImageRepository.save(productImage);
 
-            return new ResponseEntity<>("썸네일 이미지 업로드 성공: " + savedFileName, HttpStatus.OK);
+            return new ResponseEntity<>("파일 업로드 성공 및 DB 저장 완료: " + savedFileName, HttpStatus.OK);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,36 +98,4 @@ public class ImageUploadController {
         }
     }
 
-    @PostMapping("/upload/detail")
-    public ResponseEntity<String> uploadDetailImage(@RequestParam("file") MultipartFile file,
-            @RequestParam("productId") Long productId) {
-        if (file.isEmpty()) {
-            return new ResponseEntity<>("파일을 선택해 주세요.", HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            String originalFileName = file.getOriginalFilename();
-            String uuid = UUID.randomUUID().toString();
-            String savedFileName = uuid + "_" + originalFileName;
-
-            File destinationFile = new File(uploadPath, savedFileName);
-            file.transferTo(destinationFile);
-
-            ProductDetailImage detailImage = ProductDetailImage.builder()
-                    .productId(productId)
-                    .fileName(savedFileName)
-                    .build();
-
-            productDetailImageRepository.save(detailImage);
-
-            return new ResponseEntity<>("상세 이미지 업로드 성공: " + savedFileName, HttpStatus.OK);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("파일 업로드 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("알 수 없는 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

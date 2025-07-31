@@ -4,8 +4,6 @@ import com.busanit501.shoppingweb_project.domain.Product;
 import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
-import com.busanit501.shoppingweb_project.domain.ProductDetailImage;
-import com.busanit501.shoppingweb_project.repository.ProductDetailImageRepository;
 import com.busanit501.shoppingweb_project.repository.ProductImageRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
-    private final ProductDetailImageRepository productDetailImageRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -39,16 +36,6 @@ public class ProductServiceImpl implements ProductService {
         // 썸네일 이미지 설정
         productImageRepository.findByProductIdAndThumbnail(product.getProductId(), true)
                 .ifPresent(productImage -> productDTO.setImageFileName(productImage.getFileName()));
-
-        // 상세 이미지 목록 설정
-        List<ProductDetailImage> detailImages = productDetailImageRepository
-                .findByProductIdOrderByOrdAsc(product.getProductId());
-        if (detailImages != null && !detailImages.isEmpty()) {
-            List<String> detailImageFileNames = detailImages.stream()
-                    .map(ProductDetailImage::getFileName)
-                    .collect(Collectors.toList());
-            productDTO.setDetailImageFileNames(detailImageFileNames);
-        }
 
         return productDTO;
     }

@@ -182,12 +182,7 @@
         // 상품 상세 정보 표시 (product-detail.html)
         function displayProductDetail(product) {
             const productImageLarge = document.getElementById('productImageLarge');
-            let imageUrl = '/images/default_product.png'; // 기본 이미지
-            if (product.detailImageFileNames && product.detailImageFileNames.length > 0) {
-                imageUrl = `/api/image/display/${product.detailImageFileNames[0]}`; // 첫 번째 상세 이미지
-            } else if (product.imageFileName) {
-                imageUrl = `/api/image/display/${product.imageFileName}`; // 썸네일 이미지 (대체용)
-            }
+            const imageUrl = product.imageFileName ? `/api/image/display/${product.imageFileName}` : '/images/default_product.png';
             productImageLarge.innerHTML = `<img src="${imageUrl}" alt="${product.productName}">`;
             document.getElementById('productCategory').textContent = product.productTag;
             document.getElementById('productTitle').textContent = product.productName;

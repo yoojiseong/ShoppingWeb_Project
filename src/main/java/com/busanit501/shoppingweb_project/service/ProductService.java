@@ -30,7 +30,6 @@ public interface ProductService {
                 .productName(productDTO.getProductName())
                 .price(productDTO.getPrice())
                 .stock(productDTO.getStock())
-                .image(productDTO.getImage())
                 .productTag(productDTO.getProductTag())
                 .build();
         return product;
@@ -42,7 +41,6 @@ public interface ProductService {
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .stock(product.getStock())
-                .image(product.getImage())
                 .productTag(product.getProductTag())
                 .build();
         return productDTO;
