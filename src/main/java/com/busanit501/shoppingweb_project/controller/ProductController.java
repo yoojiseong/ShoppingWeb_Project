@@ -1,5 +1,6 @@
 package com.busanit501.shoppingweb_project.controller;
 
+import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.service.ProductService;
@@ -7,9 +8,12 @@ import com.busanit501.shoppingweb_project.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -47,11 +51,18 @@ public class ProductController {
 ////        productService.getProductById(productId) => productDTO
 //    }
 
-    @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO requestDto) {
-        ProductDTO responseDto = productService.createProduct(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-    }
+@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<?> createProduct(
+        @RequestParam String productName,
+        @RequestParam BigDecimal price,
+        @RequestParam int stock,
+        @RequestParam ProductCategory productTag,
+        @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
+        @RequestParam(value = "details", required = false) List<MultipartFile> details) {
+
+    productService.createProductWithImages(productName, price, stock, productTag, thumbnail, details);
+    return ResponseEntity.ok().build();
+}
 
 //    @GetMapping
 //    public ResponseEntity<List<ProductDTO>> getAllProducts() {

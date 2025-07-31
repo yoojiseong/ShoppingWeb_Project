@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductService {
@@ -54,4 +57,9 @@ public interface ProductService {
 
     // 상품 삭제 메서드 시그니처 추가
     void deleteProduct(Long productId);
+
+    // 관리자 모드에서 상품과 이미지 함께 저장
+    void createProductWithImages(String productName, BigDecimal price, int stock, ProductCategory productTag,
+                                 MultipartFile thumbnail,
+                                 List<MultipartFile> detailImages);
 }
