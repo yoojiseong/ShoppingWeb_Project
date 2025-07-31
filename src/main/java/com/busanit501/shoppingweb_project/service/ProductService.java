@@ -6,6 +6,7 @@ import com.busanit501.shoppingweb_project.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import java.util.List;
 
 public interface ProductService {
@@ -22,24 +23,24 @@ public interface ProductService {
     List<ProductDTO> searchProducts(String keyword);
 
     void saveProduct(Product product);
-    default Product dtoToEntity(ProductDTO productDTO){
+
+    default Product dtoToEntity(ProductDTO productDTO) {
         Product product = Product.builder()
                 .productId(productDTO.getProductId())
                 .productName(productDTO.getProductName())
                 .price(productDTO.getPrice())
                 .stock(productDTO.getStock())
-                .image(productDTO.getImage())
                 .productTag(productDTO.getProductTag())
                 .build();
         return product;
     }
-    default ProductDTO entityToDto(Product product){
+
+    default ProductDTO entityToDto(Product product) {
         ProductDTO productDTO = ProductDTO.builder()
                 .productId(product.getProductId())
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .stock(product.getStock())
-                .image(product.getImage())
                 .productTag(product.getProductTag())
                 .build();
         return productDTO;

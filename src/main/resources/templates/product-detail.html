@@ -1,247 +1,249 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fashion Store - 상품 상세</title>
     <link th:href="@{/css/style.css}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-          crossorigin="anonymous">
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
+
 <body>
-<header class="header">
-    <div class="container">
-        <div class="logo">
-            <h1><a th:href="@{/home}">Fashion Store</a></h1>
-        </div>
-        <nav class="nav">
-            <div class="nav-buttons">
-                <button onclick="goToMyPage()">마이페이지</button>
-                <button onclick="goToCart()">장바구니 (<span id="cartCount">0</span>)</button>
-                <div sec:authorize="isAuthenticated()">
-                    <span sec:authentication="name">사용자 이메일</span>
-                    <a class="nav-link" href="/logout">로그아웃</a>
-                </div>
-
-                <div sec:authorize="!isAuthenticated()">
-                    <button onclick="goToLogin()" id="loginBtn">로그인</button>
-                    <button onclick="goToSignup()">회원가입</button>
-                </div>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1><a th:href="@{/home}">Fashion Store</a></h1>
             </div>
-        </nav>
-    </div>
-</header>
-
-<main class="main">
-    <div class="container">
-        <!-- 뒤로가기 버튼 -->
-        <button class="back-btn" onclick="goBack()">
-            ← 상품 목록으로
-        </button>
-
-        <!-- 상품 상세 정보 -->
-        <div class="product-detail-container">
-            <div class="product-detail-grid">
-                <!-- 상품 이미지 -->
-                <div class="product-image-large" id="productImageLarge">
-                    <!-- JavaScript로 동적 생성 -->
-                </div>
-
-                <!-- 상품 정보 -->
-                <div class="product-info-detail">
-                    <div class="product-category" id="productCategory"></div>
-                    <h1 class="product-title" id="productTitle"></h1>
-                    <div class="product-price-large" id="productPriceLarge"></div>
-
-                    <!-- 평점 정보 -->
-                    <div class="rating-info">
-                        <div class="stars" id="averageStars"></div>
-                        <span class="rating-score" id="averageRating">0.0</span>
-                        <span class="review-count" id="reviewCount">(0개 리뷰)</span>
+            <nav class="nav">
+                <div class="nav-buttons">
+                    <button onclick="goToMyPage()">마이페이지</button>
+                    <button onclick="goToCart()">장바구니 (<span id="cartCount">0</span>)</button>
+                    <div sec:authorize="isAuthenticated()">
+                        <span sec:authentication="name">사용자 이메일</span>
+                        <a class="nav-link" href="/logout">로그아웃</a>
                     </div>
 
-                    <!-- 상품 설명 -->
-                    <div class="product-description">
-                        <h3>상품 설명</h3>
-                        <p id="productDescription"></p>
+                    <div sec:authorize="!isAuthenticated()">
+                        <button onclick="goToLogin()" id="loginBtn">로그인</button>
+                        <button onclick="goToSignup()">회원가입</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- 뒤로가기 버튼 -->
+            <button class="back-btn" onclick="goBack()">
+                ← 상품 목록으로
+            </button>
+
+            <!-- 상품 상세 정보 -->
+            <div class="product-detail-container">
+                <div class="product-detail-grid">
+                    <!-- 상품 이미지 -->
+                    <div class="product-image-large" id="productImageLarge">
+                        <!-- JavaScript로 동적 생성 -->
                     </div>
 
-                    <!-- 구매 버튼 -->
-                    <button class="add-to-cart-btn-large" onclick="addToCartFromDetail()">
-                        🛒 장바구니 담기
-                    </button>
+                    <!-- 상품 정보 -->
+                    <div class="product-info-detail">
+                        <div class="product-category" id="productCategory"></div>
+                        <h1 class="product-title" id="productTitle"></h1>
+                        <div class="product-price-large" id="productPriceLarge"></div>
+
+                        <!-- 평점 정보 -->
+                        <div class="rating-info">
+                            <div class="stars" id="averageStars"></div>
+                            <span class="rating-score" id="averageRating">0.0</span>
+                            <span class="review-count" id="reviewCount">(0개 리뷰)</span>
+                        </div>
+
+                        <!-- 상품 설명 -->
+                        <div class="product-description">
+                            <h3>상품 설명</h3>
+                            <p id="productDescription"></p>
+                        </div>
+
+                        <!-- 구매 버튼 -->
+                        <button class="add-to-cart-btn-large" onclick="addToCartFromDetail()">
+                            🛒 장바구니 담기
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 리뷰 섹션 -->
-        <div class="review-section">
-            <h2>상품 리뷰</h2>
+            <!-- 리뷰 섹션 -->
+            <div class="review-section">
+                <h2>상품 리뷰</h2>
 
-            <!-- 리뷰 작성 -->
-            <div class="review-write-container" id="reviewWriteContainer">
-                <div class="review-write-card">
-                    <h3>리뷰 작성</h3>
-                    <form id="reviewForm" onsubmit="submitReview(event)">
-                        <div class="form-group">
-                            <label>평점</label>
-                            <div class="star-rating" id="starRating">
-                                <span class="star" data-rating="1">★</span>
-                                <span class="star" data-rating="2">★</span>
-                                <span class="star" data-rating="3">★</span>
-                                <span class="star" data-rating="4">★</span>
-                                <span class="star" data-rating="5">★</span>
+                <!-- 리뷰 작성 -->
+                <div class="review-write-container" id="reviewWriteContainer">
+                    <div class="review-write-card">
+                        <h3>리뷰 작성</h3>
+                        <form id="reviewForm" onsubmit="submitReview(event)">
+                            <div class="form-group">
+                                <label>평점</label>
+                                <div class="star-rating" id="starRating">
+                                    <span class="star" data-rating="1">★</span>
+                                    <span class="star" data-rating="2">★</span>
+                                    <span class="star" data-rating="3">★</span>
+                                    <span class="star" data-rating="4">★</span>
+                                    <span class="star" data-rating="5">★</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label>리뷰 내용</label>
-                            <textarea id="reviewComment" placeholder="상품에 대한 솔직한 후기를 남겨주세요." rows="4" required></textarea>
-                        </div>
-                        <button type="submit" class="submit-review-btn">리뷰 등록</button>
-                    </form>
+                            <div class="form-group">
+                                <label>리뷰 내용</label>
+                                <textarea id="reviewComment" placeholder="상품에 대한 솔직한 후기를 남겨주세요." rows="4"
+                                    required></textarea>
+                            </div>
+                            <button type="submit" class="submit-review-btn">리뷰 등록</button>
+                        </form>
+                    </div>
                 </div>
-            </div>
 
-            <!-- 로그인 필요 메시지 -->
+                <!-- 로그인 필요 메시지 -->
 
-                 <div class="login-required" id="loginRequired" style="display: none;">
+                <div class="login-required" id="loginRequired" style="display: none;">
                     <div class="login-required-card">
                         <p>리뷰를 작성하려면 로그인이 필요합니다.</p>
                         <button onclick="goToLogin()">로그인하기</button>
                     </div>
-                 </div>
+                </div>
 
 
-            <!-- 리뷰 목록 -->
-            <div class="review-list" id="reviewList">
-                <!-- JavaScript로 동적 생성 -->
+                <!-- 리뷰 목록 -->
+                <div class="review-list" id="reviewList">
+                    <!-- JavaScript로 동적 생성 -->
+                </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<script th:src="@{/js/script.js}"></script>
-<script>
-    let currentUser = null;
-    let currentProduct = null;
+    <script th:src="@{/js/script.js}"></script>
+    <script>
+        let currentUser = null;
+        let currentProduct = null;
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        await fetchCurrentUser();         // currentUser 먼저 세팅
-        initializeProductDetail();        // 상세 페이지 표시
-        initializeReviewForm();
-    });
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchCurrentUser();         // currentUser 먼저 세팅
+            initializeProductDetail();        // 상세 페이지 표시
+            initializeReviewForm();
+        });
 
-    async function fetchCurrentUser() {
-        try {
-            const res = await fetch('/api/members/me');
-            if (!res.ok) throw new Error('로그인 안됨');
-            currentUser = await res.json();
-            console.log('로그인 사용자:', currentUser);
-        } catch (err) {
-            console.warn('비로그인 상태', err);
-            currentUser = null;
-        }
-    }
-
-
-    // 뒤로가기 (product-detail.html)
-    function goBack() {
-        window.location.href = '/home';
-    }
-
-    // 상품 상세 페이지 초기화 (product-detail.html)
-    async function initializeProductDetail() {
-        const pathSegments = window.location.pathname.split('/');
-        const productId = pathSegments[pathSegments.length - 1];
-
-        if (!productId) {
-            window.location.href = '/home';
-            return;
-        }
-
-        try {
-            const res = await fetch(`/api/products/${productId}`);
-            if (!res.ok) throw new Error('상품 정보를 불러오지 못했습니다.');
-
-            const product = await res.json();
-            console.log("product : ", product);
-            currentProduct = product;
-
-            displayProductDetail(product);
-            updateCartCount();
-        } catch (err) {
-            alert(err.message);
-            window.location.href = '/';
-        }
-    }
-
-    // 상품 상세 정보 표시 (product-detail.html)
-    function displayProductDetail(product) {
-        document.getElementById('productImageLarge').textContent = product.image;
-        document.getElementById('productCategory').textContent = product.productTag;
-        document.getElementById('productTitle').textContent = product.productName;
-        document.getElementById('productPriceLarge').textContent = Number(product.price).toLocaleString() + '원';
-        // 상품 설명 설정
-        const descriptions = {
-            '바지': '편안한 착용감과 스타일을 동시에 만족시키는 바지입니다. 다양한 상황에서 활용할 수 있는 베이직한 디자인으로 제작되었습니다.',
-            '신발': '발의 편안함을 최우선으로 고려한 신발입니다. 고품질 소재를 사용하여 내구성과 스타일을 모두 갖추었습니다.',
-            '상의': '부드러운 소재와 세련된 디자인이 특징인 상의입니다. 일상복으로도, 외출복으로도 완벽한 아이템입니다.',
-            '아우터': '추운 날씨에도 따뜻함을 유지해주는 아우터입니다. 실용성과 패션성을 모두 고려한 디자인입니다.'
-        };
-        document.getElementById('productDescription').textContent = descriptions[product.category] || '고품질 상품입니다.';
-        // 평점 정보 업데이트
-        updateProductRating(product.id);
-    }
-
-
-    // 상품 평점 정보 업데이트 (product-detail.html)
-    function updateProductRating(productId) {
-        const productReviews = reviews.filter(review => review.productId === productId);
-        const averageRating = productReviews.length > 0
-            ? productReviews.reduce((sum, review) => sum + review.rating, 0) / productReviews.length
-            : 0;
-        const starsContainer = document.getElementById('averageStars');
-        const ratingScore = document.getElementById('averageRating');
-        const reviewCount = document.getElementById('reviewCount');
-        starsContainer.innerHTML = renderStars(Math.round(averageRating));
-        ratingScore.textContent = averageRating.toFixed(1);
-        reviewCount.textContent = `(${productReviews.length}개 리뷰)`;
-    }
-
-    // 별점 렌더링 (product-detail.html)
-    function renderStars(rating) {
-        let starsHTML = '';
-        for (let i = 1; i <= 5; i++) {
-            if (i <= rating) {
-                starsHTML += '<span class="star">★</span>';
-            } else {
-                starsHTML += '<span class="star empty">★</span>';
+        async function fetchCurrentUser() {
+            try {
+                const res = await fetch('/api/members/me');
+                if (!res.ok) throw new Error('로그인 안됨');
+                currentUser = await res.json();
+                console.log('로그인 사용자:', currentUser);
+            } catch (err) {
+                console.warn('비로그인 상태', err);
+                currentUser = null;
             }
         }
-        return starsHTML;
-    }
 
-    // 상품 리뷰 표시 (product-detail.html)
-    function displayProductReviews(productId) {
-        const productReviews = reviews.filter(review => review.productId === productId);
-        const reviewList = document.getElementById('reviewList');
-        if (productReviews.length === 0) {
-            reviewList.innerHTML = `
+
+        // 뒤로가기 (product-detail.html)
+        function goBack() {
+            window.location.href = '/home';
+        }
+
+        // 상품 상세 페이지 초기화 (product-detail.html)
+        async function initializeProductDetail() {
+            const pathSegments = window.location.pathname.split('/');
+            const productId = pathSegments[pathSegments.length - 1];
+
+            if (!productId) {
+                window.location.href = '/home';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/products/${productId}`);
+                if (!res.ok) throw new Error('상품 정보를 불러오지 못했습니다.');
+
+                const product = await res.json();
+                console.log("product : ", product);
+                currentProduct = product;
+
+                displayProductDetail(product);
+                updateCartCount();
+            } catch (err) {
+                alert(err.message);
+                window.location.href = '/';
+            }
+        }
+
+        // 상품 상세 정보 표시 (product-detail.html)
+        function displayProductDetail(product) {
+            const productImageLarge = document.getElementById('productImageLarge');
+            const imageUrl = product.imageFileName ? `/api/image/display/${product.imageFileName}` : '/images/default_product.png';
+            productImageLarge.innerHTML = `<img src="${imageUrl}" alt="${product.productName}">`;
+            document.getElementById('productCategory').textContent = product.productTag;
+            document.getElementById('productTitle').textContent = product.productName;
+            document.getElementById('productPriceLarge').textContent = Number(product.price).toLocaleString() + '원';
+            // 상품 설명 설정
+            const descriptions = {
+                '바지': '편안한 착용감과 스타일을 동시에 만족시키는 바지입니다. 다양한 상황에서 활용할 수 있는 베이직한 디자인으로 제작되었습니다.',
+                '신발': '발의 편안함을 최우선으로 고려한 신발입니다. 고품질 소재를 사용하여 내구성과 스타일을 모두 갖추었습니다.',
+                '상의': '부드러운 소재와 세련된 디자인이 특징인 상의입니다. 일상복으로도, 외출복으로도 완벽한 아이템입니다.',
+                '아우터': '추운 날씨에도 따뜻함을 유지해주는 아우터입니다. 실용성과 패션성을 모두 고려한 디자인입니다.'
+            };
+            document.getElementById('productDescription').textContent = descriptions[product.category] || '고품질 상품입니다.';
+            // 평점 정보 업데이트
+            updateProductRating(product.id);
+        }
+
+
+        // 상품 평점 정보 업데이트 (product-detail.html)
+        function updateProductRating(productId) {
+            const productReviews = reviews.filter(review => review.productId === productId);
+            const averageRating = productReviews.length > 0
+                ? productReviews.reduce((sum, review) => sum + review.rating, 0) / productReviews.length
+                : 0;
+            const starsContainer = document.getElementById('averageStars');
+            const ratingScore = document.getElementById('averageRating');
+            const reviewCount = document.getElementById('reviewCount');
+            starsContainer.innerHTML = renderStars(Math.round(averageRating));
+            ratingScore.textContent = averageRating.toFixed(1);
+            reviewCount.textContent = `(${productReviews.length}개 리뷰)`;
+        }
+
+        // 별점 렌더링 (product-detail.html)
+        function renderStars(rating) {
+            let starsHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    starsHTML += '<span class="star">★</span>';
+                } else {
+                    starsHTML += '<span class="star empty">★</span>';
+                }
+            }
+            return starsHTML;
+        }
+
+        // 상품 리뷰 표시 (product-detail.html)
+        function displayProductReviews(productId) {
+            const productReviews = reviews.filter(review => review.productId === productId);
+            const reviewList = document.getElementById('reviewList');
+            if (productReviews.length === 0) {
+                reviewList.innerHTML = `
             <div class="no-reviews">
                 <p>아직 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!</p>
             </div>
         `;
-            return;
-        }
-        reviewList.innerHTML = '';
-        productReviews.slice().reverse().forEach(review => {
-            const reviewItem = document.createElement('div');
-            reviewItem.className = 'review-item';
-            reviewItem.innerHTML = `
+                return;
+            }
+            reviewList.innerHTML = '';
+            productReviews.slice().reverse().forEach(review => {
+                const reviewItem = document.createElement('div');
+                reviewItem.className = 'review-item';
+                reviewItem.innerHTML = `
             <div class="review-header">
                 <div class="review-user-info">
                     <div class="review-user-name">${review.userName}</div>
@@ -251,149 +253,150 @@
             </div>
             <div class="review-comment">${review.comment}</div>
         `;
-            reviewList.appendChild(reviewItem);
-        });
-    }
+                reviewList.appendChild(reviewItem);
+            });
+        }
 
-    // 리뷰 폼 초기화 (product-detail.html)
-    function initializeReviewForm() {
-        const reviewWriteContainer = document.getElementById('reviewWriteContainer');
-        const loginRequired = document.getElementById('loginRequired');
-        if (currentUser) {
-            reviewWriteContainer.style.display = 'block';
-            loginRequired.style.display = 'none';
-            // 별점 클릭 이벤트 설정
-            const stars = document.querySelectorAll('.star-rating .star');
-            stars.forEach((star, index) => {
-                star.addEventListener('click', () => {
-                    selectedRating = index + 1;
+        // 리뷰 폼 초기화 (product-detail.html)
+        function initializeReviewForm() {
+            const reviewWriteContainer = document.getElementById('reviewWriteContainer');
+            const loginRequired = document.getElementById('loginRequired');
+            if (currentUser) {
+                reviewWriteContainer.style.display = 'block';
+                loginRequired.style.display = 'none';
+                // 별점 클릭 이벤트 설정
+                const stars = document.querySelectorAll('.star-rating .star');
+                stars.forEach((star, index) => {
+                    star.addEventListener('click', () => {
+                        selectedRating = index + 1;
+                        updateStarRating();
+                    });
+                    star.addEventListener('mouseover', () => {
+                        highlightStars(index + 1);
+                    });
+                });
+                document.querySelector('.star-rating').addEventListener('mouseleave', () => {
                     updateStarRating();
                 });
-                star.addEventListener('mouseover', () => {
-                    highlightStars(index + 1);
-                });
-            });
-            document.querySelector('.star-rating').addEventListener('mouseleave', () => {
                 updateStarRating();
-            });
-            updateStarRating();
-        } else {
-            reviewWriteContainer.style.display = 'none';
-            loginRequired.style.display = 'block';
-        }
-    }
-
-    // 별점 업데이트 (product-detail.html)
-    function updateStarRating() {
-        const stars = document.querySelectorAll('.star-rating .star');
-        stars.forEach((star, index) => {
-            if (index < selectedRating) {
-                star.classList.add('active');
             } else {
-                star.classList.remove('active');
+                reviewWriteContainer.style.display = 'none';
+                loginRequired.style.display = 'block';
             }
-        });
-    }
-
-    // 별점 하이라이트 (product-detail.html)
-    function highlightStars(rating) {
-        const stars = document.querySelectorAll('.star-rating .star');
-        stars.forEach((star, index) => {
-            if (index < rating) {
-                star.classList.add('active');
-            } else {
-                star.classList.remove('active');
-            }
-        });
-    }
-
-    // 리뷰 제출 (product-detail.html)
-    function submitReview(event) {
-        event.preventDefault();
-        if (!currentUser) {
-            alert('로그인이 필요합니다.');
-            return;
         }
-        const productId = parseInt(localStorage.getItem('selectedProductId'));
-        const comment = document.getElementById('reviewComment').value.trim();
-        if (!comment) {
-            alert('리뷰 내용을 입력해주세요.');
-            return;
-        }
-        const newReview = {
-            id: Date.now(),
-            productId: productId,
-            userId: currentUser.email,
-            userName: currentUser.name,
-            rating: selectedRating,
-            comment: comment,
-            date: new Date().toLocaleDateString()
-        };
-        reviews.push(newReview);
-        localStorage.setItem('reviews', JSON.stringify(reviews));
-        // 폼 초기화
-        document.getElementById('reviewComment').value = '';
-        selectedRating = 5;
-        updateStarRating();
-        // 리뷰 목록 및 평점 업데이트
-        displayProductReviews(productId);
-        updateProductRating(productId);
-        alert('리뷰가 등록되었습니다.');
-    }
 
-    // 상세 페이지에서 장바구니 담기 (product-detail.html)
-    function addToCartFromDetail() {
-        const pathParts = window.location.pathname.split('/');
-        const productId = pathParts[pathParts.length - 1];
-        addToCart(currentProduct.productId , currentProduct.productName);
-    }
-
-    function addToCart(productId, productName) {
-        const payload = {
-            productId: productId,
-            quantity: 1
-        };
-
-        fetch('/api/cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('장바구니 추가에 실패했습니다.');
+        // 별점 업데이트 (product-detail.html)
+        function updateStarRating() {
+            const stars = document.querySelectorAll('.star-rating .star');
+            stars.forEach((star, index) => {
+                if (index < selectedRating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
                 }
-                return res.json();
-            })
-            .then(data => {
-                alert(`🛒 ${productName}이(가) 장바구니에 추가되었습니다.`);
-                updateCartCount();
-                // 필요시 UI 업데이트 or 장바구니 수량 갱신
-                // updateCartCount();
-            })
-            .catch(err => {
-                console.error(err);
+            });
+        }
 
+        // 별점 하이라이트 (product-detail.html)
+        function highlightStars(rating) {
+            const stars = document.querySelectorAll('.star-rating .star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
             });
-    }
-    function updateCartCount() {
-        fetch('/api/cart')
-            .then(res => {
-                if (!res.ok) throw new Error('장바구니 불러오기 실패');
-                return res.json();
+        }
+
+        // 리뷰 제출 (product-detail.html)
+        function submitReview(event) {
+            event.preventDefault();
+            if (!currentUser) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+            const productId = parseInt(localStorage.getItem('selectedProductId'));
+            const comment = document.getElementById('reviewComment').value.trim();
+            if (!comment) {
+                alert('리뷰 내용을 입력해주세요.');
+                return;
+            }
+            const newReview = {
+                id: Date.now(),
+                productId: productId,
+                userId: currentUser.email,
+                userName: currentUser.name,
+                rating: selectedRating,
+                comment: comment,
+                date: new Date().toLocaleDateString()
+            };
+            reviews.push(newReview);
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+            // 폼 초기화
+            document.getElementById('reviewComment').value = '';
+            selectedRating = 5;
+            updateStarRating();
+            // 리뷰 목록 및 평점 업데이트
+            displayProductReviews(productId);
+            updateProductRating(productId);
+            alert('리뷰가 등록되었습니다.');
+        }
+
+        // 상세 페이지에서 장바구니 담기 (product-detail.html)
+        function addToCartFromDetail() {
+            const pathParts = window.location.pathname.split('/');
+            const productId = pathParts[pathParts.length - 1];
+            addToCart(currentProduct.productId, currentProduct.productName);
+        }
+
+        function addToCart(productId, productName) {
+            const payload = {
+                productId: productId,
+                quantity: 1
+            };
+
+            fetch('/api/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
             })
-            .then(data => {
-                const count = data.length;
-                document.getElementById('cartCount').textContent = count;
-            })
-            .catch(err => {
-                console.error(err);
-                // 오류 시 0으로 설정
-                document.getElementById('cartCount').textContent = 0;
-            });
-    }
-</script>
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('장바구니 추가에 실패했습니다.');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    alert(`🛒 ${productName}이(가) 장바구니에 추가되었습니다.`);
+                    updateCartCount();
+                    // 필요시 UI 업데이트 or 장바구니 수량 갱신
+                    // updateCartCount();
+                })
+                .catch(err => {
+                    console.error(err);
+
+                });
+        }
+        function updateCartCount() {
+            fetch('/api/cart')
+                .then(res => {
+                    if (!res.ok) throw new Error('장바구니 불러오기 실패');
+                    return res.json();
+                })
+                .then(data => {
+                    const count = data.length;
+                    document.getElementById('cartCount').textContent = count;
+                })
+                .catch(err => {
+                    console.error(err);
+                    // 오류 시 0으로 설정
+                    document.getElementById('cartCount').textContent = 0;
+                });
+        }
+    </script>
 </body>
+
 </html>
