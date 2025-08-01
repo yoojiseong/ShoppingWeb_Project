@@ -7,12 +7,14 @@ import com.busanit501.shoppingweb_project.repository.AddressRepository;
 import com.busanit501.shoppingweb_project.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -29,9 +31,20 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Transactional
     public Address addAddress(AddressDTO dto, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("회원 정보를 찾을 수 없습니다."));
+
+        log.info("기본배송지 여부 (DTO): {}", dto.isDefault());
+
+        // 만약 기본배송지라면 기존 기본배송지 초기화
+        if (dto.isDefault()) {
+            log.info("기존 기본배송지 초기화 시작");
+            addressRepository.resetDefaultAddress(member.getId());
+            addressRepository.flush();
+            log.info("기존 기본배송지 초기화 완료");
+        }
 
         Address address = Address.builder()
                 .zipcode(dto.getZipcode())
@@ -41,11 +54,6 @@ public class AddressServiceImpl implements AddressService {
                 .isDefault(dto.isDefault())  // dto에 기본배송지 여부가 있으면 반영
                 .member(member)
                 .build();
-
-        // 만약 기본배송지라면 기존 기본배송지 초기화
-        if (address.isDefault()) {
-            addressRepository.resetDefaultAddress(member.getMemberId());
-        }
 
         return addressRepository.save(address);
     }
@@ -63,7 +71,7 @@ public class AddressServiceImpl implements AddressService {
         address.setAddressId(dto.getAddressId());
         // 기본배송지 변경 시 처리
         if (dto.isDefault()) {
-            addressRepository.resetDefaultAddress(address.getMember().getMemberId());
+            addressRepository.resetDefaultAddress(address.getMember().getId());
             address.setIsDefault(true);
         } else {
             address.setIsDefault(false);
@@ -75,7 +83,7 @@ public class AddressServiceImpl implements AddressService {
     public void setDefaultAddress(Long memberId, Long addressId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("회원 정보를 찾을 수 없습니다."));
-        addressRepository.resetDefaultAddress(member.getMemberId());
+        addressRepository.resetDefaultAddress(member.getId());
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new NoSuchElementException("배송지를 찾을 수 없습니다."));
         address.setIsDefault(true);

@@ -21,7 +21,7 @@ public class MemberDTO {
     private String confirmPassword;
     private String userName;
     private String phone;
-    private LocalDate birthDate;
+    private String birthDate;
 
     private String zipcode;
     private String addressLine;

@@ -9,6 +9,7 @@ import com.busanit501.shoppingweb_project.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -60,6 +61,9 @@ public class MemberController {
 
     @GetMapping("/userInfo-update")
     public String showUpdateForm(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
         MemberDTO memberDTO = memberService.findByMemberId(userDetails.getUsername());
         model.addAttribute("user", memberDTO);
         return "userInfo-update";
@@ -85,28 +89,47 @@ public class MemberController {
 
     @GetMapping("/complete-profile")
     public String showCompleteProfileForm(Model model, @AuthenticationPrincipal MemberSecurityDTO userDetails) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
         model.addAttribute("member", userDetails);
         model.addAttribute("address", new AddressDTO());
         return "complete-profile";
     }
 
     @PostMapping("/complete-profile")
-    public String completeProfile(@AuthenticationPrincipal MemberSecurityDTO userDetails,
+    public String completeProfile(Authentication authentication,
                                   @RequestParam String phone,
+                                  @RequestParam(name = "isDefault", required = false, defaultValue = "false") boolean isDefault,
                                   @ModelAttribute AddressDTO addressDTO) {
 
-        if(userDetails == null || userDetails.getMid() == null) {
+        addressDTO.setDefault(isDefault);
+
+        log.info("AddressDTO: {}", addressDTO);
+        log.info("isDefault: {}", addressDTO.isDefault());
+        if(authentication == null || !authentication.isAuthenticated()) {
             // 인증 정보 없으면 로그인 페이지 등으로 리다이렉트 처리
             return "redirect:/login";
         }
-        String memberId = userDetails.getMid(); // String 타입 아이디
 
-        Long memberIdLong = Long.parseLong(memberId);
-        memberService.updatePhone(memberIdLong, phone);
-        log.info("전화번호 : ",memberIdLong, phone);
-        addressService.addAddress(addressDTO, memberIdLong);
-        log.info("주소 정보 : ", addressDTO, memberIdLong);
+        // Authentication에서 직접 MemberSecurityDTO 꺼내기
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof MemberSecurityDTO userDetails)) {
+            return "redirect:/login";
+        }
 
-        return "redirect:/userInfo-update";
+        String memberIdStr = userDetails.getMid();
+        if (memberIdStr == null) {
+            return "redirect:/login";
+        }
+
+        Long memberId = memberService.getMemberPkByMemberId(memberIdStr);
+
+        memberService.updatePhone(memberIdStr, phone);
+        log.info("전화번호: memberId={}, phone={}", memberIdStr, phone);
+        addressService.addAddress(addressDTO, memberId);
+        log.info("주소 정보: {}, memberId={}", addressDTO, memberId);
+
+        return "redirect:/home";
     }
 }

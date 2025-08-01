@@ -22,13 +22,14 @@ public class MemberSecurityDTO extends User implements OAuth2User {
     private boolean del;
     private boolean social;
 
+    private boolean defaultAddressExists;
     private String phone;
     private Map<String, Object> props;
 
     public MemberSecurityDTO(String memberId, String password,
                              String email, boolean del, boolean social,
                              Collection<? extends GrantedAuthority> authorities) {
-        super(email, password, authorities);
+        super(memberId, password, authorities);
         this.memberId = memberId;
         this.mpw = password;
         this.email = email;
@@ -50,7 +51,11 @@ public class MemberSecurityDTO extends User implements OAuth2User {
         return this.memberId;
     }
 
+    public boolean isKakaoUser() {
+        return this.isSocial();
+    }
+
     public boolean isProfileIncomplete() {
-        return (this.getPhone() == null || this.getPhone().isEmpty());
+        return (this.getPhone() == null || this.getPhone().isEmpty() || !this.isDefaultAddressExists());
     }
 }

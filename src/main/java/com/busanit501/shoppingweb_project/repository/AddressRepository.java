@@ -20,6 +20,6 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     // 기본 배송지 초기화
     @Modifying
     @Query("update Address a set a.isDefault = false where a.member.memberId = :memberId")
-    void resetDefaultAddress(String memberId);
+    void resetDefaultAddress(@Param("memberId") Long memberId);
 
 }

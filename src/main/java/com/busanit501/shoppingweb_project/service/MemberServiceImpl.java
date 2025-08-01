@@ -84,8 +84,8 @@ public class MemberServiceImpl implements MemberService {
 
         // 기본 배송지 변경 처리 (예: memberDTO에 기본배송지 id가 있다면)
         if (dto.getDefaultAddressId() != null) {
-            String memberIdString = member.getMemberId();
-            addressRepository.resetDefaultAddress(memberIdString);
+            Long memberPk = member.getId();
+            addressRepository.resetDefaultAddress(memberPk);
             Address defaultAddress = addressRepository.findById(dto.getDefaultAddressId())
                     .orElseThrow(() -> new NoSuchElementException("기본 배송지 정보를 찾을 수 없습니다."));
             defaultAddress.setIsDefault(true);
@@ -99,15 +99,32 @@ public class MemberServiceImpl implements MemberService {
     public MemberDTO findByMemberId(String memberId) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다."));
-        return modelMapper.map(member, MemberDTO.class);
+
+        MemberDTO dto = modelMapper.map(member, MemberDTO.class);
+
+        // birthDate null 체크 후 빈 문자열 처리
+        if (member.getBirthDate() == null) {
+            dto.setBirthDate("");
+        } else {
+            dto.setBirthDate(member.getBirthDate().toString());
+        }
+
+        return dto;
     }
 
     @Override
-    public void updatePhone(Long memberId, String phone) {
-        Member member = memberRepository.findById(memberId)
+    public void updatePhone(String memberId, String phone) {
+        Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new NoSuchElementException("회원 없음"));
         member.setPhone(phone);
         memberRepository.save(member);
+    }
+
+    @Override
+    public Long getMemberPkByMemberId(String memberId) {
+        return memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new NoSuchElementException("회원 없음"))
+                .getId();
     }
 
 }

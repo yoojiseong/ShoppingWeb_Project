@@ -65,7 +65,7 @@
             <div class="user-detail"><strong>이름:</strong> ${user.userName}</div>
             <div class="user-detail"><strong>이메일:</strong> ${user.email}</div>
             <div class="user-detail"><strong>전화번호:</strong> ${user.phone}</div>
-            <div class="user-detail"><strong>생일:</strong> ${new Date(user.birthDate).toLocaleDateString()}</div>
+            <div class="user-detail"><strong>생일:</strong>${user.birthDate ? new Date(user.birthDate).toLocaleDateString() : '미등록'}</div>
         `;
             })
             .catch(err => {

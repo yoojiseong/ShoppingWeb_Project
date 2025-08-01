@@ -55,4 +55,8 @@ public class Member {
         return false;
     }
 
+    public boolean isKakaoUser(){
+        return isSocial();
+    }
+
 }
