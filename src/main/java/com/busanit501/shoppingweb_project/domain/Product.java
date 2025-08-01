@@ -1,17 +1,19 @@
 package com.busanit501.shoppingweb_project.domain;
 
 import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
+import com.busanit501.shoppingweb_project.dto.ProductDTO;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Builder
 @Getter
-@Setter
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "products")
@@ -23,7 +25,14 @@ public class Product {
     private String productName;
     private BigDecimal price;
     private int stock;
-    private String image;
+
+    @OneToMany(mappedBy = "product" , cascade = {CascadeType.ALL}
+    , fetch = FetchType.LAZY,
+    orphanRemoval = true)
+    @Builder.Default
+    @JsonManagedReference
+    @BatchSize(size = 20)
+    private Set<ProductImage> imageSet = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private ProductCategory productTag;
@@ -53,25 +62,54 @@ public class Product {
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
-
     public void addReview(Review review) {
         this.reviews.add(review);
         review.setProduct(this);
     }
 
-
     public void removeReview(Review review) {
         this.reviews.remove(review);
         review.setProduct(null);
     }
-
-    public void changeTitleContent(String productName, BigDecimal price, int stock, ProductCategory productTag) {
-        this.productName = productName;
-        this.price = price;
-        this.stock = stock;
-        this.productTag = productTag;
+    public void addImage(ProductImage image) {
+        imageSet.add(image);
+        image.setProduct(this);
     }
 
+    public void changeTitleContent(ProductDTO productDTO) {
+        this.productName = productDTO.getProductName();
+        this.price = productDTO.getPrice();
+        this.stock = productDTO.getStock();
+        this.productTag = productDTO.getProductTag();
+    }
+
+    public Optional<ProductImage> getThumbnailImage(){
+        return imageSet.stream()
+                .filter(ProductImage::isThumbnail)
+                .findFirst();
+    }
+
+    public static ProductDTO entityToDTO(Product product){
+        String thumbnailFileName = product.getThumbnailImage()
+                .map(ProductImage::getFileName)
+                .orElse(null);
+
+        List<String> detailFileNames = product.getImageSet().stream()
+                .filter(img -> !img.isThumbnail())
+                .map(ProductImage::getFileName)
+                .toList();
+
+        return ProductDTO.builder()
+                .productId(product.getProductId())
+                .productName(product.getProductName())
+                .price(product.getPrice())
+                .stock(product.getStock())
+                .productTag(product.getProductTag())
+                .thumbnailFileName(thumbnailFileName)
+                .fileNames(detailFileNames)
+                .build();
+    }
+
+
+
 }
-
-

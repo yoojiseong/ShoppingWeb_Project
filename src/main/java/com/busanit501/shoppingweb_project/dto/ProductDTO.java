@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,18 +25,14 @@ public class ProductDTO {
     @NotNull
     private BigDecimal price;
     private int stock;
-    private String image;
     private ProductCategory productTag;
+    private String thumbnailFileName; // 이미지 파일 이름 담을 필드 추가
 
-    public static ProductDTO fromEntity(Product product) {
-        return ProductDTO.builder()
-                .productId(product.getProductId())
-                .productName(product.getProductName())
-                .price(product.getPrice())
-                .stock(product.getStock())
-                .image(product.getImage())
-                .productTag(ProductCategory.valueOf(product.getProductTag().name())) // Enum을 문자열로 변환
-                .build();
+    private List<String> fileNames;
+
+    public void setImageFileName(String fileName)
+    {
+        this.thumbnailFileName = fileName;
     }
 
 }

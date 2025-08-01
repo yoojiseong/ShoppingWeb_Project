@@ -19,7 +19,7 @@ let reviews = [];       // 상품 리뷰 (localStorage에서 로드)
 let selectedRating = 5; // 리뷰 작성 시 선택된 별점 (product-detail.html에서 사용)
 
 // 페이지 로드 시 초기화 함수 (모든 HTML 페이지의 <script> 태그 내부에 포함)
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializePage();
 });
 
@@ -31,10 +31,7 @@ function initializePage() {
 
     // 현재 페이지에 따라 초기화 로직 분기
     const currentPath = window.location.pathname;
-    if (currentPath === '/' || currentPath.includes('home')) {
-        // home.html (메인 페이지)
-        displayProducts(products); // 상품 목록 표시
-    } else if (currentPath.includes('cart')) {
+    if (currentPath.includes('cart')) {
         // cart.html (장바구니 페이지)
         displayCartItems(); // 장바구니 아이템 표시
     } else if (currentPath.includes('mypage')) {
@@ -154,7 +151,7 @@ function loadDaumPostcodeScript(callback) {
 function execDaumPostcode() {
     loadDaumPostcodeScript(() => {
         new daum.Postcode({
-            oncomplete: function(data) {
+            oncomplete: function (data) {
                 document.getElementById('zipcode').value = data.zonecode;
                 document.getElementById('addressId').value = data.roadAddress;
                 document.getElementById('addressLine').focus();

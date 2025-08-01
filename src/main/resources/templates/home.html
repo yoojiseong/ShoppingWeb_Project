@@ -15,38 +15,49 @@
 
 <body>
 <header class="header">
-    <div class="container">
+    <div class="container d-flex justify-content-between align-items-center py-3">
+        <!-- 로고 -->
         <div class="logo">
-            <h1><a href="/home">Fashion Store</a></h1>
+            <h1><a href="/home" class="text-decoration-none text-dark">Fashion Store</a></h1>
         </div>
-        <nav class="nav">
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="상품을 검색하세요...">
-                <button onclick="searchProducts()">검색</button>
+
+        <!-- 검색창 -->
+        <div class="search-container d-flex">
+            <input type="text" id="searchInput" placeholder="상품을 검색하세요..." class="form-control me-2">
+            <button onclick="searchProducts()" class="btn btn-outline-primary">검색</button>
+        </div>
+
+        <!-- 네비게이션 버튼 -->
+        <div class="nav-buttons d-flex align-items-center gap-2">
+
+            <!-- 공통 버튼 -->
+            <button class="btn btn-outline-secondary" onclick="goToMyPage()">마이페이지</button>
+            <button class="btn btn-outline-secondary" onclick="goToCart()">
+                장바구니 (<span id="cartCount">0</span>)
+            </button>
+
+            <!-- 로그인 상태일 때 -->
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                <span sec:authentication="name" class="fw-bold text-primary"></span>
+                <a href="/logout" class="btn btn-outline-danger btn-sm">로그아웃</a>
             </div>
-            <div class="nav-buttons">
-                <button onclick="goToMyPage()">마이페이지</button>
-                <button onclick="goToCart()">장바구니 (<span id="cartCount">0</span>)</button>
 
-                <div sec:authorize="isAuthenticated()">
-                    <span sec:authentication="name">사용자 이메일</span>
-                    <a class="nav-link" href="/logout">로그아웃</a>
-                </div>
-
-                <div sec:authorize="!isAuthenticated()">
-                    <button onclick="goToLogin()" id="loginBtn">로그인</button>
-                    <button onclick="goToSignup()">회원가입</button>
-                </div>
-
-                <!-- 관리자 로그인시 화면에 출력되는 버튼-->
-                <div sec:authorize="hasRole('ADMIN')">
-                    <span style="color: red; font-weight: bold;">관리자 계정입니다</span>
-                    <a href="/admin" class="btn btn-sm btn-warning ms-2">관리자 페이지</a>
-                </div>
-                <!-- 관리자 로그인시 화면에 출력되는 버튼-->
-
+            <!-- 비로그인 상태일 때 -->
+            <div sec:authorize="!isAuthenticated()" class="d-flex gap-2">
+                <button onclick="goToLogin()" class="btn btn-outline-primary btn-sm">로그인</button>
+                <button onclick="goToSignup()" class="btn btn-outline-success btn-sm">회원가입</button>
             </div>
-        </nav>
+
+            <!-- 관리자 전용 버튼 -->
+            <div sec:authorize="hasRole('ADMIN')" class="d-flex flex-column align-items-start ms-3">
+                <span class="text-danger fw-bold">관리자 계정입니다</span>
+                <div class="d-flex gap-2 mt-1">
+                    <a href="/admin" class="btn btn-warning btn-sm">관리자 페이지</a>
+                    <a href="/admin/products/register" class="btn btn-success btn-sm">상품 등록</a>
+                </div>
+            </div>
+
+        </div>
     </div>
 </header>
 
@@ -158,9 +169,11 @@
         productsToShow.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
-
-            productCard.innerHTML = `
-            <div class="product-image">${product.image || '이미지 없음'}</div>
+            console.log(product.thumbnailFileName);
+                productCard.innerHTML = `
+            <img src="${product.thumbnailFileName != null ? '/api/image/display/' + product.thumbnailFileName : '/images/default_product.png'}"
+     th:alt="${product.productName}"
+     class="product-image" />
             <div class="product-info">
                 <h3 onclick="goToProductDetail(${product.productId})">${product.productName}</h3> <!-- product.name으로 변경 -->
                 <p>카테고리: ${product.productTag}</p> <!-- product.category로 변경 -->
