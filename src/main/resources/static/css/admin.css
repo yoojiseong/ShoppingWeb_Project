@@ -1,15 +1,14 @@
-/* 기본 스타일 및 색상 팔레트 */
 :root {
-    --primary-color: #4a90e2; /* 산뜻한 파랑 */
-    --secondary-color: #6c757d; /* 회색 */
-    --success-color: #28a745; /* 초록 */
-    --danger-color: #dc3545; /* 빨강 */
-    --info-color: #17a2b8; /* 정보색 (수정 버튼용) */
-    --light-bg: #f5f7fa; /* 연한 배경색 */
-    --card-bg: #ffffff; /* 카드 배경색 */
-    --border-color: #e0e6ed; /* 테두리색 */
-    --text-color: #333333; /* 기본 텍스트 색상 */
-    --light-text-color: #666666; /* 연한 텍스트 색상 */
+    --primary-color: #4a90e2;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --light-bg: #f5f7fa;
+    --card-bg: #ffffff;
+    --border-color: #e0e6ed;
+    --text-color: #333333;
+    --light-text-color: #666666;
 }
 
 body {
@@ -21,7 +20,6 @@ body {
     padding-bottom: 40px;
 }
 
-/* 헤더 스타일 */
 header {
     background-color: var(--card-bg);
     color: var(--text-color);
@@ -62,7 +60,6 @@ header .btn:hover {
     transform: translateY(-2px);
 }
 
-/* 메인 콘텐츠 영역 스타일 */
 main {
     background-color: var(--card-bg);
     padding: 40px;
@@ -79,7 +76,6 @@ h2 {
     display: inline-block;
 }
 
-/* 테이블 스타일 */
 .table {
     margin-bottom: 40px;
     border-radius: 8px;
@@ -113,7 +109,7 @@ h2 {
     vertical-align: middle;
     border-top: 1px solid var(--border-color);
 }
-/* 테이블 내 버튼 스타일 (이전 "수정" 버튼 스타일은 이제 사용되지 않음) */
+
 .table .btn-sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
@@ -137,8 +133,6 @@ h2 {
     border-color: #b21f2d;
 }
 
-
-/* 폼 요소 스타일 */
 .form-label {
     font-weight: 600;
     color: var(--light-text-color);
@@ -159,7 +153,6 @@ h2 {
     outline: none;
 }
 
-/* 버튼 스타일 */
 .btn {
     padding: 10px 20px;
     border-radius: 8px;
@@ -184,7 +177,7 @@ h2 {
     background-color: var(--secondary-color);
     border-color: var(--secondary-color);
 }
-.btn-info { /* 새로 추가된 정보색 버튼 */
+.btn-info {
     background-color: var(--info-color);
     border-color: var(--info-color);
 }
@@ -225,7 +218,7 @@ h2 {
     border: 1px solid #ddd;
     border-radius: 4px;
 }
-/* ⭐ 추가: 이미지 미리보기 클릭 가능 스타일 */
+/* 이미지 미리보기 클릭 가능 스타일 */
 .image-preview-container img#productThumbnailPreview,
 .detail-image-thumb {
     cursor: pointer; /* 클릭 가능한 커서로 변경 */
