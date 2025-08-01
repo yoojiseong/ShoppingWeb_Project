@@ -242,11 +242,11 @@
             return;
         }
         // FormData 구성
-        const formData = new FormData();
+        cagonst formData = new FormData();
         formData.append('productName', name);
         formData.append('price', price);
         formData.append('stock', stock);
-        formData.append('productTag', productTag);
+        formData.append('productTag', productT);
 
         if (thumbnailFile) {
             formData.append('thumbnail', thumbnailFile);  // 썸네일 파일

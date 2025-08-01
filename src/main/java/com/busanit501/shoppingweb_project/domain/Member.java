@@ -36,6 +36,8 @@ public class Member {
     @Column(nullable = false)
     private String role;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean social;
