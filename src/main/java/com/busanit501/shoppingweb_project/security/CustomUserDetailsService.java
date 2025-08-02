@@ -3,9 +3,11 @@ package com.busanit501.shoppingweb_project.security;
 import com.busanit501.shoppingweb_project.domain.Member;
 import com.busanit501.shoppingweb_project.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service

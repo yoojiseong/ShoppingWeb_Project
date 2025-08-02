@@ -3,18 +3,31 @@ package com.busanit501.shoppingweb_project.mapper;
 import com.busanit501.shoppingweb_project.dto.MemberDTO;
 import com.busanit501.shoppingweb_project.domain.Address;
 import com.busanit501.shoppingweb_project.domain.Member;
+import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
+@Component
 public class MemberMapper {
     public static Member toMemberEntity(MemberDTO dto, String encodedPassword) {
+        LocalDate birthDate = null;
+        try {
+            if (dto.getBirthDate() != null && !dto.getBirthDate().isEmpty()) {
+                birthDate = LocalDate.parse(dto.getBirthDate());
+            }
+        } catch (DateTimeParseException e) {
+            System.out.println("birthDate 파싱 실패: " + dto.getBirthDate());
+        }
+
         return Member.builder()
                 .memberId(dto.getMemberId())
                 .email(dto.getEmail())
                 .password(encodedPassword)
                 .userName(dto.getUserName())
                 .phone(dto.getPhone())
-                .birthDate(dto.getBirthDate())
+                .birthDate(birthDate)   // 여기서 변수 사용함
                 .createdAt(LocalDateTime.now())
                 .role("ROLE_USER")
                 .build();
@@ -29,6 +42,17 @@ public class MemberMapper {
                 .createdAt(LocalDateTime.now())
                 .isDefault(true)
                 .member(member)
+                .build();
+    }
+
+    public static MemberDTO toMemberDTO(Member member) {
+        return MemberDTO.builder()
+                .memberId(member.getMemberId())
+                .email(member.getEmail())
+                .userName(member.getUserName())
+                .phone(member.getPhone())
+                .birthDate(member.getBirthDate() != null ? member.getBirthDate().toString() : "")
+                // 나머지 필드도 필요하면 추가
                 .build();
     }
 }

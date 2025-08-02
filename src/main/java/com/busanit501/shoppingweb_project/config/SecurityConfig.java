@@ -1,8 +1,13 @@
 package com.busanit501.shoppingweb_project.config;
 
+import com.busanit501.shoppingweb_project.repository.AddressRepository;
 import com.busanit501.shoppingweb_project.repository.MemberRepository;
 import com.busanit501.shoppingweb_project.security.CustomOAuth2UserService;
+import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
+import com.busanit501.shoppingweb_project.security.handler.OAuth2LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,22 +18,26 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+@Log4j2
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final UserDetailsService customUserDetailsService;
-
-    @Bean
-    public CustomOAuth2UserService customOAuth2UserService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
-        return new CustomOAuth2UserService(memberRepository, passwordEncoder);
-    }
+    private final MemberRepository memberRepository;
+    private final AddressRepository addressRepository;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     // 비밀번호 암호화에 사용될 Bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CustomOAuth2UserService customOAuth2UserService() {
+        return new CustomOAuth2UserService(memberRepository, passwordEncoder(), addressRepository);
     }
 
     // 보안 필터 체인 설정 (접근 권한, 로그인/로그아웃 설정 등)
@@ -42,7 +51,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/{productId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/{id}").permitAll()
-                        .requestMatchers("/home", "/signup", "/login", "/css/**", "/js/**", "/images/**", "/api/check-id","/api/products").permitAll()
+                        .requestMatchers("/home", "/complete-profile","/complete-profile/**", "/signup", "/login", "/css/**", "/js/**", "/images/**", "/api/check-id","/api/products").permitAll()
+                        .requestMatchers("/api/members/me", "/api/orders","/api/orders/**","/api/cart/**", "/userInfo-update").authenticated()
                         // 관리자 권한 필요
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // 그 외 모든 요청은 인증 필요
@@ -68,10 +78,26 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
                 )
-                .oauth2Login(oauthLogin -> oauthLogin
+                .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService(null, null)))
-                        .defaultSuccessUrl("/home", true)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService())
+                        )
+                        .successHandler(oAuth2LoginSuccessHandler)
+//                            Object principal = authentication.getPrincipal();
+//                            log.info("OAuth2 로그인 principal 클래스: {}", principal.getClass().getName());
+//
+//                            if (principal instanceof MemberSecurityDTO user) {
+//                                if (user.isSocial() && user.isProfileIncomplete()) {
+//                                    log.info("isSocial: {}", user.isSocial());
+//                                    log.info("isProfileIncomplete: {}", user.isProfileIncomplete());
+//                                    response.sendRedirect("/complete-profile");
+//                                    return;
+//                                }
+//                            }
+//                            log.warn("principal이 MemberSecurityDTO가 아님. principal: {}", principal);
+//                            response.sendRedirect("/home");
+
                 );
 
         return http.build();

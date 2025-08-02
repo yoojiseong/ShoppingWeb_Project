@@ -11,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -46,6 +47,16 @@ public class Member {
 
     public void settingRole(String role){
         this.role = role;
+    }
+
+    public boolean isProfileIncomplete(){
+        if (this.social){return (phone == null || phone.isBlank() || addresses == null || addresses.isEmpty());
+        }
+        return false;
+    }
+
+    public boolean isKakaoUser(){
+        return isSocial();
     }
 
 }

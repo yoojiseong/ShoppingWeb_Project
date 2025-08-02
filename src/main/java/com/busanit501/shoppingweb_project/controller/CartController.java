@@ -13,6 +13,7 @@ import com.busanit501.shoppingweb_project.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -35,17 +36,25 @@ public class CartController {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
 
+
     @GetMapping
     public ResponseEntity<List<CartItemDTO>> getCartItems(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         Long memberId = userDetails.getMemberId();
         log.info("CartController에서 작업중 memberId : " + memberId);
         return ResponseEntity.ok(cartItemService.getCartItemsByMemberId(memberId));
     }
 
+
     @PostMapping
     public ResponseEntity<CartItemDTO> addToCart(@RequestBody CartItemDTO dto,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        log.info("화면에서 받아온 dto확인중 : " + dto);
+                                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        log.info("화면에서 받아온 dto확인중 : " +dto);
         Long memberId = userDetails.getMemberId();
         dto.setMemberId(memberId);
 
@@ -57,6 +66,9 @@ public class CartController {
     public ResponseEntity<?> updateQuantity(@PathVariable Long productId,
             @RequestBody Map<String, Integer> request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null || request.get("quantityChange") == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         try {
             int quantityChange = request.get("quantityChange");
             Long memberId = userDetails.getMemberId();
@@ -73,7 +85,10 @@ public class CartController {
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<?> removeFromCart(@PathVariable Long productId,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         cartItemService.removeFromCart(userDetails.getMemberId(), productId);
         Map<String, String> result = new HashMap<>();
         result.put("message", "삭제 성공");
@@ -82,6 +97,9 @@ public class CartController {
 
     @DeleteMapping("/clear")
     public ResponseEntity<?> clearCart(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         cartItemService.clearCart(userDetails.getMemberId());
         Map<String, String> response = new HashMap<>();
         response.put("result", "success");
