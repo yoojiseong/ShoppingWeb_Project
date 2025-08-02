@@ -1,5 +1,6 @@
 package com.busanit501.shoppingweb_project.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +33,9 @@ public class Member {
     private String phone;
     private LocalDate birthDate;
     private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Order> orders = new ArrayList<>();
 
     @Column(nullable = false)
     private String role;
@@ -48,6 +52,11 @@ public class Member {
 
     public void settingRole(String role){
         this.role = role;
+    }
+
+    public void addOrder(Order order) {
+        orders.add(order);
+        order.setMember(this); // 양방향 설정
     }
 
 }

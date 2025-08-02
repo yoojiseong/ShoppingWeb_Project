@@ -50,4 +50,8 @@ public class Review {
             product.getReviews().add(this);
         }
     }
+
+    public void updateContent(String content) {
+        this.reviewContent = content;
+    }
 }

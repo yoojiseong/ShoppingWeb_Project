@@ -21,6 +21,7 @@ public class ReviewDTO {
     @NotEmpty
     private int rating;
     private String memberName;
+    private Long memberId;
 
     private String createdAt;
     private Long productId; // productId 필드 추가

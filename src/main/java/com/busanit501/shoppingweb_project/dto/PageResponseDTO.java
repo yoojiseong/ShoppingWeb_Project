@@ -36,6 +36,8 @@ public class PageResponseDTO<T> {
     private String keyword;
     private String link;
 
+
+
     public void setTotal(int total) {
         this.total = total;
 

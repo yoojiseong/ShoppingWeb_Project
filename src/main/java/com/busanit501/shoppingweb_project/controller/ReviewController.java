@@ -11,16 +11,11 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/reviews")
@@ -47,6 +42,16 @@ public class ReviewController {
         PageResponseDTO<ReviewDTO> response = reviewService.getList(requestDTO);
         log.info("ReviewController에서 반환할 데이터 : "+ response.toString());
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<Void> updateReview(@PathVariable Long reviewId,
+                                             @RequestBody Map<String, String> body,
+                                             @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
+        String updatedContent = body.get("reviewContent");
+        log.info("ReviewController에서 userDetails에 뭐 있는지 확인중 : "+ userDetails);
+        reviewService.updateReview(reviewId, updatedContent, userDetails.getMemberId());
+        return ResponseEntity.ok().build();
     }
 //    @PostMapping
 //    public ResponseEntity<ReviewResponseDto> createReview(
