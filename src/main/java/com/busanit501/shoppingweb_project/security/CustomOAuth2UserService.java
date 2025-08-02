@@ -97,6 +97,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .anyMatch(Address::isDefault);
 
         MemberSecurityDTO dto = new MemberSecurityDTO(
+                member.getId(),
                 member.getMemberId(),
                 member.getPassword(),
                 member.getEmail(),

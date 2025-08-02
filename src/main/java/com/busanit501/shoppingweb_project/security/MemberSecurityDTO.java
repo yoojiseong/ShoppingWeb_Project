@@ -15,8 +15,9 @@ import java.util.Map;
 @ToString
 public class MemberSecurityDTO extends User implements OAuth2User {
 
+    private Long id;
+
     private String memberId;
-    private String mid;
     private String mpw;
     private String email;
     private boolean del;
@@ -26,10 +27,11 @@ public class MemberSecurityDTO extends User implements OAuth2User {
     private String phone;
     private Map<String, Object> props;
 
-    public MemberSecurityDTO(String memberId, String password,
+    public MemberSecurityDTO(Long id,String memberId, String password,
                              String email, boolean del, boolean social,
                              Collection<? extends GrantedAuthority> authorities) {
         super(memberId, password, authorities);
+        this.id = id;
         this.memberId = memberId;
         this.mpw = password;
         this.email = email;

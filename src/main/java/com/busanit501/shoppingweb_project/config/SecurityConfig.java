@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/{productId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/{id}").permitAll()
                         .requestMatchers("/home", "/complete-profile","/complete-profile/**", "/signup", "/login", "/css/**", "/js/**", "/images/**", "/api/check-id","/api/products").permitAll()
+                        .requestMatchers("/api/members/me", "/api/orders","/api/orders/**","/api/cart/**", "/userInfo-update").authenticated()
                         // 관리자 권한 필요
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // 그 외 모든 요청은 인증 필요
