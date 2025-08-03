@@ -7,9 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -20,7 +17,7 @@ public class UserinfoDTO {
     private String email;
     private String userName;
     private String phone;
-    private LocalDate birthDate;
+    private String birthDate;
 
     private String addressLine;
     private String addressId;
@@ -31,9 +28,11 @@ public class UserinfoDTO {
                 .email(member.getEmail())
                 .userName(member.getUserName())
                 .phone(member.getPhone())
-                .birthDate(member.getBirthDate())
-                .addressLine(address.getAddressLine())
-                .addressId(address.getAddressId())
+                // birthDate가 null이면 빈 문자열, 아니면 문자열로 변환
+                .birthDate(member.getBirthDate() != null ? member.getBirthDate().toString() : "")
+                // address가 null일 수도 있으니 체크
+                .addressLine(address != null ? address.getAddressLine() : "")
+                .addressId(address != null ? address.getAddressId() : "")
                 .id(member.getId())
                 .build();
     }

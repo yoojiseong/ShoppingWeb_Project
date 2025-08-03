@@ -26,7 +26,7 @@
         <nav class="nav">
             <div class="d-flex gap-3">
                 <button class="btn btn-outline-secondary btn-sm" onclick="goToCart()">🛒 장바구니</button>
-                <button class="btn btn-outline-danger btn-sm" onclick="logout()">🚪 로그아웃</button>
+                <button class="btn btn-outline-danger btn-sm" onclick="logout()" id="logoutBtn">🚪 로그아웃</button>
             </div>
         </nav>
     </div>
@@ -42,7 +42,7 @@
                     <div id="userInfo">
                         <!-- 사용자 정보가 JavaScript로 동적 생성됩니다 -->
                     </div>
-                    <button onclick="editProfile()" class="edit-btn">정보 수정</button>
+                    <a href="/userInfo-update" class="btn btn-primary edit-btn">정보 수정</a>
                 </div>
                 <div class="order-history">
                     <h3>주문 내역</h3>
@@ -58,19 +58,25 @@
 <script th:src="@{/js/script.js}"></script>
 <script>
     function displayUserInfo() {
-        fetch('/api/members/me')
+        fetch('/api/members/me', {credentials: 'include'})
             .then(res => {
+                if (res.status === 401) {
+                    alert('로그인이 필요합니다.');
+                    window.location.href = '/login';
+                    return;
+                }
                 if (!res.ok) throw new Error('사용자 정보를 불러올 수 없습니다.');
                 return res.json();
             })
             .then(user => {
+                if (!user) return;
                 const userInfo = document.getElementById('userInfo');
                 if (!userInfo) return;
                 userInfo.innerHTML = `
             <div class="user-detail"><strong>이름:</strong> ${user.userName}</div>
             <div class="user-detail"><strong>이메일:</strong> ${user.email}</div>
             <div class="user-detail"><strong>전화번호:</strong> ${user.phone}</div>
-            <div class="user-detail"><strong>생일:</strong> ${new Date(user.birthDate).toLocaleDateString()}</div>
+            <div class="user-detail"><strong>생일:</strong>${user.birthDate ? new Date(user.birthDate).toLocaleDateString() : '미등록'}</div>
         `;
             })
             .catch(err => {
@@ -81,12 +87,18 @@
 
     // 주문 내역 표시 (mypage.html)
     function displayOrderHistory() {
-        fetch('/api/orders')
+        fetch('/api/orders', {credentials: 'include'})
             .then(res => {
+                if (res.status === 401) {
+                    alert('로그인이 필요합니다.');
+                    window.location.href = '/login';
+                    return;
+                }
                 if (!res.ok) throw new Error('주문 내역을 불러올 수 없습니다.');
                 return res.json();
             })
             .then(orders => {
+                if (!orders) return;
                 const orderHistory = document.getElementById('orderHistory');
                 if (!orderHistory) return;
                 if (orders.length === 0) {
@@ -112,10 +124,7 @@
                 alert('주문 내역을 불러오는 데 실패했습니다.');
             });
     }
-    // 프로필 수정 (mypage.html)
-    function editProfile() {
-        alert('프로필 수정 기능은 추후 구현 예정입니다.');
-    }
+
     // 페이지 로딩 시 사용자 정보 및 주문 내역 표시
     document.addEventListener('DOMContentLoaded', () => {
         displayUserInfo();

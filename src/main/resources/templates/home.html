@@ -34,11 +34,15 @@
                     장바구니 (<span id="cartCount">0</span>)
                 </button>
 
-                <!-- 로그인 상태일 때 -->
-                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
-                    <span sec:authentication="name" class="fw-bold text-primary"></span>
-                    <a href="/logout" class="btn btn-outline-danger btn-sm">로그아웃</a>
-                </div>
+            <!-- 로그인 상태일 때 -->
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                <span sec:authentication="name" class="fw-bold text-primary"></span>
+                <img th:if="${#authentication.principal instanceof T(org.springframework.security.oauth2.core.user.OAuth2User) and #authentication.principal.isKakaoUser()}"
+                     th:src="@{/images/login/kakao_logo_small.png}"
+                     alt="카카오 로그인"
+                     style="width:20px; height:20px; margin-left:5px;" />
+                <a href="/logout" class="btn btn-outline-danger btn-sm">로그아웃</a>
+            </div>
 
                 <!-- 비로그인 상태일 때 -->
                 <div sec:authorize="!isAuthenticated()" class="d-flex gap-2">
