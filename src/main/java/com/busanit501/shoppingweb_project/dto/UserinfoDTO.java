@@ -7,9 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -20,7 +17,7 @@ public class UserinfoDTO {
     private String email;
     private String userName;
     private String phone;
-    private LocalDate birthDate;
+    private String birthDate;
 
     private String addressLine;
     private String addressId;
