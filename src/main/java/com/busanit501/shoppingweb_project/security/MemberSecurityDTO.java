@@ -15,24 +15,19 @@ import java.util.Map;
 @ToString
 public class MemberSecurityDTO extends User implements OAuth2User {
 
-    private Long id;
-
-    private String memberId;
+    private String mid;
     private String mpw;
     private String email;
     private boolean del;
     private boolean social;
 
-    private boolean defaultAddressExists;
-    private String phone;
     private Map<String, Object> props;
 
-    public MemberSecurityDTO(Long id,String memberId, String password,
+    public MemberSecurityDTO(String username, String password,
                              String email, boolean del, boolean social,
                              Collection<? extends GrantedAuthority> authorities) {
-        super(memberId, password, authorities);
-        this.id = id;
-        this.memberId = memberId;
+        super(username, password, authorities);
+        this.mid = username;
         this.mpw = password;
         this.email = email;
         this.del = del;
@@ -46,18 +41,6 @@ public class MemberSecurityDTO extends User implements OAuth2User {
 
     @Override
     public String getName() {
-        return this.memberId;
-    }
-
-    public String getMid() {
-        return this.memberId;
-    }
-
-    public boolean isKakaoUser() {
-        return this.isSocial();
-    }
-
-    public boolean isProfileIncomplete() {
-        return (this.getPhone() == null || this.getPhone().isEmpty() || !this.isDefaultAddressExists());
+        return this.mid;
     }
 }

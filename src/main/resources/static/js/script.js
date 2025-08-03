@@ -194,26 +194,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmPassword = document.getElementById('confirmPassword');
     const passwordHelp = document.getElementById('passwordHelp');
 
-    if (password && confirmPassword && passwordHelp) {
-        confirmPassword.addEventListener('input', function() {
-            if (password.value !== confirmPassword.value) {
-                passwordHelp.style.display = 'block';
-            } else {
-                passwordHelp.style.display = 'none';
-            }
-        });
-    }
+    confirmPassword.addEventListener('input', function() {
+        if (password.value !== confirmPassword.value) {
+            passwordHelp.style.display = 'block';
+        } else {
+            passwordHelp.style.display = 'none';
+        }
+    });
 
     const form = document.getElementById('signupForm');
-    if (form && password && confirmPassword) {
-        form.addEventListener('submit', function(e) {
-            if (password.value !== confirmPassword.value) {
-                e.preventDefault();
-                alert('비밀번호가 일치하지 않습니다.');
-                confirmPassword.focus();
-            }
-        });
-    }
+    form.addEventListener('submit', function(e) {
+        if (password.value !== confirmPassword.value) {
+            e.preventDefault();
+            alert('비밀번호가 일치하지 않습니다.');
+            confirmPassword.focus();
+        }
+    });
 });
 
 

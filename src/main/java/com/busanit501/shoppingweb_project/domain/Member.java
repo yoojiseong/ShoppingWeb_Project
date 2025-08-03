@@ -12,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -48,21 +47,11 @@ public class Member {
     private boolean social;
 
     @Builder.Default
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
 
     public void settingRole(String role){
         this.role = role;
-    }
-
-    public boolean isProfileIncomplete(){
-        if (this.social){return (phone == null || phone.isBlank() || addresses == null || addresses.isEmpty());
-        }
-        return false;
-    }
-
-    public boolean isKakaoUser(){
-        return isSocial();
     }
 
     public void addOrder(Order order) {
