@@ -45,4 +45,16 @@ public class OrderController {
         });
         return ResponseEntity.ok(orderHistory);
     }
+
+    @GetMapping("/has-product")
+    public ResponseEntity<Boolean> hasPurchasedProduct(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("productId") Long productId
+    ) {
+        log.info("OrderController에서 사용자가 상품을 구매했는지 확인중 : " + userDetails.getMemberId());
+        log.info("OrderController에서 사용자가 상품을 구매했는지 확인중 : " + productId);
+        boolean hasPurchased = orderService.hasPurchasedProduct(userDetails.getMemberId(), productId);
+        return ResponseEntity.ok(hasPurchased);
+    }
+
 }

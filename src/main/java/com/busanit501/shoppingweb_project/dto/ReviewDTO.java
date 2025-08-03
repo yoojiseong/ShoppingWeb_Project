@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @Builder
@@ -19,8 +20,9 @@ public class ReviewDTO {
     private String reviewContent;
     @NotEmpty
     private int rating;
+    private String memberName;
+    private Long memberId;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    private String createdAt;
     private Long productId; // productId 필드 추가
 }

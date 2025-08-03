@@ -1,4 +1,5 @@
 package com.busanit501.shoppingweb_project.domain;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,8 +21,10 @@ public class Order {
     @Column(name = "orderId") // PK
     private Long orderId;
 
-    @Column(name = "memberId", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id") // 외래 키 이름
+    @JsonBackReference
+    private Member member;
 
     @Column(name = "orderdate")
     private LocalDateTime orderDate;
@@ -48,5 +51,11 @@ public class Order {
     }
     public void setTotalPrice(int totalPrice){
         this.totalPrice = totalPrice;
+    }
+    public void setMember(Member member) {
+        this.member = member;
+        if (!member.getOrders().contains(this)) {
+            member.getOrders().add(this);
+        }
     }
 }

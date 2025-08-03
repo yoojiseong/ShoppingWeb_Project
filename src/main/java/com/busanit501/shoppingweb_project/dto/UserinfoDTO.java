@@ -15,11 +15,12 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserinfoDTO {
+    private Long id;
     private String memberId;
     private String email;
     private String userName;
     private String phone;
-    private String birthDate;
+    private LocalDate birthDate;
 
     private String addressLine;
     private String addressId;
@@ -35,6 +36,7 @@ public class UserinfoDTO {
                 // address가 null일 수도 있으니 체크
                 .addressLine(address != null ? address.getAddressLine() : "")
                 .addressId(address != null ? address.getAddressId() : "")
+                .id(member.getId())
                 .build();
     }
 }

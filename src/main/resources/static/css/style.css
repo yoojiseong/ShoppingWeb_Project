@@ -160,6 +160,34 @@ body {
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
+    position: relative;
+    /* 자식 요소의 position: absolute 기준 */
+}
+
+/* 품절 오버레이 */
+.sold-out-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    /* 반투명 흰색 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.sold-out-text {
+    color: red;
+    font-size: 2rem;
+    font-weight: bold;
+    transform: rotate(-15deg);
+    /* 텍스트 약간 회전 */
+    border: 3px solid red;
+    padding: 10px 20px;
+    border-radius: 10px;
 }
 
 .product-card:hover {
@@ -180,7 +208,8 @@ body {
     width: 100%;
     height: 200px;
     object-fit: contain;
-    background-color: #f8f9fa; /* 페이지 배경색과 맞추기 */
+    background-color: #f8f9fa;
+    /* 페이지 배경색과 맞추기 */
     border-radius: 8px;
     display: block;
 }
@@ -228,6 +257,14 @@ body {
     background: #2980b9;
 }
 
+.add-to-cart-btn:disabled {
+    background-color: #ccc;
+    /* 회색 배경 */
+    cursor: not-allowed;
+    /* 금지 커서 */
+    color: #666;
+}
+
 /* Product Detail Page */
 .back-btn {
     padding: 0.75rem 1.5rem;
@@ -260,16 +297,21 @@ body {
 /*제품 상세 이미지 조절css*/
 .product-detail-images {
     display: flex;
-    flex-direction: column; /* 세로 방향 정렬 */
-    gap: 10px; /* 이미지 사이 간격 */
+    flex-direction: column;
+    /* 세로 방향 정렬 */
+    gap: 10px;
+    /* 이미지 사이 간격 */
     margin-bottom: 20px;
     align-items: center;
 }
 
 .product-detail-images img {
-    width: 100%;      /* 가로폭 100%로 꽉 채우기 */
-    max-width: 400px; /* 최대 너비 제한 (원하는 크기로 조절 가능) */
-    height: auto;     /* 높이는 자동 비율 유지 */
+    width: 100%;
+    /* 가로폭 100%로 꽉 채우기 */
+    max-width: 400px;
+    /* 최대 너비 제한 (원하는 크기로 조절 가능) */
+    height: auto;
+    /* 높이는 자동 비율 유지 */
     object-fit: cover;
     border-radius: 8px;
     cursor: pointer;
@@ -278,7 +320,7 @@ body {
 
 .product-detail-images img:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
 }
 
 
