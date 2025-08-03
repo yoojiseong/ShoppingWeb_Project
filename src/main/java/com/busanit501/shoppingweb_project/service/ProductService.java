@@ -23,6 +23,7 @@ public interface ProductService {
     // 카테고리별 조회
     List<ProductDTO> getProductsByCategory(String category);
 
+    ProductDTO mapProductToDtoWithImage(Product product);
     // 키워드 검색
     List<ProductDTO> searchProducts(String keyword);
 

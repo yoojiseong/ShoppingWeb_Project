@@ -260,7 +260,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Helper method to map Product to ProductDTO and attach image filename
-    private ProductDTO mapProductToDtoWithImage(Product product) {
+    @Override
+    public ProductDTO mapProductToDtoWithImage(Product product) {
         ProductDTO dto = Product.entityToDTO(product);
         productImageRepository.findByProduct_ProductIdAndThumbnail(product.getProductId(), true)
                 .ifPresent(productImage -> dto.setImageFileName(productImage.getFileName()));

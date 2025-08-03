@@ -88,7 +88,11 @@
                         const cartItem = document.createElement('div');
                         cartItem.className = 'cart-item';
                         cartItem.innerHTML = `
-                    <div class="cart-item-image">${item.image || '이미지 없음'}</div>
+                    <div class="cart-item-image">
+                    <img src="${item.productDTO.thumbnailFileName != null ? '/api/image/display/' + item.productDTO.thumbnailFileName : '/images/default_product.png'}"
+                     alt="${item.productDTO.productName}"
+                     class="product-image" />
+</div>
                     <div class="cart-item-info">
                         <h4>${item.productDTO.productName}</h4>
                         <div class="cart-item-price">${item.productDTO.price.toLocaleString()}원</div>
