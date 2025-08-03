@@ -25,17 +25,23 @@ public class Review {
     private int rating;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private String createdAt;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+
+    public void setMember(Member member) {
+        this.member = member;
+        if (!member.getReviews().contains(this)) {
+            member.getReviews().add(this);
+        }
     }
 
     public void setProduct(Product product) {
@@ -43,5 +49,9 @@ public class Review {
         if (!product.getReviews().contains(this)) {
             product.getReviews().add(this);
         }
+    }
+
+    public void updateContent(String content) {
+        this.reviewContent = content;
     }
 }

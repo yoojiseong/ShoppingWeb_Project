@@ -15,6 +15,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserinfoDTO {
+    private Long id;
     private String memberId;
     private String email;
     private String userName;
@@ -33,6 +34,7 @@ public class UserinfoDTO {
                 .birthDate(member.getBirthDate())
                 .addressLine(address.getAddressLine())
                 .addressId(address.getAddressId())
+                .id(member.getId())
                 .build();
     }
 }
