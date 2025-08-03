@@ -32,7 +32,7 @@ public class ProductImage {
     @JsonBackReference
     private Product product;
 
-    @Column(name = "thumbnail", nullable = false)
+    @Column(name = "is_thumbnail", nullable = false)
     @Builder.Default
     private boolean thumbnail = false;
 
