@@ -27,11 +27,11 @@ public class OrderItem{
     @JoinColumn(name = "orderId")
     private Order order;
 
-    private Long productId; // camelCase
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     private int quantity;
-
-
 
     private BigDecimal price;
 
@@ -43,5 +43,8 @@ public class OrderItem{
         if (!order.getOrderItems().contains(this)) {
             order.getOrderItems().add(this);
         }
+    }
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

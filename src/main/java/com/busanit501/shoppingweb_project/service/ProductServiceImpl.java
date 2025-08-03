@@ -2,10 +2,12 @@ package com.busanit501.shoppingweb_project.service;
 
 import com.busanit501.shoppingweb_project.domain.Product;
 import com.busanit501.shoppingweb_project.domain.ProductImage;
+import com.busanit501.shoppingweb_project.domain.Review;
 import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
 import com.busanit501.shoppingweb_project.repository.ProductImageRepository;
+import com.busanit501.shoppingweb_project.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -29,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageRepository productImageRepository;
     private final ModelMapper modelMapper;
     private final FileUploadService fileUploadService;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public ProductDTO getProductById(Long productId) {
@@ -39,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
         ProductDTO productDTO =  Product.entityToDTO(product);
         log.info("ProductService 에서 작업중 productDTO.thumbnailFileName : " + productDTO.getThumbnailFileName());
         log.info("ProductService 에서 작업중 productDTO.FileName : " + productDTO.getFileNames());
+        log.info("ProductService 에서 작업중 productDTO.avgRate : " + product.getAvgRate());
 
         // 썸네일 이미지 설정
         productImageRepository.findByProduct_ProductIdAndThumbnail(product.getProductId(), true)
@@ -256,7 +260,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Helper method to map Product to ProductDTO and attach image filename
-    private ProductDTO mapProductToDtoWithImage(Product product) {
+    @Override
+    public ProductDTO mapProductToDtoWithImage(Product product) {
         ProductDTO dto = Product.entityToDTO(product);
         productImageRepository.findByProduct_ProductIdAndThumbnail(product.getProductId(), true)
                 .ifPresent(productImage -> dto.setImageFileName(productImage.getFileName()));

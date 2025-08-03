@@ -25,6 +25,8 @@ public class Product {
     private String productName;
     private BigDecimal price;
     private int stock;
+    private double avgRate;
+    private int rateCount=0;
 
     @OneToMany(mappedBy = "product" , cascade = {CascadeType.ALL}
     , fetch = FetchType.LAZY,
@@ -107,7 +109,16 @@ public class Product {
                 .productTag(product.getProductTag())
                 .thumbnailFileName(thumbnailFileName)
                 .fileNames(detailFileNames)
+                .avgRate(product.getAvgRate())
+                .rateCount(product.getRateCount())
                 .build();
+    }
+
+    public void addReview(int rate)
+    {
+        avgRate = (avgRate * rateCount) + rate;
+        rateCount++;
+        avgRate /= rateCount;
     }
 
 
