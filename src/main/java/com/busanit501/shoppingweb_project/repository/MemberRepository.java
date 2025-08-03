@@ -30,4 +30,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Transactional
     @Query("update Member m set m.password = :password where m.memberId = :memberId")
     void updatePassword(@Param("password") String password, @Param("memberId") String memberId);
+
+    @Query("SELECT m FROM Member m LEFT JOIN FETCH m.addresses WHERE m.memberId = :memberId")
+    Optional<Member> findByMemberIdWithAddresses(@Param("memberId") String memberId);
 }

@@ -31,7 +31,8 @@
     </div>
 
     <div class="form-check mb-3">
-      <input type="checkbox" id="isDefault" name="isDefault" class="form-check-input" th:checked="${address.isDefault}" />
+      <input type="hidden" name="isDefault" value="false" />
+      <input type="checkbox" id="isDefault" name="isDefault" class="form-check-input" value="true" th:checked="${address.isDefault}" />
       <label for="isDefault" class="form-check-label">기본 배송지로 설정</label>
     </div>
 

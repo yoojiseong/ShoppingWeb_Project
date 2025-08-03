@@ -1,5 +1,6 @@
 package com.busanit501.shoppingweb_project.mapper;
 
+import com.busanit501.shoppingweb_project.dto.AddressDTO;
 import com.busanit501.shoppingweb_project.dto.MemberDTO;
 import com.busanit501.shoppingweb_project.domain.Address;
 import com.busanit501.shoppingweb_project.domain.Member;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class MemberMapper {
@@ -46,12 +49,27 @@ public class MemberMapper {
     }
 
     public static MemberDTO toMemberDTO(Member member) {
+        List<AddressDTO> addressDTOs = new ArrayList<>();
+        if (member.getAddresses() != null) {
+            for (Address addr : member.getAddresses()) {
+                AddressDTO dto = AddressDTO.builder()
+                        .id(addr.getId())
+                        .zipcode(addr.getZipcode())
+                        .addressLine(addr.getAddressLine())
+                        .addressId(addr.getAddressId())
+                        .isDefault(addr.isDefault())
+                        .build();
+                addressDTOs.add(dto);
+            }
+        }
+
         return MemberDTO.builder()
                 .memberId(member.getMemberId())
                 .email(member.getEmail())
                 .userName(member.getUserName())
                 .phone(member.getPhone())
                 .birthDate(member.getBirthDate() != null ? member.getBirthDate().toString() : "")
+                .addresses(addressDTOs)
                 // 나머지 필드도 필요하면 추가
                 .build();
     }
