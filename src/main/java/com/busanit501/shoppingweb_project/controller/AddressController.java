@@ -2,6 +2,7 @@ package com.busanit501.shoppingweb_project.controller;
 
 import com.busanit501.shoppingweb_project.dto.AddressDTO;
 import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import com.busanit501.shoppingweb_project.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -38,19 +39,37 @@ public class AddressController {
     // 배송지 추가 처리
     @PostMapping("/address-add")
     public String addAddress(@ModelAttribute AddressDTO addressDTO,
-                             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        addressService.addAddress(addressDTO, userDetails.getMemberId());
+                             @AuthenticationPrincipal MemberSecurityDTO userDetails) {
+
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+
+        log.info("addAddress - AddressDTO.isDefault = {}", addressDTO.isDefault());
+        log.info("addAddress - AddressDTO 내용: {}", addressDTO);
+
+        addressService.addAddress(addressDTO, userDetails.getId());
         return "redirect:/userInfo-update";
     }
 
     // 배송지 수정 처리
     @PostMapping("/address-edit")
     public String editAddress(@ModelAttribute AddressDTO addressDTO,
-                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+                              @AuthenticationPrincipal MemberSecurityDTO userDetails) {
+
+        log.info("editAddress() 호출됨");
+        log.info("editAddress - AddressDTO.isDefault = {}", addressDTO.isDefault());
+
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+
         log.info("수정할 주소 ID: " + addressDTO.getId());
+        log.info("editAddress - AddressDTO.isDefault = {}", addressDTO.isDefault());
+        log.info("editAddress - AddressDTO 내용: {}", addressDTO);
 
         Long addressId = addressDTO.getId();
-        Long memberId = userDetails.getMemberId();
+        Long memberId = userDetails.getId();
 
         addressService.updateAddress(addressId, addressDTO, memberId);
         return "redirect:/userInfo-update";

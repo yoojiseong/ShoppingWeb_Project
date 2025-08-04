@@ -1,7 +1,9 @@
 package com.busanit501.shoppingweb_project.controller;
 
+import com.busanit501.shoppingweb_project.domain.Member;
 import com.busanit501.shoppingweb_project.dto.AddressDTO;
 import com.busanit501.shoppingweb_project.dto.MemberDTO;
+import com.busanit501.shoppingweb_project.mapper.MemberMapper;
 import com.busanit501.shoppingweb_project.security.CustomUserDetails;
 import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import com.busanit501.shoppingweb_project.service.AddressService;
@@ -60,18 +62,19 @@ public class MemberController {
     }
 
     @GetMapping("/userInfo-update")
-    public String showUpdateForm(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+    public String showUpdateForm(@AuthenticationPrincipal MemberSecurityDTO userDetails, Model model) {
         if (userDetails == null) {
             return "redirect:/login";
         }
-        MemberDTO memberDTO = memberService.findByMemberId(userDetails.getUsername());
+        Member member = memberService.findByMemberIdWithAddresses(userDetails.getUsername());
+        MemberDTO memberDTO = MemberMapper.toMemberDTO(member);
         model.addAttribute("user", memberDTO);
         return "userInfo-update";
     }
 
     @PostMapping("/userInfo-update")
     public String updateUserInfo(@ModelAttribute MemberDTO memberDTO,
-                                 @AuthenticationPrincipal CustomUserDetails userDetails,
+                                 @AuthenticationPrincipal MemberSecurityDTO userDetails,
                                  Model model) {
         // 비밀번호 확인 처리
         if (memberDTO.getPassword() != null && !memberDTO.getPassword().isEmpty()) {
@@ -82,7 +85,7 @@ public class MemberController {
             }
         }
 
-        memberService.updateMemberInfo(userDetails.getMemberId(), memberDTO);
+        memberService.updateMemberInfo(userDetails.getId(), memberDTO);
 
         return "redirect:/mypage";
     }
@@ -118,7 +121,7 @@ public class MemberController {
             return "redirect:/login";
         }
 
-        String memberIdStr = userDetails.getMid();
+        String memberIdStr = userDetails.getMemberId();
         if (memberIdStr == null) {
             return "redirect:/login";
         }

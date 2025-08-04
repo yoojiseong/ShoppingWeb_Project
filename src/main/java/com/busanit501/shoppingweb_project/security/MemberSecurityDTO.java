@@ -49,8 +49,8 @@ public class MemberSecurityDTO extends User implements OAuth2User {
         return this.memberId;
     }
 
-    public String getMid() {
-        return this.memberId;
+    public Long getMid() {
+        return this.id;
     }
 
     public boolean isKakaoUser() {

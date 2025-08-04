@@ -37,7 +37,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         MemberSecurityDTO userDetails = (MemberSecurityDTO) principal;
 
-        memberRepository.findByMemberId(userDetails.getMid())
+        memberRepository.findByMemberId(userDetails.getMemberId())
                 .ifPresentOrElse(member -> {
                     try {
                         boolean needsPhone = member.getPhone() == null || member.getPhone().isBlank();

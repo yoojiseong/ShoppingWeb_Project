@@ -38,14 +38,6 @@ public class AddressServiceImpl implements AddressService {
 
         log.info("기본배송지 여부 (DTO): {}", dto.isDefault());
 
-        // 만약 기본배송지라면 기존 기본배송지 초기화
-        if (dto.isDefault()) {
-            log.info("기존 기본배송지 초기화 시작");
-            addressRepository.resetDefaultAddress(member.getId());
-            addressRepository.flush();
-            log.info("기존 기본배송지 초기화 완료");
-        }
-
         Address address = Address.builder()
                 .zipcode(dto.getZipcode())
                 .addressLine(dto.getAddressLine())
@@ -54,6 +46,17 @@ public class AddressServiceImpl implements AddressService {
                 .isDefault(dto.isDefault())  // dto에 기본배송지 여부가 있으면 반영
                 .member(member)
                 .build();
+
+        // 만약 기본배송지라면 기존 기본배송지 초기화
+        if (dto.isDefault()) {
+            log.info("기존 기본배송지 초기화 시작");
+            addressRepository.resetDefaultAddress(member.getId());
+            addressRepository.flush();
+            log.info("기존 기본배송지 초기화 완료");
+            address.setIsDefault(true);
+        } else {
+            address.setIsDefault(false);
+        }
 
         return addressRepository.save(address);
     }
@@ -69,14 +72,25 @@ public class AddressServiceImpl implements AddressService {
         address.setZipcode(dto.getZipcode());
         address.setAddressLine(dto.getAddressLine());
         address.setAddressId(dto.getAddressId());
+
+        log.info("updateAddress() 호출됨 - DTO 내용: {}", dto);
         // 기본배송지 변경 시 처리
-        if (dto.isDefault()) {
-            addressRepository.resetDefaultAddress(address.getMember().getId());
+        if (Boolean.TRUE.equals(dto.isDefault())) {
+            log.info("기본배송지 초기화 시작");
+            int updatedCount = addressRepository.resetDefaultAddress(address.getMember().getId());
+            log.info("기본배송지 초기화 쿼리 실행 결과: {}건 수정됨", updatedCount);
+            addressRepository.flush();
+            log.info("기본배송지 초기화 완료");
             address.setIsDefault(true);
+            log.info("현재 주소 기본배송지로 설정: {}", address.getId());
         } else {
             address.setIsDefault(false);
+            log.info("기본배송지 체크 안함, 현재 주소 기본배송지 false로 설정: {}", address.getId());
         }
-        return addressRepository.save(address);
+        Address saved = addressRepository.save(address);
+        log.info("주소 업데이트 완료: {}", saved);
+
+        return saved;
     }
 
     @Override

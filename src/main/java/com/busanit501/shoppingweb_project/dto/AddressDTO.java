@@ -18,4 +18,12 @@ public class AddressDTO {
     private String zipcode;       // 우편번호
 
     private boolean isDefault;    // 기본 배송지 여부
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
 }

@@ -51,7 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/{productId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/{id}").permitAll()
                         .requestMatchers("/home", "/complete-profile","/complete-profile/**", "/signup", "/login", "/css/**", "/js/**", "/images/**", "/api/check-id","/api/products").permitAll()
-                        .requestMatchers("/api/members/me", "/api/orders","/api/orders/**","/api/cart/**", "/userInfo-update").authenticated()
+                        .requestMatchers("/mypage/**","/api/members/me", "/api/orders","/api/orders/**","/api/cart/**", "/userInfo-update").authenticated()
                         // 관리자 권한 필요
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // 그 외 모든 요청은 인증 필요
@@ -83,20 +83,6 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService())
                         )
                         .successHandler(oAuth2LoginSuccessHandler)
-//                            Object principal = authentication.getPrincipal();
-//                            log.info("OAuth2 로그인 principal 클래스: {}", principal.getClass().getName());
-//
-//                            if (principal instanceof MemberSecurityDTO user) {
-//                                if (user.isSocial() && user.isProfileIncomplete()) {
-//                                    log.info("isSocial: {}", user.isSocial());
-//                                    log.info("isProfileIncomplete: {}", user.isProfileIncomplete());
-//                                    response.sendRedirect("/complete-profile");
-//                                    return;
-//                                }
-//                            }
-//                            log.warn("principal이 MemberSecurityDTO가 아님. principal: {}", principal);
-//                            response.sendRedirect("/home");
-
                 );
 
         return http.build();

@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -125,6 +126,12 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new NoSuchElementException("회원 없음"))
                 .getId();
+    }
+
+    @Override
+    public Member findByMemberIdWithAddresses(String memberId) {
+        return memberRepository.findByMemberIdWithAddresses(memberId)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
 }

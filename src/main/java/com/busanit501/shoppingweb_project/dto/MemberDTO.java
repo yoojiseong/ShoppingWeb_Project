@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -30,6 +31,6 @@ public class MemberDTO {
 
     private Long defaultAddressId;
 
-    private List<AddressDTO> addresses;
+    private List<AddressDTO> addresses =  new ArrayList<>();
 
 }
