@@ -134,6 +134,7 @@
         const deleteProductButton = document.getElementById('deleteProductButton');
         const resetFormButton = document.getElementById('resetFormButton');
 
+
         // --- 폼 모드 제어 함수 ---
         function setFormMode(mode) {
             const formFields = [
@@ -168,7 +169,8 @@
             }
         }
 
-        // --- 상품 목록 가져오기 ---
+
+        // --- 상품 목록 관리 ---
         function fetchProducts() {
             fetch('/api/products')
                 .then(res => {
@@ -194,12 +196,12 @@
                 const tr = document.createElement('tr');
                 tr.addEventListener('click', () => fillFormForEdit(p.productId));
                 tr.innerHTML = `
-                <td>${p.productId}</td>
-                <td>${p.productName}</td>
-                <td>${p.price}</td>
-                <td>${p.stock}</td>
-                <td>${p.productTag}</td>
-            `;
+                    <td>${p.productId}</td>
+                    <td>${p.productName}</td>
+                    <td>${p.price}</td>
+                    <td>${p.stock}</td>
+                    <td>${p.productTag}</td>
+                `;
                 productTableBody.appendChild(tr);
             });
         }
@@ -231,6 +233,9 @@
                 alert('상품을 찾을 수 없습니다.');
                 return;
             }
+
+            console.log("썸네일 이미지 미리보기 : "+ product.thumbnailFileName);
+            console.log("상품 상세 이미지 미리보기 : "+ product.fileNames);
 
             editingProductId = product.productId;
             deletedThumbnail = false;
@@ -334,7 +339,9 @@
             }
         }
 
-        // --- 새 상품 등록 폼 제출 ---
+
+        // --- 이벤트 리스너 ---
+        // 상품 등록 이벤트
         productManagementForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -399,7 +406,7 @@
             }
         });
 
-        // --- 수정 완료 버튼 클릭 이벤트 ---
+        //상품 수정 버튼 클릭 이벤트
         actualCompleteUpdateButton.addEventListener('click', async function () {
             const idToUpdate = productIdInput.value;
             if (!idToUpdate || !editingProductId) {
@@ -407,6 +414,7 @@
                 return;
             }
 
+            const productId = editingProductId;
             const name = productNameInput.value.trim();
             const price = Number(productPriceInput.value);
             const stock = Number(productStockInput.value);
@@ -421,16 +429,11 @@
 
             try {
                 const formData = new FormData();
-
-                const productDto = {
-                    productName: name,
-                    price: price,
-                    stock: stock,
-                    productTag: productTag,
-                    deletedThumbnail: deletedThumbnail,
-                    deletedDetailImageNames: deletedDetailImageNames
-                };
-                formData.append('productDto', new Blob([JSON.stringify(productDto)], { type: 'application/json' }));
+                formData.append('productId', productId);
+                formData.append('productName', name);
+                formData.append('price', price);
+                formData.append('stock', stock);
+                formData.append('productTag', productTag);
 
                 if (newThumbnailFile) {
                     formData.append('thumbnail', newThumbnailFile);
@@ -448,6 +451,7 @@
                     const errorText = await response.text();
                     throw new Error(errorText || `상품 수정에 실패했습니다. 상태 코드: ${response.status}`);
                 }
+
 
                 const responseText = await response.text();
                 let messageToDisplay = '';

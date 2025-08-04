@@ -104,13 +104,64 @@ public class ProductServiceImpl implements ProductService {
     // 상품 수정 메서드 구현
     @Override
     public ProductDTO updateProduct(Long productId, String productName, BigDecimal price, int stock,
-                                    ProductCategory productTag, MultipartFile thumbnail, MultipartFile[] details) {
+                                    ProductCategory productTag, MultipartFile thumbnail, List<MultipartFile> details) {
         log.info("ProductService에서 작업중 수정된 ProductDTO : " + productName);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다. id=" + productId));
         // 상품 정보 수정
         product.changeTitleContent( productName , price , stock , productTag);
-    return null;
+        // ✅ 썸네일 이미지 처리
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            boolean hasThumbnail = product.getThumbnailImage().isPresent(); // thumbnail == true인 이미지가 있는지 확인
+
+            if (!hasThumbnail) {
+                try {
+                    String savedFileName = fileUploadService.saveFile(thumbnail);
+
+                    ProductImage thumbnailImage = ProductImage.builder()
+                            .fileName(savedFileName)
+                            .ord(0)
+                            .thumbnail(true) // 썸네일임을 명시
+                            .build();
+
+                    product.addImage(thumbnailImage);
+                    log.info("새 썸네일 추가됨: " + savedFileName);
+                    productImageRepository.save(thumbnailImage);
+                } catch (IOException e) {
+                    throw new RuntimeException("썸네일 이미지 저장 실패", e);
+                }
+            } else {
+                log.info("기존 썸네일이 있어서 새로 추가하지 않음");
+            }
+        }
+
+        // ✅ 상세 이미지 처리
+        if (details != null && !details.isEmpty()) {
+            int ord = 1; // 썸네일이 ord 0이라면 상세는 그 다음부터
+
+            for (MultipartFile detail : details) {
+                if (detail != null && !detail.isEmpty()) {
+                    try {
+                        String savedFileName = fileUploadService.saveFile(detail);
+
+                        ProductImage detailImage = ProductImage.builder()
+                                .fileName(savedFileName)
+                                .ord(ord++)
+                                .thumbnail(false) // 상세 이미지이므로 false
+                                .build();
+
+                        product.addImage(detailImage);
+                        log.info("상세 이미지 추가됨: " + savedFileName);
+                        productImageRepository.save(detailImage);
+                    } catch (IOException e) {
+                        throw new RuntimeException("상세 이미지 저장 실패", e);
+                    }
+                }
+            }
+        }
+
+        // 엔티티 변경은 트랜잭션 내부에서 자동 반영됨
+        return modelMapper.map(product, ProductDTO.class);
     }
 
     // 상품 삭제 메서드 구현
