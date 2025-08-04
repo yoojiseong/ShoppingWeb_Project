@@ -362,6 +362,15 @@
             console.log('페이지네이션 데이터:', pageData);
             container.innerHTML = '';
 
+            // '이전' 버튼 추가
+            if (pageData.prev) {
+                const prevBtn = document.createElement('button');
+                prevBtn.textContent = '이전';
+                prevBtn.className = 'btn btn-outline-secondary btn-sm';
+                prevBtn.addEventListener('click', () => fetchReviews(productId, pageData.start - 1));
+                container.appendChild(prevBtn);
+            }
+
             for(let i = pageData.start; i <= pageData.end; i++){
                 const btn = document.createElement('button');
                 btn.textContent = i;
@@ -369,7 +378,18 @@
                 btn.addEventListener('click', () => fetchReviews(productId, i));
                 container.appendChild(btn);
             }
+
+            // '다음' 버튼 추가
+            if (pageData.next) {
+                const nextBtn = document.createElement('button');
+                nextBtn.textContent = '다음';
+                nextBtn.className = 'btn btn-outline-secondary btn-sm';
+                nextBtn.addEventListener('click', () => fetchReviews(productId, pageData.end + 1));
+                container.appendChild(nextBtn);
+            }
         }
+        // ==================================================================================================
+
         // ==================================================================================================
 
 
