@@ -35,6 +35,7 @@ public class OrderServicImpl implements OrderService {
     @Override
     public OrderDTO PurchaseFromCart(Long memberId) {
         List<CartItem> cartItems = cartItemRepository.findByMemberId(memberId);
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("OrderServcie에서 작업중 member객체에 null값이 있습니다."));
 
@@ -52,7 +53,6 @@ public class OrderServicImpl implements OrderService {
 
         // 주문 객체 생성
         Order order = Order.builder()
-                .memberId(memberId)
                 .orderDate(LocalDateTime.now())
                 .status(true) // 또는 enum 사용 시 OrderStatus.ORDERED
                 .address(userinfoDTo.getAddressId())
@@ -61,6 +61,8 @@ public class OrderServicImpl implements OrderService {
                 .receiverPhone(userinfoDTo.getPhone())
                 .build();
 
+        member.addOrder(order);
+
         for (CartItem cart : cartItems) {
             Product product = cart.getProduct();
             product.removeStock(cart.getQuantity());
@@ -68,10 +70,11 @@ public class OrderServicImpl implements OrderService {
             total = total.add(itemTotal);
 
             OrderItem orderItem = OrderItem.builder()
-                    .productId(product.getProductId())
                     .quantity(cart.getQuantity())
                     .price(itemTotal)
                     .build();
+
+            orderItem.setProduct(product);
 
             order.addOrderItem(orderItem); // 연관관계 설정
         }
@@ -109,7 +112,7 @@ public class OrderServicImpl implements OrderService {
                         OrderItemDTO dto = modelMapper.map(orderItem, OrderItemDTO.class);
 
                         // 🔽 productId로 Product 조회해서 productName 세팅
-                        productRepository.findById(orderItem.getProductId())
+                        productRepository.findById(orderItem.getProduct().getProductId())
                                 .ifPresent(product -> dto.setProductName(product.getProductName()));
 
                         return dto;
@@ -122,4 +125,8 @@ public class OrderServicImpl implements OrderService {
         log.info("OrderService에서 작업중 orderDTO : " + orderDTOList);
         return orderDTOList;
     }
+    public boolean hasPurchasedProduct(Long memberId, Long productId) {
+        return orderRepository.existsByMember_IdAndOrderItems_Product_ProductId(memberId, productId);
+    }
+
 }

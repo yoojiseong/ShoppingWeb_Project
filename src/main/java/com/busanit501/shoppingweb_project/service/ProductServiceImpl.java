@@ -1,16 +1,24 @@
 package com.busanit501.shoppingweb_project.service;
 
 import com.busanit501.shoppingweb_project.domain.Product;
+import com.busanit501.shoppingweb_project.domain.ProductImage;
+import com.busanit501.shoppingweb_project.domain.Review;
 import com.busanit501.shoppingweb_project.domain.enums.ProductCategory;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
+import com.busanit501.shoppingweb_project.repository.ProductImageRepository;
+import com.busanit501.shoppingweb_project.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,71 +28,62 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductImageRepository productImageRepository;
     private final ModelMapper modelMapper;
+    private final FileUploadService fileUploadService;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public ProductDTO getProductById(Long productId) {
-        log.info("ProductService 에서 받아온 Id확인중 : " + productId);
+        log.info("ProductService - getProductById: " + productId);
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
-        ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
-        log.info("ProductService 에서 받아온 pproductDTO확인 : " + productDTO);
+                .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다. id=" + productId));
+
+        ProductDTO productDTO =  Product.entityToDTO(product);
+        log.info("ProductService 에서 작업중 productDTO.thumbnailFileName : " + productDTO.getThumbnailFileName());
+        log.info("ProductService 에서 작업중 productDTO.FileName : " + productDTO.getFileNames());
+        log.info("ProductService 에서 작업중 productDTO.avgRate : " + product.getAvgRate());
+
+        // 썸네일 이미지 설정
+        productImageRepository.findByProduct_ProductIdAndThumbnail(product.getProductId(), true)
+                .ifPresent(productImage -> productDTO.setImageFileName(productImage.getFileName()));
+        log.info("ProductService 에서 작업중 productDTO.thumbnailFileName : " + productDTO.getThumbnailFileName());
+        log.info("ProductService 에서 작업중 productDTO.FileName : " + productDTO.getFileNames());
+
         return productDTO;
     }
 
     @Override
     public List<ProductDTO> getAllProducts() {
+        log.info("ProductService - getAllProducts 호출");
         List<Product> products = productRepository.findAll();
-        log.info("ProductService에서 모든 Product 받아오는 중 " + products);
-        List<ProductDTO> productDTO = products.stream()
-                .map(ProductDTO::fromEntity) // 위에서 만든 정적 팩토리 메서드 사용
+        return products.stream()
+                .map(this::mapProductToDtoWithImage)
                 .collect(Collectors.toList());
 
-        return productDTO;
     }
 
     @Override
     public List<ProductDTO> getProductsByCategory(String category) {
-        ProductCategory productCategory;
-        try {
-            productCategory = ProductCategory.fromKoreanName(category);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("잘못된 카테고리 값입니다: " + category);
-        }
-
-        // 2. Repository 호출
+        log.info("ProductService - getProductsByCategory: " + category);
+        ProductCategory productCategory = ProductCategory.fromKoreanName(category);
         List<Product> products = productRepository.findByProductTag(productCategory);
-
-        // 3. Entity → DTO 변환
         return products.stream()
-                .map(product -> ProductDTO.builder()
-                        .productId(product.getProductId())
-                        .productName(product.getProductName())
-                        .price(product.getPrice())
-                        .stock(product.getStock())
-                        .productTag(ProductCategory.valueOf(product.getProductTag().name())) // 문자열로 변환
-                        .build())
-                .toList();
-
+                .map(this::mapProductToDtoWithImage)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ProductDTO> searchProducts(String keyword) {
+        log.info("ProductService - searchProducts: " + keyword);
         List<Product> products = productRepository.searchByKeyword(keyword);
-
         return products.stream()
-                .map(product -> ProductDTO.builder()
-                        .productId(product.getProductId())
-                        .productName(product.getProductName())
-                        .price(product.getPrice())
-                        .stock(product.getStock())
-                        .productTag(ProductCategory.valueOf(product.getProductTag().name())) // Enum → String
-                        .build())
-                .toList();
+                .map(this::mapProductToDtoWithImage)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void saveProduct(Product product){
+    public void saveProduct(Product product) {
         productRepository.save(product);
     }
 
@@ -94,21 +93,21 @@ public class ProductServiceImpl implements ProductService {
         if (productDTO.getProductTag() == null) {
             productDTO.setProductTag(ProductCategory.UNKNOWN);
         }
-        Product product = dtoToEntity(productDTO);
-        Product saved = productRepository.save(product);
-        return entityToDto(saved);
+        Product product = productRepository.findByProductId(productDTO.getProductId());
+        Product savedProduct = productRepository.save(product);
+        return Product.entityToDTO(savedProduct);
     }
 
     // 상품 수정 메서드 구현
     @Override
-    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
-        log.info("ProductService에서 작업중 수정된 ProductDTO : "+productDTO.getProductName());
+    public ProductDTO updateProduct(Long productId, String productName, BigDecimal price, int stock,
+                                    ProductCategory productTag, MultipartFile thumbnail, MultipartFile[] details) {
+        log.info("ProductService에서 작업중 수정된 ProductDTO : " + productName);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다. id=" + productId));
         // 상품 정보 수정
-        product.changeTitleContent(productDTO);
-        log.info("ProductService에서 작업중 수정된 Product : "+product.getProductName());
-        return entityToDto(product);
+        product.changeTitleContent( productName , price , stock , productTag);
+    return null;
     }
 
     // 상품 삭제 메서드 구현
@@ -117,27 +116,62 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(productId);
     }
 
-    // DTO → Entity 변환
-    public Product dtoToEntity(ProductDTO dto) {
-        return Product.builder()
-                .productName(dto.getProductName())
-                .price(dto.getPrice())
-                .stock(dto.getStock())
-                .image(dto.getImage())
-                .productTag(dto.getProductTag())
+    @Override
+    public void createProductWithImages(String productName, BigDecimal price, int stock, ProductCategory productTag, MultipartFile thumbnail, List<MultipartFile> detailImages) {
+        Product product = Product.builder()
+                .productName(productName)
+                .price(price)
+                .stock(stock)
+                .productTag(productTag)
                 .build();
+        log.info("ProductService에서 작업중 관리자가 생성한 Product : "+ product.getProductName());
+        productRepository.save(product);
+
+        // 2. 섬네일 이미지 저장 thumnail = true로 저장
+        if(thumbnail != null && !thumbnail.isEmpty()) {
+            try {
+                String savedFileName = fileUploadService.saveFile(thumbnail);
+                ProductImage thumbnailEntity = ProductImage.builder()
+                        .fileName(savedFileName)
+                        .ord(0)
+                        .thumbnail(true)
+                        .build();
+                product.addImage(thumbnailEntity);
+                log.info("ProductService에서 작업중 썸네일 이미지인지 확인 : " + thumbnailEntity.getFileName());
+                productImageRepository.save(thumbnailEntity);
+            }catch(IOException e) {
+                e.printStackTrace();
+            }
+
+            //상세 이미지 DB에 저장 thumnail = false로 표시해주기
+            if(detailImages != null && !detailImages.isEmpty()) {
+                int order=1;
+                for(MultipartFile file : detailImages){
+                    try {
+                        if(!file.isEmpty()) {
+                            String savedFileName = fileUploadService.saveFile(file);
+                            ProductImage detailImageEntity = ProductImage.builder()
+                                    .fileName(savedFileName)
+                                    .ord(order++)
+                                    .thumbnail(false)
+                                    .build();
+                            product.addImage(detailImageEntity);
+                            log.info("ProductService에서 작업중 썸네일 이미지인지 확인 : " + detailImageEntity.getFileName());
+                            productImageRepository.save(detailImageEntity);
+                        }
+                    }catch(IOException e) {}
+                }
+            }
+        }
     }
 
-    // Entity → DTO 변환
-    public ProductDTO entityToDto(Product product) {
-        return ProductDTO.builder()
-                .productId(product.getProductId())
-                .productName(product.getProductName())
-                .price(product.getPrice())
-                .stock(product.getStock())
-                .image(product.getImage())
-                .productTag(product.getProductTag())
-                .build();
+    // Helper method to map Product to ProductDTO and attach image filename
+    @Override
+    public ProductDTO mapProductToDtoWithImage(Product product) {
+        ProductDTO dto = Product.entityToDTO(product);
+        productImageRepository.findByProduct_ProductIdAndThumbnail(product.getProductId(), true)
+                .ifPresent(productImage -> dto.setImageFileName(productImage.getFileName()));
+        return dto;
     }
 
 }

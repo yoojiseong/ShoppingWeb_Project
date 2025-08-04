@@ -1,6 +1,5 @@
 package com.busanit501.shoppingweb_project.dto;
 
-import com.busanit501.shoppingweb_project.domain.OrderItem;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,13 +25,5 @@ public class OrderItemDTO {
 
     @NotNull
     private BigDecimal price;
-
-    public static OrderItemDTO fromEntitySafe(OrderItem orderItem) {
-        return OrderItemDTO.builder()
-                .productid(orderItem.getProductId())
-                .quantity(orderItem.getQuantity())
-                .price(orderItem.getPrice())
-                .build();
-    }
 
 }

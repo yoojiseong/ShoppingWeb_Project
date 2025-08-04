@@ -1,13 +1,8 @@
 package com.busanit501.shoppingweb_project.config;
 
-import com.busanit501.shoppingweb_project.repository.AddressRepository;
 import com.busanit501.shoppingweb_project.repository.MemberRepository;
 import com.busanit501.shoppingweb_project.security.CustomOAuth2UserService;
-import com.busanit501.shoppingweb_project.security.CustomUserDetails;
-import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
-import com.busanit501.shoppingweb_project.security.handler.OAuth2LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,9 +20,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserDetailsService customUserDetailsService;
-    private final MemberRepository memberRepository;
-    private final AddressRepository addressRepository;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
+    @Bean
+    public CustomOAuth2UserService customOAuth2UserService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+        return new CustomOAuth2UserService(memberRepository, passwordEncoder);
+    }
 
     // 비밀번호 암호화에 사용될 Bean
     @Bean
@@ -47,6 +44,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 허용할 경로
+                        .requestMatchers(HttpMethod.GET, "/api/image/display/{fileName}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/{productId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/{id}").permitAll()

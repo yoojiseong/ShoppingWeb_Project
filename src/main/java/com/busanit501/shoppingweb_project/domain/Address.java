@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,14 +21,6 @@ public class Address {
     private LocalDateTime createdAt;
 
     private boolean isDefault; // 기본 배송지 여부
-
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    public void setIsDefault(boolean isDefault) {
-        this.isDefault = isDefault;
-    }
 
     // N(배송지) : 1(회원)
     // 하나의 회원에 여러개의 배송지를 입력할 수 있도록 만들겠습니다.

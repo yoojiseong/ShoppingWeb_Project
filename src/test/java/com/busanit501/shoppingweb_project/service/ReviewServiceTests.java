@@ -25,7 +25,7 @@ public class ReviewServiceTests {
     // 리뷰 등록 테스트
     @Test
     public void testInsertReview() {
-        Long productId = 5L; // 리뷰를 달 상품의 ID
+        Long productId = 1L; // 리뷰를 달 상품의 ID
 
         Optional<Product> productResult = productRepository.findById(productId);
 
@@ -55,7 +55,7 @@ public class ReviewServiceTests {
     @Test
     @Transactional
     public void testSelectReview() {
-        Long reviewId = 2L;
+        Long reviewId = 1L;
         log.info("리뷰 조회 테스트 시작 - 대상 리뷰 ID : " + reviewId);
 
         Optional<Review> result = reviewRepository.findById(reviewId);
@@ -73,7 +73,7 @@ public class ReviewServiceTests {
     // 리뷰 수정 테스트
     @Test
     public void testUpdateReview() {
-        Long reviewId = 2L;
+        Long reviewId = 1L;
         log.info("리뷰 수정 테스트 시작 - 대상 리뷰 ID : " + reviewId);
 
         Optional<Review> result = reviewRepository.findById(reviewId);

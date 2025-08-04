@@ -72,9 +72,14 @@ public class CartController {
         int quantityChange = request.get("quantityChange");
         Long memberId = userDetails.getId();
 
-        CartItemDTO updated = cartItemService.updateQuantity(memberId, productId , quantityChange);
-        log.info("CartController에서 작업중 업데이트된 CartItemDTO : " + updated);
-        return ResponseEntity.ok(updated);
+            CartItemDTO updated = cartItemService.updateQuantity(memberId, productId, quantityChange);
+            log.info("CartController에서 작업중 업데이트된 CartItemDTO : " + updated);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalStateException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
     }
 
     @DeleteMapping("/{productId}")

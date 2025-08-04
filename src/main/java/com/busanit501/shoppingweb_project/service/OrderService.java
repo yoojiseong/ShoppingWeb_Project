@@ -10,4 +10,5 @@ public interface OrderService {
     OrderDTO PurchaseFromCart(Long memberId);
     CartItemDTO AddCartItemFromProductDetail(CartItemDTO cartItemDTO);
     List<OrderDTO> getOrderHistoryByMemberId(Long memberId);
+    boolean hasPurchasedProduct(Long memberId, Long productId);
 }
