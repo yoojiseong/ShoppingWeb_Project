@@ -32,7 +32,7 @@
                         <button class="btn btn-outline-success btn-sm" onclick="goToLogin()" id="loginBtn">로그인</button>
                     </div>
                     <div sec:authorize="isAuthenticated()">
-                        <button class="btn btn-outline-danger btn-sm" onclick="logout()" id="logoutBtn">로그아웃</button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="goToLogout()" id="logoutBtn">로그아웃</button>
                     </div>
                 </div>
             </nav>

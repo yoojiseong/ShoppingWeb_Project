@@ -60,6 +60,7 @@ public class CartController {
         dto.setMemberId(memberId);
 
         CartItemDTO saved = cartItemService.addToCart(dto);
+        log.info("CartController에서 Service에서 넘어온 DTO확인 : " + saved);
         return ResponseEntity.ok(saved);
     }
     @PatchMapping("/{productId}")

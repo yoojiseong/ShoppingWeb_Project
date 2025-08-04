@@ -89,7 +89,6 @@ public class OrderServicImpl implements OrderService {
         // 장바구니 비우기
         cartItemRepository.deleteByMemberId(memberId);
 
-        // DTO 매핑은 저장 후!
         return modelMapper.map(savedOrder, OrderDTO.class);
     }
 
