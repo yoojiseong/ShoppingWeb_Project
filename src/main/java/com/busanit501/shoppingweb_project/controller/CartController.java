@@ -8,7 +8,7 @@ import com.busanit501.shoppingweb_project.repository.CartItemRepository;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
 import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import com.busanit501.shoppingweb_project.service.CartItemService;
-import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+//import com.busanit501.shoppingweb_project.security.CustomUserDetails;
 import com.busanit501.shoppingweb_project.service.OrderService;
 import com.busanit501.shoppingweb_project.service.ProductService;
 import lombok.RequiredArgsConstructor;

@@ -59,6 +59,7 @@ public class OrderServicImpl implements OrderService {
                 .addressDetail(userinfoDTo.getAddressLine())
                 .receiverName(userinfoDTo.getUserName())
                 .receiverPhone(userinfoDTo.getPhone())
+                .orderDate(LocalDateTime.now())
                 .build();
 
         member.addOrder(order);

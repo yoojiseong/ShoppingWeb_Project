@@ -1,9 +1,11 @@
 package com.busanit501.shoppingweb_project.controller;
 
+import com.busanit501.shoppingweb_project.domain.Member;
 import com.busanit501.shoppingweb_project.dto.PageRequestDTO;
 import com.busanit501.shoppingweb_project.dto.PageResponseDTO;
 import com.busanit501.shoppingweb_project.dto.ReviewDTO;
-import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+//import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import com.busanit501.shoppingweb_project.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,9 +31,15 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<Void> registerReview(
             @RequestBody ReviewDTO dto,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal MemberSecurityDTO userDetails
     ) {
-        reviewService.createReview(dto, userDetails.getMemberId());
+
+        if (userDetails == null) {
+//            log.warn("리뷰 등록 요청: 로그인 정보 없음");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        log.info("ReveiwController 리뷰 등록 진행 : " + userDetails.getUsername()+ dto.getReviewContent());
+        reviewService.createReview(dto, userDetails.getId());
         return ResponseEntity.ok().build();
     }
 
@@ -47,10 +55,14 @@ public class ReviewController {
     @PatchMapping("/{reviewId}")
     public ResponseEntity<Void> updateReview(@PathVariable Long reviewId,
                                              @RequestBody Map<String, String> body,
-                                             @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
+                                             @AuthenticationPrincipal MemberSecurityDTO userDetails) throws AccessDeniedException {
+        if (userDetails == null) {
+//            log.warn("리뷰 등록 요청: 로그인 정보 없음");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         String updatedContent = body.get("reviewContent");
         log.info("ReviewController에서 userDetails에 뭐 있는지 확인중 : "+ userDetails);
-        reviewService.updateReview(reviewId, updatedContent, userDetails.getMemberId());
+        reviewService.updateReview(reviewId, updatedContent, userDetails.getId());
         return ResponseEntity.ok().build();
     }
 //    @PostMapping

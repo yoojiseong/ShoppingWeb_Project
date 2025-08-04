@@ -25,7 +25,8 @@ public class Product {
     private String productName;
     private BigDecimal price;
     private int stock;
-    private double avgRate;
+    @Builder.Default
+    private double avgRate=0;
     private int rateCount=0;
 
     @OneToMany(mappedBy = "product" , cascade = {CascadeType.ALL}

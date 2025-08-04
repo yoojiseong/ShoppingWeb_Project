@@ -490,7 +490,8 @@
                 const res = await fetch(`/api/reviews/${editingReviewId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(reviewData)
+                    body: JSON.stringify(reviewData),
+                    credentials: 'include'
                 });
 
                 if (res.ok) {
@@ -500,11 +501,13 @@
                 }
 
             } else {
+                console.log("리뷰 등록 하겠습니다.");
                 // 신규 등록
                 const res = await fetch('/api/reviews', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(reviewData)
+                    body: JSON.stringify(reviewData),
+                    credentials: 'include'
                 });
 
                 if (res.ok) {

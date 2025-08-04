@@ -53,6 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
         review.setProduct(product);
         review.setMember(member);
         product.addReview(dto.getRating());
+        log.info("리뷰 정보 확인 : " + review);
 
         reviewRepository.save(review);
     }

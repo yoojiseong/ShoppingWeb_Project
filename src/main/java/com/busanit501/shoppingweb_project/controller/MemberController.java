@@ -4,7 +4,7 @@ import com.busanit501.shoppingweb_project.domain.Member;
 import com.busanit501.shoppingweb_project.dto.AddressDTO;
 import com.busanit501.shoppingweb_project.dto.MemberDTO;
 import com.busanit501.shoppingweb_project.mapper.MemberMapper;
-import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+//import com.busanit501.shoppingweb_project.security.CustomUserDetails;
 import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import com.busanit501.shoppingweb_project.service.AddressService;
 import com.busanit501.shoppingweb_project.service.MemberService;

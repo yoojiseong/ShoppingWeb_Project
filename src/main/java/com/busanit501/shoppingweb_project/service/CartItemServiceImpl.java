@@ -6,7 +6,7 @@ import com.busanit501.shoppingweb_project.dto.CartItemDTO;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.repository.CartItemRepository;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
-import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+//import com.busanit501.shoppingweb_project.security.CustomUserDetails;
 import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.busanit501.shoppingweb_project.controller;
 
 import com.busanit501.shoppingweb_project.dto.AddressDTO;
-import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+//import com.busanit501.shoppingweb_project.security.CustomUserDetails;
 import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import com.busanit501.shoppingweb_project.service.AddressService;
 import lombok.RequiredArgsConstructor;
