@@ -168,20 +168,33 @@
         productsToShow.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
-            console.log(product.thumbnailFileName);
-                productCard.innerHTML = `
-            <img src="${product.thumbnailFileName != null ? '/api/image/display/' + product.thumbnailFileName : '/images/default_product.png'}"
-     th:alt="${product.productName}"
-     class="product-image" />
-            <div class="product-info">
-                <h3 onclick="goToProductDetail(${product.productId})">${product.productName}</h3> <!-- product.name으로 변경 -->
-                <p>카테고리: ${product.productTag}</p> <!-- product.category로 변경 -->
-                <div class="product-price">${Number(product.price).toLocaleString()}원</div>
-                <button class="add-to-cart-btn" onclick="addToCart(${product.productId}, '${product.productName}')">
-                    장바구니 담기
-                </button>
-            </div>
-        `;
+
+            // 재고가 0인지 확인
+            const isSoldOut = product.stock === 0;
+
+            let soldOutOverlay = '';
+            if (isSoldOut) {
+                soldOutOverlay = `
+                    <div class="sold-out-overlay">
+                        <div class="sold-out-text">Sold Out</div>
+                    </div>
+                `;
+            }
+
+            productCard.innerHTML = `
+                ${soldOutOverlay}
+                <img src="${product.thumbnailFileName != null ? '/api/image/display/' + product.thumbnailFileName : '/images/default_product.png'}"
+                     alt="${product.productName}"
+                     class="product-image" />
+                <div class="product-info">
+                    <h3 onclick="goToProductDetail(${product.productId})">${product.productName}</h3>
+                    <p>카테고리: ${product.productTag}</p>
+                    <div class="product-price">${Number(product.price).toLocaleString()}원</div>
+                    <button class="add-to-cart-btn" onclick="addToCart(${product.productId}, '${product.productName}')" ${isSoldOut ? 'disabled' : ''}>
+                        장바구니 담기
+                    </button>
+                </div>
+            `;
             productGrid.appendChild(productCard);
         });
     }
