@@ -27,6 +27,7 @@ public class OrderDTO {
     @CreatedDate
     @Column(name = "regDate", updatable = true)
     private LocalDateTime orderDate;
+    private String formattedDate;
 
     private boolean status;
     private String address;
@@ -36,4 +37,8 @@ public class OrderDTO {
     private String receiverPhone;
 
     private List<OrderItemDTO> orderItems;
+
+    public void setFormattedDate(String orderDate) {
+        this.formattedDate = orderDate.toString();
+    }
 }

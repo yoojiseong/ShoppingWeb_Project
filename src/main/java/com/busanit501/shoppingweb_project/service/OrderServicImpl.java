@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -111,7 +112,9 @@ public class OrderServicImpl implements OrderService {
             List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
                     .map(orderItem -> {
                         OrderItemDTO dto = modelMapper.map(orderItem, OrderItemDTO.class);
-
+                        // LocalDateTime → String 형식으로 변환
+                        String formattedDate = order.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                        orderDTO.setFormattedDate(formattedDate); // 새 필드로 추가
                         // 🔽 productId로 Product 조회해서 productName 세팅
                         productRepository.findById(orderItem.getProduct().getProductId())
                                 .ifPresent(product -> dto.setProductName(product.getProductName()));

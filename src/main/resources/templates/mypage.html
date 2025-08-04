@@ -107,7 +107,7 @@
                     orderItem.className = 'order-item';
                     const itemList = order.orderItems.map(item => `${item.productName} x ${item.quantity}`).join(', ');
                     orderItem.innerHTML = `
-                <div class="order-date">주문일: ${new Date(order.orderDate).toLocaleDateString()}</div>
+                <div class="order-date">주문일: ${order.formattedDate}</div>
                 <div class="order-items">${itemList}</div>
                 <div class="order-total">총 금액: ${order.totalPrice.toLocaleString()}원</div>
                 <div class="order-address">배송지 : ${order.address},${order.addressDetail}</div>
