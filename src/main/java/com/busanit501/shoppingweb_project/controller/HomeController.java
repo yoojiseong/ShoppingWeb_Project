@@ -2,6 +2,7 @@ package com.busanit501.shoppingweb_project.controller;
 
 import com.busanit501.shoppingweb_project.domain.Product;
 import com.busanit501.shoppingweb_project.dto.ProductDTO;
+import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import com.busanit501.shoppingweb_project.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -9,6 +10,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
@@ -40,9 +44,21 @@ public class HomeController {
         return "cart";
     }
 
-    @PreAuthorize("hasRole('USER')")
     @GetMapping("/mypage")
-    public String mypage() {
+    public String mypage(@AuthenticationPrincipal MemberSecurityDTO member, Model model) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        log.info("==== 🔐 로그인 디버깅 ====");
+        log.info("Authentication 객체: {}", auth);
+        log.info("이름: {}", auth.getName());
+        log.info("권한들: {}", auth.getAuthorities());
+        log.info("Principal 클래스: {}", auth.getPrincipal().getClass());
+
+        if (member == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("member", member);
         return "mypage";
     }
 

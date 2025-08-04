@@ -7,6 +7,7 @@ import com.busanit501.shoppingweb_project.dto.ProductDTO;
 import com.busanit501.shoppingweb_project.repository.CartItemRepository;
 import com.busanit501.shoppingweb_project.repository.ProductRepository;
 import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -31,12 +32,11 @@ public class CartItemServiceImpl implements CartItemService {
     CartItemRepository cartItemRepository;
     @Autowired
     ProductService productService;
-
     private Long getCurrentMemberId() {
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        return userDetails.getMemberId();
+        MemberSecurityDTO userDetails = (MemberSecurityDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDetails.getId();
     }
+
 
     // 장바구니 조회
     public List<CartItemDTO> getCartItems() {
