@@ -110,4 +110,18 @@ public ResponseEntity<?> createProduct(
         return ResponseEntity.noContent().build();
     }
 
+    // 썸네일 이미지 삭제
+    @DeleteMapping("/image/thumbnail/{productId}")
+    public ResponseEntity<Void> deleteThumbnail(@PathVariable Long productId) {
+        productService.deleteThumbnail(productId); // 썸네일 삭제 서비스 호출
+        return ResponseEntity.noContent().build();
+    }
+
+    // 상세 이미지 삭제
+    @DeleteMapping("/image/detail/{productId}/{fileName}")
+    public ResponseEntity<Void> deleteDetailImage(@PathVariable Long productId,
+                                                  @PathVariable String fileName) {
+        productService.deleteDetailImage(productId, fileName); // 상세 이미지 삭제 서비스 호출
+        return ResponseEntity.noContent().build();
+    }
 }

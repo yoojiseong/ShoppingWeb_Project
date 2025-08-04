@@ -17,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -164,6 +167,24 @@ public class ProductServiceImpl implements ProductService {
     // 상품 삭제 메서드 구현
     @Override
     public void deleteProduct(Long productId) {
+        // 1. 상품 이미지 목록 조회
+        List<ProductImage> images = productImageRepository.findByProduct_ProductId(productId);
+
+        // 2. 실제 파일 삭제
+        for (ProductImage img : images) {
+            try {
+                Path filePath = Paths.get(fileUploadService.getFullPath(img.getFileName()));
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                log.error("파일 삭제 실패: " + img.getFileName(), e);
+            }
+        }
+
+
+        // 3. 상품 이미지 레코드 삭제 (cascade 설정 없으면 직접 삭제)
+        productImageRepository.deleteAll(images);
+
+        // 4. 상품 삭제
         productRepository.deleteById(productId);
     }
 
@@ -223,6 +244,64 @@ public class ProductServiceImpl implements ProductService {
         productImageRepository.findByProduct_ProductIdAndThumbnail(product.getProductId(), true)
                 .ifPresent(productImage -> dto.setImageFileName(productImage.getFileName()));
         return dto;
+    }
+
+    @Override
+    public void deleteThumbnail(Long productId) {
+        // 1. 상품 존재 확인 (없으면 예외 발생)
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. id=" + productId));
+
+        // 2. 해당 상품의 썸네일 이미지 조회 (thumbnail = true)
+        Optional<ProductImage> thumbnailOpt = productImageRepository.findByProduct_ProductIdAndThumbnail(productId, true);
+
+        if (thumbnailOpt.isPresent()) {
+            ProductImage thumbnail = thumbnailOpt.get();
+
+            // 3. DB에서 썸네일 이미지 데이터 삭제
+            productImageRepository.delete(thumbnail);
+
+            // 4. 실제 파일 시스템(서버 폴더)에서 썸네일 이미지 파일 삭제
+            try {
+                String fullPath = fileUploadService.getFullPath(thumbnail.getFileName());  // 저장된 이미지 경로 반환
+                Files.deleteIfExists(Paths.get(fullPath));  // 해당 경로 파일이 존재하면 삭제
+            } catch (Exception e) {
+                // 삭제 실패 시 RuntimeException 발생시키고 로그 출력
+                throw new RuntimeException("썸네일 이미지 파일 삭제 실패: " + e.getMessage(), e);
+            }
+        } else {
+            // 썸네일 이미지가 없으면 예외 발생
+            throw new IllegalArgumentException("삭제할 썸네일 이미지가 없습니다.");
+        }
+    }
+
+    @Override
+    public void deleteDetailImage(Long productId, String fileName) {
+        // 1. 상품 존재 확인 (없으면 예외 발생)
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. id=" + productId));
+
+        // 2. 해당 상품과 파일명으로 상세 이미지 조회
+        Optional<ProductImage> detailImageOpt = productImageRepository.findByProduct_ProductIdAndFileName(productId, fileName);
+
+        if (detailImageOpt.isPresent()) {
+            ProductImage detailImage = detailImageOpt.get();
+
+            // 3. DB에서 상세 이미지 데이터 삭제
+            productImageRepository.delete(detailImage);
+
+            // 4. 실제 파일 시스템에서 상세 이미지 파일 삭제
+            try {
+                String fullPath = fileUploadService.getFullPath(detailImage.getFileName());  // 이미지 전체 경로 반환
+                Files.deleteIfExists(Paths.get(fullPath));  // 파일 존재 시 삭제
+            } catch (Exception e) {
+                // 삭제 실패 시 예외 발생 및 로그 출력
+                throw new RuntimeException("상세 이미지 파일 삭제 실패: " + e.getMessage(), e);
+            }
+        } else {
+            // 상세 이미지가 없으면 예외 발생
+            throw new IllegalArgumentException("삭제할 상세 이미지가 없습니다.");
+        }
     }
 
 }

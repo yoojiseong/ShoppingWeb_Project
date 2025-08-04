@@ -37,4 +37,8 @@ public class ProductDTO {
         this.thumbnailFileName = fileName;
     }
 
+    private boolean deletedThumbnail; // 기존 썸네일을 삭제할지 여부
+    private List<String> deletedDetailImageNames; // 삭제할 상세 이미지 파일명 리스트
+
+
 }
