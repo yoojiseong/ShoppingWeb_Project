@@ -19,5 +19,9 @@ public class CustomServletConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/css/");
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");
+
+        // 이미지 경로 추가
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations("file:///c:/upload/WebShopingDetailImg/");
     }
 }

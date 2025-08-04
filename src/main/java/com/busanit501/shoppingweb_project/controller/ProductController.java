@@ -79,13 +79,13 @@ public ResponseEntity<?> createProduct(
 
     @PutMapping("/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(
-            @PathVariable Long productId,
-            @RequestParam("name") String productName,
-            @RequestParam("price") BigDecimal price,
-            @RequestParam("stock") int stock,
-            @RequestParam("productTag") ProductCategory productTag,
+            @RequestParam Long productId,
+            @RequestParam String productName,
+            @RequestParam BigDecimal price,
+            @RequestParam int stock,
+            @RequestParam ProductCategory productTag,
             @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
-            @RequestParam(value = "details", required = false) MultipartFile[] details) {
+            @RequestParam(value = "details", required = false) List<MultipartFile> details) {
 
         log.info("ProductController에서 작업 중 - productId: " + productId);
         log.info("전송된 데이터: productName: " + productName + ", price: " + price);
@@ -110,4 +110,18 @@ public ResponseEntity<?> createProduct(
         return ResponseEntity.noContent().build();
     }
 
+    // 썸네일 이미지 삭제
+    @DeleteMapping("/image/thumbnail/{productId}")
+    public ResponseEntity<Void> deleteThumbnail(@PathVariable Long productId) {
+        productService.deleteThumbnail(productId); // 썸네일 삭제 서비스 호출
+        return ResponseEntity.noContent().build();
+    }
+
+    // 상세 이미지 삭제
+    @DeleteMapping("/image/detail/{productId}/{fileName}")
+    public ResponseEntity<Void> deleteDetailImage(@PathVariable Long productId,
+                                                  @PathVariable String fileName) {
+        productService.deleteDetailImage(productId, fileName); // 상세 이미지 삭제 서비스 호출
+        return ResponseEntity.noContent().build();
+    }
 }

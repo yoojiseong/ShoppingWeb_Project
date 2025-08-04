@@ -53,5 +53,8 @@ public class ProductImage {
     public void changeThumbnail(boolean thumbnail) {
         this.thumbnail = thumbnail;
     }
+    public boolean isThumbnail(){
+        return thumbnail;
+    }
 
 }
