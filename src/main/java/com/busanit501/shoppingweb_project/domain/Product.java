@@ -78,11 +78,12 @@ public class Product {
         image.setProduct(this);
     }
 
-    public void changeTitleContent(ProductDTO productDTO) {
-        this.productName = productDTO.getProductName();
-        this.price = productDTO.getPrice();
-        this.stock = productDTO.getStock();
-        this.productTag = productDTO.getProductTag();
+    public void changeTitleContent( String productName, BigDecimal price, int stock,
+                                   ProductCategory productTag) {
+        this.productName = productName;
+        this.price = price;
+        this.stock = stock;
+        this.productTag = productTag;
     }
 
     public Optional<ProductImage> getThumbnailImage(){

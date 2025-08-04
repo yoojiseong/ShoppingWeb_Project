@@ -36,7 +36,8 @@ public interface ProductService {
     ProductDTO createProduct(ProductDTO productDTO);
 
     // 상품 수정 메서드 시그니처 추가
-    ProductDTO updateProduct(Long productId, ProductDTO productDTO);
+    ProductDTO updateProduct(Long productId, String productName, BigDecimal price, int stock,
+                             ProductCategory productTag, MultipartFile thumbnail, MultipartFile[] details);
 
     // 상품 삭제 메서드 시그니처 추가
     void deleteProduct(Long productId);

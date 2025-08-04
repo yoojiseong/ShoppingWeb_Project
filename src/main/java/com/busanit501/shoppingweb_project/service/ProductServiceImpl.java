@@ -100,15 +100,14 @@ public class ProductServiceImpl implements ProductService {
 
     // 상품 수정 메서드 구현
     @Override
-    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
-        log.info("ProductService에서 작업중 수정된 ProductDTO : " + productDTO.getProductName());
+    public ProductDTO updateProduct(Long productId, String productName, BigDecimal price, int stock,
+                                    ProductCategory productTag, MultipartFile thumbnail, MultipartFile[] details) {
+        log.info("ProductService에서 작업중 수정된 ProductDTO : " + productName);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다. id=" + productId));
         // 상품 정보 수정
-        product.changeTitleContent(productDTO);
-        log.info("ProductService에서 작업중 수정된 Product : " + product.getProductName());
-        Product updatedProduct = productRepository.save(product);
-        return Product.entityToDTO(updatedProduct);
+        product.changeTitleContent( productName , price , stock , productTag);
+    return null;
     }
 
     // 상품 삭제 메서드 구현

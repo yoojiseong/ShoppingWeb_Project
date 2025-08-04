@@ -223,3 +223,46 @@ h2 {
 .detail-image-thumb {
     cursor: pointer; /* 클릭 가능한 커서로 변경 */
 }
+/* 새롭게 추가된 스타일 */
+.image-preview-item {
+    position: relative;
+    display: inline-block; /* 인라인 블록으로 옆으로 나열 */
+    margin: 5px;
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 5px;
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+}
+.image-preview-item img {
+    max-width: 100px; /* 미리보기 이미지 크기 조절 */
+    max-height: 100px;
+    display: block;
+}
+.image-preview-item .delete-button {
+    position: absolute;
+    top: 0px; /* 오른쪽 위로 위치 조정 */
+    right: 0px;
+    background: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%; /* 원형 버튼 */
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+    line-height: 1; /* 텍스트 세로 중앙 정렬 */
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    display: flex; /* Flexbox를 사용하여 내부 X를 중앙 정렬 */
+    align-items: center;
+    justify-content: center;
+    z-index: 10; /* 다른 요소 위에 표시 */
+}
+.image-preview-item .delete-button:hover {
+    background: red;
+}
+/* 상세 이미지 미리보기 컨테이너 스타일 */
+#productDetailImagesPreview {
+    display: flex; /* 상세 이미지를 가로로 나열 */
+    flex-wrap: wrap; /* 공간 부족 시 다음 줄로 */
+}

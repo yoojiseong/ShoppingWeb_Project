@@ -78,9 +78,29 @@ public ResponseEntity<?> createProduct(
 
 
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId, @RequestBody ProductDTO requestDto) {
-        log.info("ProductControllerRestAPI에서 작업중 화면에서 가져온 데이터 확인중 : productId "+ productId+"productDTO : "+ requestDto.getProductName());
-        ProductDTO updatedProduct = productService.updateProduct(productId, requestDto);
+    public ResponseEntity<ProductDTO> updateProduct(
+            @PathVariable Long productId,
+            @RequestParam("name") String productName,
+            @RequestParam("price") BigDecimal price,
+            @RequestParam("stock") int stock,
+            @RequestParam("productTag") ProductCategory productTag,
+            @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
+            @RequestParam(value = "details", required = false) MultipartFile[] details) {
+
+        log.info("ProductController에서 작업 중 - productId: " + productId);
+        log.info("전송된 데이터: productName: " + productName + ", price: " + price);
+
+        // 새로운 상품 데이터로 업데이트 처리 (파일이 있으면 처리)
+        ProductDTO updatedProduct = productService.updateProduct(
+                productId,
+                productName,
+                price,
+                stock,
+                productTag,
+                thumbnail,
+                details
+        );
+
         return ResponseEntity.ok(updatedProduct);
     }
 
