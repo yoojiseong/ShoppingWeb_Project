@@ -1,0 +1,61 @@
+package com.busanit501.shoppingweb_project.domain;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "orders") // 테이블 이름 명시
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString(exclude = "orderItems") // 순환 참조 방지
+
+public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "orderId") // PK
+    private Long orderId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id") // 외래 키 이름
+    @JsonBackReference
+    private Member member;
+
+    @Column(name = "orderdate")
+    private LocalDateTime orderDate;
+
+    @Column(name = "status")
+    @Builder.Default
+    private Boolean status = false;
+
+    private String address;
+    private String addressDetail;
+    @Builder.Default
+    private int totalPrice=0;
+    private String receiverName;
+    private String receiverPhone;
+    // 양방향 연관관계 설정 - 비주인
+    @Builder.Default
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems = new ArrayList<>();
+
+    // 연관관계 편의 메서드
+    public void addOrderItem(OrderItem orderItem) {
+        this.orderItems.add(orderItem);
+        orderItem.setOrder(this); // FK 설정
+    }
+    public void setTotalPrice(int totalPrice){
+        this.totalPrice = totalPrice;
+    }
+    public void setMember(Member member) {
+        this.member = member;
+        if (!member.getOrders().contains(this)) {
+            member.getOrders().add(this);
+        }
+    }
+}
