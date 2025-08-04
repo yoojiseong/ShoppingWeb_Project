@@ -37,35 +37,6 @@ public class FileUploadService {
         }
     }
 
-    public void deleteFile(String fileName) {
-        if (fileName == null || fileName.isBlank()) {
-            return; // 유효하지 않은 파일명에 대한 초기 검사는 유지합니다.
-        }
-
-        File fileToDelete = new File(UPLOAD_DIR, fileName); // File 객체 생성
-
-        try {
-            if (fileToDelete.exists()) { // 파일이 존재하는지 확인
-                if (fileToDelete.delete()) { // File.delete() 메서드 사용
-                    System.out.println("파일 삭제 성공: " + fileName);
-                } else {
-                    // delete() 메서드가 false를 반환하는 경우 (예: 권한 문제, 디렉토리가 비어있지 않음 등)
-                    System.err.println("파일 삭제 실패 (unknown reason): " + fileName);
-                    throw new RuntimeException("파일 삭제 실패: " + fileName + ". 파일이 사용 중이거나 권한이 없습니다.");
-                }
-            } else {
-                System.out.println("삭제할 파일을 찾을 수 없음: " + fileName);
-            }
-        } catch (SecurityException e) {
-            // 파일을 삭제할 권한이 없는 경우 발생하는 예외
-            System.err.println("파일 삭제 권한 오류: " + fileName + ", 원인: " + e.getMessage());
-            throw new RuntimeException("파일 삭제 권한 오류: " + fileName, e);
-        } catch (Exception e) { // 그 외 모든 예외를 RuntimeException으로 래핑
-            System.err.println("파일 삭제 중 예상치 못한 오류: " + fileName + ", 원인: " + e.getMessage());
-            throw new RuntimeException("파일 삭제 중 오류 발생: " + fileName, e);
-        }
-    }
-
     private String extractUUID(String fileName){
         return fileName.substring(0, fileName.lastIndexOf('.'));
     }

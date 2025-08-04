@@ -77,34 +77,10 @@ public ResponseEntity<?> createProduct(
     }
 
 
-    @PatchMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ProductDTO> updateProduct(
-            @PathVariable Long productId,
-            @RequestParam String productName,
-            @RequestParam BigDecimal price,
-            @RequestParam int stock,
-            @RequestParam ProductCategory productTag,
-            @RequestParam(value = "newThumbnail", required = false) MultipartFile newThumbnail, // 새로 업로드할 썸네일 (선택 사항)
-            @RequestParam(value = "newDetails", required = false) List<MultipartFile> newDetails, // 새로 업로드할 상세 이미지들 (선택 사항)
-            @RequestParam(value = "deletedImageFileNames", required = false) List<String> deletedImageFileNames) { // 삭제할 파일명 리스트 (선택 사항)
-
-        log.info("ProductController에서 상품 업데이트 요청 - ID: {}", productId);
-        log.info("수정된 상품명: {}", productName);
-        log.info("삭제할 파일 목록: {}", deletedImageFileNames);
-        // newThumbnail과 newDetails 파일 정보도 로깅하면 디버깅에 좋습니다.
-
-        // 서비스 계층의 updateProduct 메서드 호출 (변경된 시그니처에 맞춰 파라미터 전달)
-        ProductDTO updatedProduct = productService.updateProduct(
-                productId,
-                productName,
-                price,
-                stock,
-                productTag,
-                newThumbnail,
-                newDetails,
-                deletedImageFileNames
-        );
-
+    @PutMapping("/{productId}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId, @RequestBody ProductDTO requestDto) {
+        log.info("ProductControllerRestAPI에서 작업중 화면에서 가져온 데이터 확인중 : productId "+ productId+"productDTO : "+ requestDto.getProductName());
+        ProductDTO updatedProduct = productService.updateProduct(productId, requestDto);
         return ResponseEntity.ok(updatedProduct);
     }
 

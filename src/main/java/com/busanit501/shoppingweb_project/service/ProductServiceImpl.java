@@ -98,109 +98,16 @@ public class ProductServiceImpl implements ProductService {
         return Product.entityToDTO(savedProduct);
     }
 
+    // 상품 수정 메서드 구현
     @Override
-    public ProductDTO updateProduct(Long productId,
-                                    String productName,
-                                    BigDecimal price,
-                                    int stock,
-                                    ProductCategory productTag,
-                                    MultipartFile newThumbnail,       // 새로 업로드할 썸네일 파일
-                                    List<MultipartFile> newDetailImages, // 새로 업로드할 상세 이미지 파일 목록
-                                    List<String> deletedImageFileNames) { // 삭제할 기존 이미지 파일명 목록
-
-        log.info("ProductService - updateProduct 호출 (이미지 포함): productId={}, deletedImageCount={}", productId, deletedImageFileNames != null ? deletedImageFileNames.size() : 0);
-
-        // 1. 상품 엔티티 조회 (없으면 예외 발생)
+    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
+        log.info("ProductService에서 작업중 수정된 ProductDTO : " + productDTO.getProductName());
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
-
-        // 2. 상품 기본 정보 업데이트
-        // ProductDTO를 직접 받지 않으므로 임시 ProductDTO 객체를 생성하여 changeTitleContent 호출
-        product.changeTitleContent(ProductDTO.builder()
-                .productName(productName)
-                .price(price)
-                .stock(stock)
-                .productTag(productTag)
-                .build());
-
-        // 3. 삭제할 기존 이미지 처리 (파일 시스템 및 DB에서 제거)
-        if (deletedImageFileNames != null && !deletedImageFileNames.isEmpty()) {
-            // Product 엔티티의 imageSet에서 해당 파일명을 가진 이미지 엔티티 제거
-            product.getImageSet().removeIf(productImage -> {
-                boolean shouldDelete = deletedImageFileNames.contains(productImage.getFileName());
-                if (shouldDelete) {
-                    fileUploadService.deleteFile(productImage.getFileName()); // 실제 파일 시스템에서 삭제
-                    log.info("기존 이미지 삭제 (DB & File System): " + productImage.getFileName());
-                }
-                return shouldDelete; // true를 반환하면 Set에서 해당 요소가 제거됩니다.
-            });
-        }
-
-        // 4. 새 썸네일 이미지 처리 (기존 썸네일 교체 또는 추가)
-        if (newThumbnail != null && !newThumbnail.isEmpty()) {
-            // 기존 썸네일이 있다면 제거하고 파일 시스템에서도 삭제합니다.
-            product.getImageSet().stream()
-                    .filter(ProductImage::isThumbnail) // 썸네일인 이미지를 찾음
-                    .findFirst() // 첫 번째 썸네일 (보통 하나만 존재)
-                    .ifPresent(existingThumbnail -> {
-                        product.getImageSet().remove(existingThumbnail); // Product의 Set에서 제거 (JPA cascade로 DB에서도 삭제)
-                        fileUploadService.deleteFile(existingThumbnail.getFileName()); // 파일 시스템에서 삭제
-                        log.info("기존 썸네일 교체를 위해 삭제: " + existingThumbnail.getFileName());
-                    });
-
-            try {
-                // 새 썸네일 파일 저장 및 ProductImage 엔티티 생성
-                String savedFileName = fileUploadService.saveFile(newThumbnail);
-                ProductImage newThumbnailEntity = ProductImage.builder()
-                        .fileName(savedFileName)
-                        .ord(0) // 썸네일은 보통 0번 순서
-                        .thumbnail(true)
-                        .product(product) // 연관 관계 설정 (매우 중요)
-                        .build();
-                product.addImage(newThumbnailEntity); // Product 엔티티에 새 썸네일 추가 (JPA cascade로 DB에 저장)
-                log.info("새 썸네일 추가: " + savedFileName);
-            } catch (IOException e) {
-                log.error("새 썸네일 이미지 저장 실패: " + e.getMessage(), e);
-                // 예외 처리: 이미지 저장 실패 시 롤백 또는 사용자에게 에러 메시지 전달
-            }
-        }
-
-        // 5. 새 상세 이미지 처리 (추가)
-        if (newDetailImages != null && !newDetailImages.isEmpty()) {
-            // 현재 상세 이미지들 중 가장 높은 ord 값을 찾아 새 이미지의 순서에 사용 (썸네일 제외)
-            int currentMaxOrd = product.getImageSet().stream()
-                    .filter(img -> !img.isThumbnail()) // 썸네일 제외
-                    .mapToInt(ProductImage::getOrd)
-                    .max()
-                    .orElse(0); // 상세 이미지가 없으면 0부터 시작
-
-            int order = currentMaxOrd + 1; // 새 이미지의 시작 순서
-            for (MultipartFile file : newDetailImages) {
-                try {
-                    if (!file.isEmpty()) {
-                        // 새 상세 이미지 파일 저장 및 ProductImage 엔티티 생성
-                        String savedFileName = fileUploadService.saveFile(file);
-                        ProductImage detailImageEntity = ProductImage.builder()
-                                .fileName(savedFileName)
-                                .ord(order++) // 순서 증가
-                                .thumbnail(false)
-                                .product(product) // 연관 관계 설정 (매우 중요)
-                                .build();
-                        product.addImage(detailImageEntity); // Product 엔티티에 새 상세 이미지 추가
-                        log.info("새 상세 이미지 추가: " + savedFileName);
-                    }
-                } catch (IOException e) {
-                    log.error("새 상세 이미지 저장 실패: " + e.getMessage(), e);
-                    // 예외 처리: 이미지 저장 실패 시 롤백 또는 사용자에게 에러 메시지 전달
-                }
-            }
-        }
-
-        // 6. 변경된 Product 엔티티 최종 저장 (JPA cascade 설정으로 ProductImage도 함께 처리됩니다.)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다. id=" + productId));
+        // 상품 정보 수정
+        product.changeTitleContent(productDTO);
+        log.info("ProductService에서 작업중 수정된 Product : " + product.getProductName());
         Product updatedProduct = productRepository.save(product);
-        log.info("ProductService - 상품 업데이트 완료: {}", updatedProduct.getProductName());
-
-        // 7. 업데이트된 Product를 DTO로 변환하여 반환
         return Product.entityToDTO(updatedProduct);
     }
 
