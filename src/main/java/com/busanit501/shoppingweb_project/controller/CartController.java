@@ -63,14 +63,16 @@ public class CartController {
         return ResponseEntity.ok(saved);
     }
     @PatchMapping("/{productId}")
-    public ResponseEntity<CartItemDTO> updateQuantity(@PathVariable Long productId,
+    public ResponseEntity<?> updateQuantity(@PathVariable Long productId,
                                                       @RequestBody Map<String, Integer> request,
                                                       @AuthenticationPrincipal MemberSecurityDTO userDetails) {
         if (userDetails == null || request.get("quantityChange") == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        int quantityChange = request.get("quantityChange");
-        Long memberId = userDetails.getId();
+
+        try {
+            int quantityChange = request.get("quantityChange");
+            Long memberId = userDetails.getId();
 
             CartItemDTO updated = cartItemService.updateQuantity(memberId, productId, quantityChange);
             log.info("CartController에서 작업중 업데이트된 CartItemDTO : " + updated);

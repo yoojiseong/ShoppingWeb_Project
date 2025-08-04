@@ -11,12 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
+    @EntityGraph(attributePaths = {"role", "addresses"})
     Optional<Member> findByMemberId(String memberId);
 
     boolean existsByMemberId(String memberId);
 
     // 이메일로 회원 찾기 (roleSet이 아니라 role 필드이므로 수정)
-    @EntityGraph(attributePaths = {"role"})
+    @EntityGraph(attributePaths = {"role", "addresses"})
     Optional<Member> findByEmail(String email);
 
     // memberId로 회원 찾기 (social 필드는 없으니 제거)

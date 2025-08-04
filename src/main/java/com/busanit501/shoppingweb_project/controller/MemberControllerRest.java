@@ -2,6 +2,7 @@ package com.busanit501.shoppingweb_project.controller;
 import com.busanit501.shoppingweb_project.dto.MemberDTO;
 import com.busanit501.shoppingweb_project.dto.UserinfoDTO;
 import com.busanit501.shoppingweb_project.security.CustomUserDetails;
+import com.busanit501.shoppingweb_project.security.MemberSecurityDTO;
 import com.busanit501.shoppingweb_project.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,11 @@ public class MemberControllerRest {
     private final MemberService memberService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserinfoDTO> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails){
-        Long memberId = userDetails.getMemberId();
+    public ResponseEntity<UserinfoDTO> getCurrentUser(@AuthenticationPrincipal MemberSecurityDTO userDetails){
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        Long memberId = userDetails.getId();
         UserinfoDTO dto = memberService.getUserinfoDTOById(memberId);
         return ResponseEntity.ok(dto);
     }
