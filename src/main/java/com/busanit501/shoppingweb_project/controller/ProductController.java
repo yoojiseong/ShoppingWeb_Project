@@ -85,12 +85,21 @@ public ResponseEntity<?> createProduct(
             @RequestParam("stock") int stock,
             @RequestParam("productTag") ProductCategory productTag,
             @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
-            @RequestParam(value = "details", required = false) MultipartFile[] details) {
+            @RequestParam(value = "details", required = false) MultipartFile[] details,
+
+            // 썸네일 삭제 여부 (삭제 버튼 눌렀을 때 true로 넘어옴)
+            @RequestParam(value = "deleteThumbnail", required = false, defaultValue = "false") boolean deleteThumbnail,
+
+            // 삭제할 상세 이미지 파일명 리스트 (여러 개가 있을 수 있음)
+            @RequestParam(value = "deletedDetailImageNames", required = false) String[] deletedDetailImageNames
+    ) {
 
         log.info("ProductController에서 작업 중 - productId: " + productId);
         log.info("전송된 데이터: productName: " + productName + ", price: " + price);
+        log.info("썸네일 삭제 여부: " + deleteThumbnail);
+        log.info("삭제된 상세 이미지들: " + (deletedDetailImageNames == null ? "없음" : String.join(", ", deletedDetailImageNames)));
 
-        // 새로운 상품 데이터로 업데이트 처리 (파일이 있으면 처리)
+        // 1. 상품 수정 처리
         ProductDTO updatedProduct = productService.updateProduct(
                 productId,
                 productName,
@@ -101,8 +110,22 @@ public ResponseEntity<?> createProduct(
                 details
         );
 
+        // 2. 썸네일 삭제 요청이 있으면 삭제 처리
+        if (deleteThumbnail) {
+            productService.deleteThumbnail(productId);
+        }
+
+        // 3. 삭제 요청된 상세 이미지들 삭제 처리
+        if (deletedDetailImageNames != null) {
+            for (String fileName : deletedDetailImageNames) {
+                productService.deleteDetailImage(productId, fileName);
+            }
+        }
+
+        // 4. 최종 수정된 상품 정보 반환
         return ResponseEntity.ok(updatedProduct);
     }
+
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
@@ -110,4 +133,18 @@ public ResponseEntity<?> createProduct(
         return ResponseEntity.noContent().build();
     }
 
+    // 썸네일 이미지 삭제
+    @DeleteMapping("/image/thumbnail/{productId}")
+    public ResponseEntity<Void> deleteThumbnail(@PathVariable Long productId) {
+        productService.deleteThumbnail(productId); // 썸네일 삭제 서비스 호출
+        return ResponseEntity.noContent().build();
+    }
+
+    // 상세 이미지 삭제
+    @DeleteMapping("/image/detail/{productId}/{fileName}")
+    public ResponseEntity<Void> deleteDetailImage(@PathVariable Long productId,
+                                                  @PathVariable String fileName) {
+        productService.deleteDetailImage(productId, fileName); // 상세 이미지 삭제 서비스 호출
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -108,10 +108,10 @@
         let editingProductId = null;
 
         // ⭐ 이미지 삭제 추적 변수 추가
-        let deletedThumbnail = false;
-        let deletedDetailImageNames = [];
+        let deletedThumbnail = false; // 썸네일 삭제 여부 저장
+        let deletedDetailImageNames = []; // 삭제된 상세 이미지 파일명 저장
 
-        // DOM 요소 캐싱
+        // DOM 요소 캐싱 (자주 쓰는 요소 미리 찾기)
         const productTableBody = document.getElementById('productTableBody');
         const formTitle = document.getElementById('formTitle');
         const productManagementForm = document.getElementById('productManagementForm');
@@ -133,7 +133,6 @@
         const actualCompleteUpdateButton = document.getElementById('actualCompleteUpdateButton');
         const deleteProductButton = document.getElementById('deleteProductButton');
         const resetFormButton = document.getElementById('resetFormButton');
-
 
         // --- 폼 모드 제어 함수 ---
         function setFormMode(mode) {
@@ -169,8 +168,7 @@
             }
         }
 
-
-        // --- 상품 목록 관리 ---
+        // --- 상품 목록 가져오기 ---
         function fetchProducts() {
             fetch('/api/products')
                 .then(res => {
@@ -189,23 +187,24 @@
                 });
         }
 
+        // --- 상품 목록 테이블 렌더링 ---
         function renderProducts() {
             productTableBody.innerHTML = '';
             products.forEach(p => {
                 const tr = document.createElement('tr');
                 tr.addEventListener('click', () => fillFormForEdit(p.productId));
                 tr.innerHTML = `
-                    <td>${p.productId}</td>
-                    <td>${p.productName}</td>
-                    <td>${p.price}</td>
-                    <td>${p.stock}</td>
-                    <td>${p.productTag}</td>
-                `;
+                <td>${p.productId}</td>
+                <td>${p.productName}</td>
+                <td>${p.price}</td>
+                <td>${p.stock}</td>
+                <td>${p.productTag}</td>
+            `;
                 productTableBody.appendChild(tr);
             });
         }
 
-        // --- 폼 관리 ---
+        // --- 폼 리셋 ---
         function resetForm() {
             productManagementForm.reset();
             productIdInput.value = '';
@@ -225,15 +224,13 @@
             productManagementForm.scrollIntoView({ behavior: 'smooth' });
         }
 
+        // --- 수정할 상품 정보 폼에 채우기 ---
         function fillFormForEdit(productId) {
             const product = products.find(p => p.productId == productId);
             if (!product) {
                 alert('상품을 찾을 수 없습니다.');
                 return;
             }
-
-            console.log("썸네일 이미지 미리보기 : "+ product.thumbnailFileName);
-            console.log("상품 상세 이미지 미리보기 : "+ product.fileNames);
 
             editingProductId = product.productId;
             deletedThumbnail = false;
@@ -245,7 +242,7 @@
             productStockInput.value = product.stock;
             productTagSelect.value = product.productTag;
 
-            // ⭐ 썸네일 이미지 미리보기 설정 및 삭제 버튼 이벤트 리스너
+            // 썸네일 이미지 미리보기 및 삭제 버튼 이벤트
             if (product.thumbnailFileName) {
                 const thumbnailUrl = `/api/image/display/${product.thumbnailFileName}`;
                 productThumbnailPreview.src = thumbnailUrl;
@@ -253,13 +250,25 @@
                 productThumbnailPreviewContainer.style.display = 'block';
                 productThumbnailPreview.onclick = () => openImageInNewTab(thumbnailUrl);
 
-                productThumbnailPreviewContainer.querySelector('.delete-button').onclick = (e) => {
+                productThumbnailPreviewContainer.querySelector('.delete-button').onclick = async (e) => {
                     e.stopPropagation();
                     if (confirm('썸네일 이미지를 삭제하시겠습니까?')) {
-                        productThumbnailPreviewContainer.style.display = 'none';
-                        productThumbnailPreview.src = '';
-                        deletedThumbnail = true;
-                        productThumbnailImageFileInput.value = '';
+                        try {
+                            // 컨트롤러 경로에 맞게 DELETE 요청 URL 수정함
+                            const response = await fetch(`/api/products/image/thumbnail/${editingProductId}`, {
+                                method: 'DELETE'
+                            });
+                            if (!response.ok) {
+                                const errorText = await response.text();
+                                throw new Error(errorText || '썸네일 삭제 실패');
+                            }
+                            deletedThumbnail = true;
+                            productThumbnailPreviewContainer.style.display = 'none';
+                            productThumbnailPreview.src = '';
+                            alert('썸네일 이미지가 삭제되었습니다.');
+                        } catch (err) {
+                            alert('썸네일 이미지 삭제 실패: ' + err.message);
+                        }
                     }
                 };
             } else {
@@ -268,7 +277,7 @@
                 productThumbnailPreview.onclick = null;
             }
 
-            // ⭐ 상세 이미지 미리보기 설정 및 삭제 버튼 이벤트 리스너
+            // 상세 이미지 미리보기 및 삭제 버튼 이벤트
             productDetailImagesPreview.innerHTML = '';
             if (product.fileNames && Array.isArray(product.fileNames) && product.fileNames.length > 0) {
                 product.fileNames.forEach(fileName => {
@@ -287,11 +296,24 @@
                     deleteBtn.dataset.type = 'detail';
                     deleteBtn.dataset.filename = fileName;
 
-                    deleteBtn.onclick = (e) => {
+                    // 컨트롤러 경로에 맞게 상세 이미지 삭제 요청 URL 수정
+                    deleteBtn.onclick = async (e) => {
                         e.stopPropagation();
                         if (confirm(`상세 이미지 '${fileName}'을(를) 삭제하시겠습니까?`)) {
-                            imgContainer.remove();
-                            deletedDetailImageNames.push(fileName);
+                            try {
+                                const response = await fetch(`/api/products/image/detail/${editingProductId}/${fileName}`, {
+                                    method: 'DELETE'
+                                });
+                                if (!response.ok) {
+                                    const errorText = await response.text();
+                                    throw new Error(errorText || '이미지 삭제 실패');
+                                }
+                                deletedDetailImageNames.push(fileName);
+                                imgContainer.remove();
+                                alert('이미지가 삭제되었습니다.');
+                            } catch (err) {
+                                alert('이미지 삭제 실패: ' + err.message);
+                            }
                         }
                     };
 
@@ -305,18 +327,19 @@
             productManagementForm.scrollIntoView({ behavior: 'smooth' });
         }
 
+        // 이미지 새창 열기
         function openImageInNewTab(imageUrl) {
             if (imageUrl) {
                 window.open(imageUrl, '_blank');
             }
         }
 
-
-        // --- 이벤트 리스너 ---
+        // --- 새 상품 등록 폼 제출 ---
         productManagementForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
             if (editingProductId) {
+                // 수정 중일 땐 등록 못하게 막음
                 return;
             }
 
@@ -366,6 +389,7 @@
             }
         });
 
+        // 수정 모드 버튼 클릭 이벤트
         editModeButton.addEventListener('click', () => {
             if (editingProductId) {
                 setFormMode('edit');
@@ -375,6 +399,7 @@
             }
         });
 
+        // --- 수정 완료 버튼 클릭 이벤트 ---
         actualCompleteUpdateButton.addEventListener('click', async function () {
             const idToUpdate = productIdInput.value;
             if (!idToUpdate || !editingProductId) {
@@ -443,9 +468,10 @@
             }
         });
 
-
+        // 리셋 버튼 클릭
         resetFormButton.addEventListener('click', resetForm);
 
+        // 상품 삭제 버튼 클릭
         deleteProductButton.addEventListener('click', async function () {
             const idToDelete = productIdInput.value;
             if (!idToDelete || !editingProductId) {
@@ -472,19 +498,24 @@
             }
         });
 
+        // 홈 버튼 (페이지 이동)
         window.goHome = function () {
             window.location.href = '/home';
         }
 
+        // 로그아웃 버튼 (localStorage 정리 후 페이지 이동)
         window.logout = function () {
             localStorage.removeItem('currentUser');
             alert('로그아웃 되었습니다.');
             window.location.href = '/login';
         }
 
+        // 페이지 로드 시 상품 목록 불러오고 폼 모드 초기화
         fetchProducts();
         setFormMode('register');
     });
 </script>
+
+
 </body>
 </html>

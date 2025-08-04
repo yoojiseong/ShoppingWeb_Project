@@ -46,4 +46,10 @@ public interface ProductService {
     void createProductWithImages(String productName, BigDecimal price, int stock, ProductCategory productTag,
                                  MultipartFile thumbnail,
                                  List<MultipartFile> detailImages);
+
+    // 썸네일 이미지 삭제 메서드
+    void deleteThumbnail(Long productId);
+
+    // 상세 이미지 삭제 메서드
+    void deleteDetailImage(Long productId, String fileName);
 }
