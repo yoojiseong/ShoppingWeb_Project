@@ -79,13 +79,13 @@ public ResponseEntity<?> createProduct(
 
     @PutMapping("/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(
-            @PathVariable Long productId,
-            @RequestParam("name") String productName,
-            @RequestParam("price") BigDecimal price,
-            @RequestParam("stock") int stock,
-            @RequestParam("productTag") ProductCategory productTag,
+            @RequestParam Long productId,
+            @RequestParam String productName,
+            @RequestParam BigDecimal price,
+            @RequestParam int stock,
+            @RequestParam ProductCategory productTag,
             @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
-            @RequestParam(value = "details", required = false) MultipartFile[] details) {
+            @RequestParam(value = "details", required = false) List<MultipartFile> details) {
 
         log.info("ProductController에서 작업 중 - productId: " + productId);
         log.info("전송된 데이터: productName: " + productName + ", price: " + price);

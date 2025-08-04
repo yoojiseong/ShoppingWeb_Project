@@ -313,6 +313,7 @@
 
 
         // --- 이벤트 리스너 ---
+        // 상품 등록 이벤트
         productManagementForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -375,6 +376,7 @@
             }
         });
 
+        //상품 수정 버튼 클릭 이벤트
         actualCompleteUpdateButton.addEventListener('click', async function () {
             const idToUpdate = productIdInput.value;
             if (!idToUpdate || !editingProductId) {
@@ -382,6 +384,7 @@
                 return;
             }
 
+            const productId = editingProductId;
             const name = productNameInput.value.trim();
             const price = Number(productPriceInput.value);
             const stock = Number(productStockInput.value);
@@ -396,16 +399,11 @@
 
             try {
                 const formData = new FormData();
-
-                const productDto = {
-                    productName: name,
-                    price: price,
-                    stock: stock,
-                    productTag: productTag,
-                    deletedThumbnail: deletedThumbnail,
-                    deletedDetailImageNames: deletedDetailImageNames
-                };
-                formData.append('productDto', new Blob([JSON.stringify(productDto)], { type: 'application/json' }));
+                formData.append('productId', productId);
+                formData.append('productName', name);
+                formData.append('price', price);
+                formData.append('stock', stock);
+                formData.append('productTag', productTag);
 
                 if (newThumbnailFile) {
                     formData.append('thumbnail', newThumbnailFile);
@@ -423,6 +421,7 @@
                     const errorText = await response.text();
                     throw new Error(errorText || `상품 수정에 실패했습니다. 상태 코드: ${response.status}`);
                 }
+
 
                 const responseText = await response.text();
                 let messageToDisplay = '';
